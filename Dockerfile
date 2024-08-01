@@ -1,11 +1,5 @@
 FROM ubuntu:latest
 
-# Create the user
-USER rgpeach10
-
-# set up locale
-RUN locale-gen en_US.UTF-8
-
 # Copies
 COPY ./bin $HOME/bin
 COPY .zshrc $HOME/.zshrc
@@ -28,16 +22,22 @@ RUN apt update && \
   npm \
   fonts-powerline
 
-# terminal colors with xterm
-ENV TERM xterm
+# Install neovim
+RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz && \
+    rm -rf /opt/nvim && \
+    tar -C /opt -xzf nvim-linux64.tar.gz
 
 # Install Oh My Zsh
 RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true
 
-# Install neovim
-curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
-sudo rm -rf /opt/nvim
-sudo tar -C /opt -xzf nvim-linux64.tar.gz
+# Create the user
+USER rgpeach10
+
+# set up locale
+RUN locale-gen en_US.UTF-8
+
+# terminal colors with xterm
+ENV TERM xterm
 
 # start zsh
 CMD [ "zsh" ]
