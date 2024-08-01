@@ -1,9 +1,5 @@
 FROM ubuntu:latest
 
-# Copies
-COPY ./bin $HOME/bin
-COPY .zshrc $HOME/.zshrc
-
 # Installs
 RUN apt-get update && \
   apt-get install -y \
@@ -35,6 +31,10 @@ RUN apt-get update && \
 
 # Install Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+# Copies
+COPY ./bin $HOME/bin
+COPY .zshrc $HOME/.zshrc
 
 # set up locale
 RUN locale-gen en_US.UTF-8
