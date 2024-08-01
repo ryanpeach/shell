@@ -6,6 +6,9 @@ name: Docker CD
 # documentation.
 
 on:
+  schedule:
+    # Run every month at midnight on the first day of the month.
+    - cron: '0 0 1 * *'
   push:
     branches: [ "main" ]
     # Publish semver tags as releases.
