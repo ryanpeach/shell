@@ -5,10 +5,11 @@ COPY ./bin $HOME/bin
 COPY .zshrc $HOME/.zshrc
 
 # Installs
-RUN apt update && \
-  apt install -y \
+RUN apt-get update && \
+  apt-get install -y \
+  build-essential \
   curl \
-  git-core \
+  git \
   gnupg \
   fd-find \
   fzf \
@@ -18,24 +19,30 @@ RUN apt update && \
   zsh \
   wget \
   nano \
+  tmux \
+  vim \
+  neovim \
   npm \
+  just \
   python3 \
   python3-pip \
-  fonts-powerline
-
-# Install neovim
-RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz && \
-    rm -rf /opt/nvim && \
-    tar -C /opt -xzf nvim-linux64.tar.gz
+  fonts-powerline \
+  tree \
+  sed \ 
+  gawk \
+  openssh-client \
+  openssh-server 
 
 # Install Oh My Zsh
-RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true
-
-# Create the user
-USER rgpeach10
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 # set up locale
 RUN locale-gen en_US.UTF-8
+
+# New user
+RUN useradd -ms /bin/zsh rgpeach10
+USER rgpeach10
+WORKDIR /home/rgpeach10
 
 # terminal colors with xterm
 ENV TERM xterm

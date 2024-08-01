@@ -70,7 +70,7 @@ ZSH_THEME="robbyrussell"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git wd aws branch fd github golang helm iterm2 kubectl python pyenv vi-mode zsh-autosuggestions zsh-syntax-highlighting)
+plugins=(git wd aws env branch fd github golang helm kubectl python pyenv vi-mode zsh-autosuggestions zsh-syntax-highlighting)
 
 # Gotta source the oh-my-zsh script
 source $ZSH/oh-my-zsh.sh
@@ -88,7 +88,7 @@ export PATH=$PATH:$HOME/bin
 
 # NeoVim
 export PATH="$PATH:/opt/nvim-linux64/bin"
+alias oldvim="vim"
 alias v="nvim"
 alias vi="nvim"
 alias vim="nvim"
-alias oldvim="vim"
