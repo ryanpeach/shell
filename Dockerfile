@@ -24,10 +24,10 @@ RUN apt-get update && \
   python3-pip \
   fonts-powerline \
   tree \
-  sed \ 
+  sed \
   gawk \
   openssh-client \
-  openssh-server 
+  openssh-server
 
 # Install Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
