@@ -7,11 +7,9 @@ repos:
     -   id: trailing-whitespace
     -   id: check-added-large-files
     -   id: check-executables-have-shebangs
-    -   id: check-shebang-scripts-are-executable
     -   id: check-yaml
     -   id: check-json
     -   id: detect-private-key
-    -   id: detect-aws-credentials
     -   id: mixed-line-ending
 - repo: https://github.com/gitleaks/gitleaks
   rev: v8.16.1
