@@ -1,22 +1,24 @@
 FROM ubuntu:latest
 
-ARG USER_NAME="dockerdude"
-ARG USER_PASSWORD="p@$$w0d"
+# Create the user
+USER rgpeach10
 
-ENV USER_NAME $USER_NAME
-ENV USER_PASSWORD $USER_PASSWORD
-ENV CONTAINER_IMAGE_VER=v1.0.0
+# set up locale
+RUN locale-gen en_US.UTF-8
 
-RUN echo $USER_NAME
-RUN echo $USER_PASSWORD
-RUN echo $CONTAINER_IMAGE_VER
+# Copies
+COPY ./bin $HOME/bin
+COPY .zshrc $HOME/.zshrc
 
-# install the tooks i wish to use
-RUN apt-get update && \
-  apt-get install -y sudo \
+# Installs
+RUN apt update && \
+  apt install -y \
   curl \
   git-core \
   gnupg \
+  fd-find \
+  fzf \
+  ripgrep \
   linuxbrew-wrapper \
   locales \
   nodejs \
@@ -24,24 +26,18 @@ RUN apt-get update && \
   wget \
   nano \
   npm \
-  fonts-powerline \
-  # set up locale
-  && locale-gen en_US.UTF-8 \
-  # add a user (--disabled-password: the user won't be able to use the account until the password is set)
-  && adduser --quiet --disabled-password --shell /bin/zsh --home /home/$USER_NAME --gecos "User" $USER_NAME \
-  # update the password
-  && echo "${USER_NAME}:${USER_PASSWORD}" | chpasswd && usermod -aG sudo $USER_NAME
+  fonts-powerline
 
-  
-  # the user we're applying this too (otherwise it most likely install for root)
-  USER $USER_NAME
-  # terminal colors with xterm
-  ENV TERM xterm
-  # set the zsh theme
-  ENV ZSH_THEME agnoster
+# terminal colors with xterm
+ENV TERM xterm
 
-  # run the installation script  
-  RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true
+# Install Oh My Zsh
+RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true
 
-  # start zsh
-  CMD [ "zsh" ]
+# Install neovim
+curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+sudo rm -rf /opt/nvim
+sudo tar -C /opt -xzf nvim-linux64.tar.gz
+
+# start zsh
+CMD [ "zsh" ]
