@@ -13,13 +13,14 @@ RUN apt update && \
   fd-find \
   fzf \
   ripgrep \
-  linuxbrew-wrapper \
   locales \
   nodejs \
   zsh \
   wget \
   nano \
   npm \
+  python3 \
+  python3-pip \
   fonts-powerline
 
 # Install neovim
