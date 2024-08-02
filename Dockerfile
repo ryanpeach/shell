@@ -2,7 +2,10 @@
 FROM ubuntu:latest
 
 # Installs
-RUN apt-get update && \
+RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
+  --mount=target=/var/cache/apt,type=cache,sharing=locked \
+  rm -f /etc/apt/apt.conf.d/docker-clean \
+  apt-get update && \
   apt-get install -y \
   linux-tools-generic \
   build-essential \
