@@ -2,7 +2,7 @@ build:
     docker buildx build -t rgpeach10/shell:local --load .
 
 run tag="local":
-    docker run -it --rm -v $(pwd):/home/rgpeach10/mnt rgpeach10/shell:{{tag}}
+    docker run -it --rm -v $HOME/.ssh:/home/rgpeach10/.ssh -v $(pwd):/home/rgpeach10/mnt rgpeach10/shell:{{tag}}
 
 test:
     just build
