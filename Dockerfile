@@ -36,7 +36,7 @@ RUN apt-get update && \
   ca-certificates \
   procps \
   file \
-  rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/*
 
 # set up locale
 RUN locale-gen en_US.UTF-8
