@@ -104,8 +104,10 @@ RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM
 
 # Copies
 COPY --chown=rgpeach10 bin bin
-COPY --chown=rgpeach10 .zshrc .zshrc
-COPY --chown=rgpeach10 .p10k.zsh .p10k.zsh
+COPY --chown=rgpeach10 home/ .
+RUN git config --global core.excludesFile '~/.gitignore_global'
+RUN git config --global pull.rebase true
+RUN git config --global --add --bool push.autoSetupRemote true
 
 # Chmod so that these files are runnable
 RUN find bin -type f -exec chmod +x {} \;
