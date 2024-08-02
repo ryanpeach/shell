@@ -111,7 +111,7 @@ COPY --chown=rgpeach10 .p10k.zsh .p10k.zsh
 RUN find bin -type f -exec chmod +x {} \;
 
 # terminal colors with xterm
-ENV TERM xterm
+ENV TERM xterm-256color
 
 # Now we are going to assume you are going to mount a directory to /home/rgpeach10/mnt
 WORKDIR /home/rgpeach10/mnt
