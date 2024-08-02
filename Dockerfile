@@ -2,7 +2,10 @@
 FROM ubuntu:latest
 
 # Installs
-RUN apt-get update && \
+RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
+  --mount=target=/var/cache/apt,type=cache,sharing=locked \
+  rm -f /etc/apt/apt.conf.d/docker-clean \
+  apt-get update && \
   apt-get install -y \
   linux-tools-generic \
   build-essential \
@@ -58,7 +61,7 @@ RUN kubectl version --client && \
 RUN useradd -ms /bin/zsh rgpeach10
 USER rgpeach10
 WORKDIR /home/rgpeach10
-ENV HOME /home/rgpeach10
+ENV HOME=/home/rgpeach10
 
 # Install Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -70,8 +73,8 @@ RUN .tfenv/bin/tfenv install latest
 # Install pyenv
 RUN git clone https://github.com/pyenv/pyenv.git .pyenv
 RUN cd .pyenv && src/configure && make -C src || true
-ENV PYENV_ROOT $HOME/.pyenv
-ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
+ENV PYENV_ROOT=$HOME/.pyenv
+ENV PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
 RUN git clone https://github.com/pyenv/pyenv-virtualenv.git $PYENV_ROOT/plugins/pyenv-virtualenv
 
 # Create some pyenv environments
@@ -97,7 +100,7 @@ RUN pip install \
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 
 # Install zsh plugins
-ENV ZSH_CUSTOM /home/rgpeach10/.oh-my-zsh/custom
+ENV ZSH_CUSTOM=/home/rgpeach10/.oh-my-zsh/custom
 RUN git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
 RUN git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
 RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
@@ -111,7 +114,7 @@ COPY --chown=rgpeach10 .p10k.zsh .p10k.zsh
 RUN find bin -type f -exec chmod +x {} \;
 
 # terminal colors with xterm
-ENV TERM xterm-256color
+ENV TERM=xterm-256color
 
 # Now we are going to assume you are going to mount a directory to /home/rgpeach10/mnt
 WORKDIR /home/rgpeach10/mnt
