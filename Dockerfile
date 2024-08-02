@@ -39,8 +39,14 @@ RUN apt-get update && \
 # set up locale
 RUN locale-gen en_US.UTF-8
 
+# New user
+RUN useradd -ms /bin/zsh rgpeach10
+USER rgpeach10
+WORKDIR /home/rgpeach10
+ENV HOME=/home/rgpeach10
+
 # Install brew
-RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
+RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 ENV PATH="/home/linuxbrew/.linuxbrew/bin:${PATH}"
 
 # Install brew packages
@@ -48,12 +54,6 @@ RUN brew install \
   gh \
   helm \
   kubectl
-
-# New user
-RUN useradd -ms /bin/zsh rgpeach10
-USER rgpeach10
-WORKDIR /home/rgpeach10
-ENV HOME=/home/rgpeach10
 
 # Install Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
