@@ -56,7 +56,7 @@ WORKDIR /home/rgpeach10
 ENV HOME=/home/rgpeach10
 
 # Install Oh My Zsh
-RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+RUN "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 # Install tfenv
 RUN git clone --depth=1 https://github.com/tfutils/tfenv.git $HOME/.tfenv
