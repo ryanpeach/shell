@@ -1,7 +1,7 @@
 build:
-    docker build -t rgpeach10/shell:local .
+    docker buildx build -t rgpeach10/shell:local --load .
 
-run tag="latest":
+run tag="local":
     docker run -it --rm -v $(pwd):/home/rgpeach10/mnt rgpeach10/shell:{{tag}}
 
 test:
