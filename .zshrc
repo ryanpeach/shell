@@ -133,4 +133,6 @@ if [ ! -f "$ZSH_PRIVATE_LOC" ]; then
     echo "Usually you put it in your home directory or in the directory"
     echo "mounted to this containers ~/mnt. However, wherever you put it, you can"
     echo "always override the location by overriding the ZSH_PRIVATE_LOC env variable"
+else
+    source $ZSH_PRIVATE_LOC
 fi
