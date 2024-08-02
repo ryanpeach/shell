@@ -120,7 +120,7 @@ source $HOME/.cargo/env
 source ~/.p10k.zsh
 
 # Load private info location
-if [ -z "$ZSH_PRIVATE_LOC" ]
+if [ -z "$ZSH_PRIVATE_LOC" ]; then
     ZSH_PRIVATE_LOC=~/mnt/.zshrc.private
 fi
 
