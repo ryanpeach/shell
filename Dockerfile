@@ -3,7 +3,8 @@ FROM ubuntu:latest
 
 # Installs
 RUN apt-get update && \
-  apt-get install -y \
+  apt-get install -y --no-install-recommends \
+  sudo \
   linux-tools-generic \
   build-essential \
   curl \
@@ -34,24 +35,38 @@ RUN apt-get update && \
   apt-transport-https \
   ca-certificates \
   procps \
-  file
+  file \
+  rm -rf /var/lib/apt/lists/*
 
 # set up locale
 RUN locale-gen en_US.UTF-8
 
 # New user
 RUN useradd -ms /bin/zsh rgpeach10
+
+# Make it so brew can be installed by this user
+RUN usermod -aG sudo linuxbrew &&  \
+  mkdir -p /home/linuxbrew/.linuxbrew && \
+  chown -R linuxbrew: /home/linuxbrew/.linuxbrew
+
+# Switch to the user
 USER rgpeach10
 WORKDIR /home/rgpeach10
 ENV HOME=/home/rgpeach10
+RUN useradd -m -s /bin/zsh linuxbrew
 
 # Install brew
 RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+USER root
+RUN chown -R $CONTAINER_USER: /home/linuxbrew/.linuxbrew
 ENV PATH="/home/linuxbrew/.linuxbrew/bin:${PATH}"
+RUN git config --global --add safe.directory /home/linuxbrew/.linuxbrew/Homebrew
+USER rgpeach10
+RUN brew update
+RUN brew doctor
 
 # Install brew packages
-RUN brew update && \
-  brew install \
+RUN brew install \
     gh \
     helm \
     kubectl \

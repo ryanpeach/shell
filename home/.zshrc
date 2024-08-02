@@ -122,7 +122,13 @@ source $HOME/.cargo/env
 source ~/.p10k.zsh
 
 # brew
+alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
 export PATH="/home/linuxbrew/.linuxbrew/bin:${PATH}"
+
+# pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
 
 # Load private info location
 if [ -z "$ZSH_PRIVATE_LOC" ]; then
