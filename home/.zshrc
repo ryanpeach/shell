@@ -123,7 +123,7 @@ source ~/.p10k.zsh
 
 # brew
 alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
-export PATH="/home/linuxbrew/.linuxbrew/bin:${PATH}"
+export PATH="/home/rgpeach10/.linuxbrew/bin:${PATH}"
 
 # pyenv
 export PYENV_ROOT="$HOME/.pyenv"
