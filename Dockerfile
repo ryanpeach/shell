@@ -30,8 +30,7 @@ RUN apt-get update && \
   sed \
   gawk \
   libsqlite3-dev \
-  openssh-client \
-  openssh-server \
+  unzip \
   apt-transport-https \
   ca-certificates
 
@@ -66,7 +65,7 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
 
 # Install tfenv
 RUN git clone --depth=1 https://github.com/tfutils/tfenv.git $HOME/.tfenv
-RUN tfenv install latest
+RUN .tfenv/bin/tfenv install latest
 
 # Install pyenv
 RUN git clone https://github.com/pyenv/pyenv.git .pyenv

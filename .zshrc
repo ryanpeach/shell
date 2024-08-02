@@ -96,6 +96,8 @@ alias ga="git add"
 alias gA="git add -A"
 alias gc="git commit -m"
 alias gas="git add -A && git status"
+alias gd="git diff"
+alias gds="git diff --staged"
 
 # Personal directories added to PATH
 export PATH=$PATH:$HOME/bin
