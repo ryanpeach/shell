@@ -25,7 +25,6 @@ RUN apt-get update && \
   python3 \
   python3-pip \
   golang-go \
-  fonts-powerline \
   tree \
   sed \
   gawk \
@@ -100,7 +99,6 @@ RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 ENV ZSH_CUSTOM /home/rgpeach10/.oh-my-zsh/custom
 RUN git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
 RUN git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
-RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
 
 # Copies
 COPY --chown=rgpeach10 bin bin
