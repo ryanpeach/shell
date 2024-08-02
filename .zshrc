@@ -1,9 +1,5 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
+# clear at the beginning
+clear
 
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
@@ -122,3 +118,17 @@ source $HOME/.cargo/env
 
 # Powerlevel 10k
 source ~/.p10k.zsh
+
+# Load private info location
+if [ -z "$ZSH_PRIVATE_LOC" ]
+    ZSH_PRIVATE_LOC=~/mnt/.zshrc.private
+fi
+
+# If it does not exist, inform them
+if [ ! -f "$ZSH_PRIVATE_LOC" ]; then
+    echo "No .zshrc.private found at '$ZSH_PRIVATE_LOC'"
+    echo "You should create this to add secret information to your session"
+    echo "Usually you put it in your home directory or in the directory"
+    echo "mounted to this containers ~/mnt. However, wherever you put it, you can"
+    echo "always override the location by overriding the ZSH_PRIVATE_LOC env variable"
+fi
