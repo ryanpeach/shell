@@ -50,24 +50,19 @@ RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/instal
 ENV PATH="/home/linuxbrew/.linuxbrew/bin:${PATH}"
 
 # Install brew packages
-RUN brew install \
-  gh \
-  helm \
-  kubectl
+RUN brew update && \
+  brew install \
+    gh \
+    helm \
+    kubectl \
+    tfenv \
+    pyenv
 
 # Install Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-# Install tfenv
-RUN git clone --depth=1 https://github.com/tfutils/tfenv.git $HOME/.tfenv
-RUN .tfenv/bin/tfenv install latest
-
-# Install pyenv
-RUN git clone https://github.com/pyenv/pyenv.git .pyenv
-RUN cd .pyenv && src/configure && make -C src || true
-ENV PYENV_ROOT=$HOME/.pyenv
-ENV PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
-RUN git clone https://github.com/pyenv/pyenv-virtualenv.git $PYENV_ROOT/plugins/pyenv-virtualenv
+# Install tfenv environments
+RUN tfenv install latest
 
 # Create some pyenv environments
 RUN pyenv install 3.11 && \
