@@ -32,27 +32,21 @@ RUN apt-get update && \
   libsqlite3-dev \
   unzip \
   apt-transport-https \
-  ca-certificates
+  ca-certificates \
+  procps \
+  file
 
 # set up locale
 RUN locale-gen en_US.UTF-8
 
-# Get kubectl
-RUN curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg && \
-    chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg && \
-    echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list && \
-    chmod 644 /etc/apt/sources.list.d/kubernetes.list && \
-    apt-get update && \
-    apt-get install -y kubectl
+# Install brew
+RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# Install Helm
-RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 && \
-  chmod 700 get_helm.sh && \
-  ./get_helm.sh
-
-# Verify installations
-RUN kubectl version --client && \
-    helm version
+# Install brew packages
+RUN brew install \
+  gh \
+  helm \
+  kubectl
 
 # New user
 RUN useradd -ms /bin/zsh rgpeach10
