@@ -121,6 +121,9 @@ source $HOME/.cargo/env
 # Powerlevel 10k
 source ~/.p10k.zsh
 
+# brew
+export PATH="/home/linuxbrew/.linuxbrew/bin:${PATH}"
+
 # Load private info location
 if [ -z "$ZSH_PRIVATE_LOC" ]; then
     ZSH_PRIVATE_LOC=~/mnt/.zshrc.private

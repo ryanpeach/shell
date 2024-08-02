@@ -40,7 +40,8 @@ RUN apt-get update && \
 RUN locale-gen en_US.UTF-8
 
 # Install brew
-RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
+ENV PATH="/home/linuxbrew/.linuxbrew/bin:${PATH}"
 
 # Install brew packages
 RUN brew install \
