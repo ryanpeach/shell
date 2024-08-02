@@ -112,8 +112,11 @@ export POETRY_VIRTUALENVS_CREATE=true
 export POETRY_VIRTUALENVS_IN_PROJECT=true
 export POETRY_VIRTUALENVS_PREFER_ACTIVE_PYTHON=true
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-source ~/.p10k.zsh
+# TFEnv
+export PATH="$HOME/.tfenv/bin:$PATH"
 
 # Rust
 source $HOME/.cargo/env
+
+# Powerlevel 10k
+source ~/.p10k.zsh
