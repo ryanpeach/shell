@@ -1,5 +1,10 @@
 # Using "noble" ubuntu as a base image at the time of writing
+# TODO: Brew does not work on ARM yet, so we have to compile a lot of things from source
+#       When it does work, we can use homebrew/brew as a base image and replace
+#       a lot of the below with brew installs
+#       REF: https://github.com/orgs/Homebrew/discussions/3612
 FROM ubuntu:latest
+
 
 # Installs
 RUN apt-get update && \
@@ -32,10 +37,28 @@ RUN apt-get update && \
   libsqlite3-dev \
   unzip \
   apt-transport-https \
-  ca-certificates
+  ca-certificates \
+  cmake \
+  libreadline-dev && \
+  apt-get clean
 
 # set up locale
 RUN locale-gen en_US.UTF-8
+
+# Install Lua
+RUN curl -R -O -L http://www.lua.org/ftp/lua-5.3.5.tar.gz && \
+  tar -zxf lua-5.3.5.tar.gz && \
+  cd lua-5.3.5 && \
+  make linux test && \
+  make install
+
+# Install Luarocks
+RUN wget https://luarocks.github.io/luarocks/releases/luarocks-3.11.1.tar.gz && \
+  tar -zxf luarocks-3.11.1.tar.gz && \
+  cd luarocks-3.11.1 && \
+  ./configure --with-lua-include=/usr/local/include && \
+  make && \
+  make install
 
 # Get kubectl
 RUN curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg && \
@@ -119,6 +142,11 @@ ENV ZSH_CUSTOM=/home/rgpeach10/.oh-my-zsh/custom
 RUN git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
 RUN git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
 RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
+
+# luarocks installs
+ENV PATH="/usr/local/lib/luarocks/bin/:$HOME/.luarocks/bin/:$PATH"
+RUN luarocks config local_by_default true
+RUN luarocks install --server=https://luarocks.org/dev luaformatter
 
 # Copies
 COPY --chown=rgpeach10 bin bin

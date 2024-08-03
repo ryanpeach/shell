@@ -2,6 +2,12 @@
 
 My personal customed shell as a docker container
 
+# Install Nerdfonts
+
+Do this on your local machine
+
+https://github.com/ryanoasis/nerd-fonts?tab=readme-ov-file#font-installation
+
 # Running
 
 `just run <tag>`
