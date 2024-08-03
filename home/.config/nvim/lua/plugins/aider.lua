@@ -1,3 +1,1 @@
-return {
-    'joshuavial/aider.nvim'
-}
+return {'joshuavial/aider.nvim'}
