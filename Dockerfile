@@ -78,9 +78,12 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
 RUN git clone --depth=1 https://github.com/tfutils/tfenv.git $HOME/.tfenv
 RUN .tfenv/bin/tfenv install latest
 
-# Install terraform docs
+# Go installs
+ENV PATH="/home/rgpeach10/go/bin:$PATH"
 RUN go install github.com/terraform-docs/terraform-docs@v0.18.0
 RUN terraform-docs --version
+RUN go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest
+RUN jira --help
 
 # Install pyenv
 RUN git clone https://github.com/pyenv/pyenv.git .pyenv
