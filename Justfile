@@ -8,8 +8,7 @@ run tag="local":
         -w /home/rgpeach10/mnt \
         -e DEBUG=1 \
         -e GITHUB_TOKEN=$(gh auth token) \
-        --pull=always \
-        rgpeach10/shell:main
+        rgpeach10/shell:{{tag}}
 
 test:
     just build

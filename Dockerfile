@@ -51,13 +51,18 @@ RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/s
   ./get_helm.sh
 
 # Add the GitHub CLI repository and install the GitHub CLI
-RUN (type -p wget >/dev/null || (apt-get update && apt-get install wget -y)) \
-    && mkdir -p -m 755 /etc/apt/keyrings \
+RUN mkdir -p -m 755 /etc/apt/keyrings \
     && wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
     && chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
     && apt-get update \
     && apt-get install gh -y
+
+# New user
+RUN useradd -ms /bin/zsh rgpeach10
+USER rgpeach10
+WORKDIR /home/rgpeach10
+ENV HOME=/home/rgpeach10
 
 # Verify installation
 RUN gh --version
@@ -65,12 +70,6 @@ RUN gh --version
 # Verify installations
 RUN kubectl version --client && \
     helm version
-
-# New user
-RUN useradd -ms /bin/zsh rgpeach10
-USER rgpeach10
-WORKDIR /home/rgpeach10
-ENV HOME=/home/rgpeach10
 
 # Install Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
