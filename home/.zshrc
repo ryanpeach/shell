@@ -120,6 +120,9 @@ export PATH="$HOME/.tfenv/bin:$PATH"
 # Rust
 source $HOME/.cargo/env
 
+# Go
+export PATH="$(go env GOPATH)/bin:$PATH"
+
 # Powerlevel 10k
 source ~/.p10k.zsh
 
