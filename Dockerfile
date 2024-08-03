@@ -87,7 +87,6 @@ RUN git clone https://github.com/pyenv/pyenv.git .pyenv
 RUN cd .pyenv && src/configure && make -C src || true
 ENV PYENV_ROOT=$HOME/.pyenv
 ENV PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
-RUN git clone https://github.com/pyenv/pyenv-virtualenv.git $PYENV_ROOT/plugins/pyenv-virtualenv
 
 # Create some pyenv environments
 RUN pyenv install 3.11 && \
