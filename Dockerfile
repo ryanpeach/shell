@@ -103,12 +103,13 @@ RUN pip install \
   pre-commit \
   poetry \
   setuptools \
-  black \
   ruff \
   numpy \
   ipython \
   ipdb \
-  awscli
+  awscli \
+  pynvim \
+  mypy
 
 # Get Rust
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
@@ -125,6 +126,9 @@ COPY --chown=rgpeach10 home/ .
 RUN git config --global core.excludesFile '~/.gitignore_global'
 RUN git config --global pull.rebase true
 RUN git config --global --add --bool push.autoSetupRemote true
+
+# Get neovim to download all its stuff
+RUN nvim --headless "+Lazy! sync" +qa
 
 # Chmod so that these files are runnable
 RUN find bin -type f -exec chmod +x {} \;
