@@ -72,7 +72,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git wd aws dotenv branch github golang helm kubectl python pyenv virtualenv poetry-env vi-mode zsh-autosuggestions zsh-syntax-highlighting)
+plugins=(git wd aws direnv branch github golang helm kubectl python pyenv virtualenv poetry-env vi-mode zsh-autosuggestions zsh-syntax-highlighting)
 
 # Gotta source the oh-my-zsh script
 export ZSH="$HOME/.oh-my-zsh"

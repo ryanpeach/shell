@@ -1,6 +1,6 @@
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.3.0
+    rev: v4.6.0
     hooks:
     -   id: check-yaml
     -   id: end-of-file-fixer
@@ -11,6 +11,10 @@ repos:
     -   id: detect-private-key
     -   id: mixed-line-ending
 - repo: https://github.com/gitleaks/gitleaks
-  rev: v8.16.1
+  rev: v8.18.4
   hooks:
   - id: gitleaks
+- repo: https://github.com/Koihik/LuaFormatter
+  rev: master
+  hooks:
+  - id: luaformatter
