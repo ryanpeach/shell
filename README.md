@@ -27,7 +27,7 @@ git config --global user.name "<name>"
 
 ## Get your Terminal to launch from the container
 
-Create a ~/.docker-shell.sh file with the following contents:
+Create a `~/.docker-shell.sh` file with the following contents:
 
 ```bash
 #!/usr/bin/env bash
