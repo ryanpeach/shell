@@ -2,7 +2,9 @@
 
 My personal customed shell as a docker container
 
-# Install Nerdfonts
+# Install in Terminal
+
+## Install Nerdfonts
 
 Do this in your terminal, not in the container
 
@@ -12,13 +14,7 @@ cd nerd-fonts
 ./install.sh
 ```
 
-# Running
-
-`just run <tag>`
-
-Should do almost everything you need to do to run this container mounting the home directory and getting `git` and `gh` to work. The rest are just understanding the commands and what they do.
-
-# Private Info
+## Private Info
 
 Create a `.zshrc.private` in your home directory to add private information to your shell
 
@@ -29,7 +25,35 @@ git config --global user.email "<email>"
 git config --global user.name "<name>"
 ```
 
-# Getting GH and Git to work
+## Get your Terminal to launch from the container
+
+Create a ~/.docker-shell.sh file with the following contents:
+
+```bash
+#!/usr/bin/env bash
+
+docker run -it --rm \
+    -v $HOME/.ssh:/home/rgpeach10/.ssh \
+    -v $HOME:/home/rgpeach10/mnt \
+    -w /home/rgpeach10/mnt \
+    -e GITHUB_TOKEN=$(gh auth token) \
+    --pull=always \
+    rgpeach10/shell:main
+```
+
+Then set your terminal to launch this script when you open it.
+
+Or you could put it in your `~/.bash_profile`, `~/.bashrc`, or `~/.zshrc` file.
+
+# Running from the Repo
+
+`just run <tag>`
+
+Should do almost everything you need to do to run this container mounting the home directory and getting `git` and `gh` to work. The rest are just understanding the commands and what they do.
+
+# Design Information
+
+## Getting GH and Git to work
 
 Log in to gh in your normal terminal using
 
