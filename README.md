@@ -4,9 +4,13 @@ My personal customed shell as a docker container
 
 # Install Nerdfonts
 
-Do this on your local machine
+Do this in your terminal, not in the container
 
-https://github.com/ryanoasis/nerd-fonts?tab=readme-ov-file#font-installation
+```bash
+git clone --depth=1 https://github.com/ryanoasis/nerd-fonts.git
+cd nerd-fonts
+./install.sh
+```
 
 # Running
 
