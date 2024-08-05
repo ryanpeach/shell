@@ -40,6 +40,7 @@ RUN apt-get update && \
   apt-transport-https \
   ca-certificates \
   cmake \
+  graphviz \
   libreadline-dev && \
   apt-get clean
 
