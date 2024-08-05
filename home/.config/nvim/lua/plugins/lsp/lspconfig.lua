@@ -67,6 +67,28 @@ return {
             ["pyright"] = function()
                 nvim_lsp["pyright"].setup({
                     on_attach = on_attach,
+                    capabilities = capabilities,
+                    settings = {
+                        pyright = {
+                            disableOrganizeImports = true -- Using Ruff
+                        },
+                        python = {
+                            analysis = {
+                                ignore = {'*'} -- Using Ruff
+                            }
+                        }
+                    }
+                })
+            end,
+            ["ruff_lsp"] = function()
+                nvim_lsp["ruff_lsp"].setup({
+                    on_attach = on_attach,
+                    capabilities = capabilities
+                })
+            end,
+            ["rust_analyzer"] = function()
+                nvim_lsp["rust_analyzer"].setup({
+                    on_attach = on_attach,
                     capabilities = capabilities
                 })
             end

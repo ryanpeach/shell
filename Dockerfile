@@ -19,6 +19,7 @@ RUN apt-get update && \
   ripgrep \
   locales \
   nodejs \
+  rustup \
   zsh \
   wget \
   nano \
@@ -132,10 +133,17 @@ RUN pip install \
   ipdb \
   awscli \
   pynvim \
-  mypy
+  ruff-lsp \
+  pyright
 
 # Get Rust
-RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+RUN rustup default stable && \
+    rustup toolchain install stable && \
+    rustup component add rust-src rustfmt clippy rust-analyzer
+RUN cargo --version && \
+    cargo clippy --version && \
+    cargo fmt --version && \
+    rust-analyzer --version
 
 # Install zsh plugins
 ENV ZSH_CUSTOM=/home/rgpeach10/.oh-my-zsh/custom

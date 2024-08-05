@@ -93,11 +93,13 @@ alias gs="git status"
 alias gA="git add -A"
 alias ga="git add $@"
 alias gc="git commit -m $@"
+alias gcm="git commit -m $@"
 alias gas="git add -A && git status"
 alias gd="git diff"
 alias gds="git diff --staged"
 alias gr='BRANCH=$(git rev-parse --abbrev-ref HEAD) && git checkout $1 && git pull && git checkout $BRANCH && git rebase $1'
 alias grm='BRANCH=$(git rev-parse --abbrev-ref HEAD) && git checkout main && git pull && git checkout $BRANCH && git rebase main'
+alias pr="gh pr create"
 
 # Personal directories added to PATH
 export PATH=$PATH:$HOME/bin
