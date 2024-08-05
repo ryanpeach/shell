@@ -14,6 +14,10 @@ cd nerd-fonts
 ./install.sh
 ```
 
+Or you can just install one.
+
+Currently I've tested this with `JetBrainsMono Nerd Font`
+
 ## Private Info
 
 Create a `.zshrc.private` in your home directory to add private information to your shell
