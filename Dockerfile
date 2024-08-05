@@ -148,6 +148,29 @@ ENV PATH="/usr/local/lib/luarocks/bin/:$HOME/.luarocks/bin/:$PATH"
 RUN luarocks config local_by_default true
 RUN luarocks install --server=https://luarocks.org/dev luaformatter
 
+# Install nvm in the current home directory
+ENV NVM_DIR="$HOME/.nvm"
+RUN git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR" && \
+  cd "$NVM_DIR" && \
+  git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)`
+
+# Gotta go back to root to install node
+USER root
+
+# Install node
+RUN \. "$NVM_DIR/nvm.sh" && nvm install node
+
+# Install stuff with npm
+RUN npm install -g prettier
+
+# Switch back to user
+USER rgpeach10
+
+# Verify installations
+RUN node --version && \
+    npm --version && \
+    prettier --version
+
 # Copies
 COPY --chown=rgpeach10 bin bin
 COPY --chown=rgpeach10 home/ .

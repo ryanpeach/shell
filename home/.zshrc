@@ -90,9 +90,9 @@ alias tf="terraform"
 alias k="kubectl"
 alias g="git"
 alias gs="git status"
-alias ga="git add"
 alias gA="git add -A"
-alias gc="git commit -m"
+alias ga="git add $@"
+alias gc="git commit -m $@"
 alias gas="git add -A && git status"
 alias gd="git diff"
 alias gds="git diff --staged"
@@ -104,6 +104,7 @@ export PATH=$PATH:$HOME/bin
 
 # NeoVim
 export PATH="$PATH:/opt/nvim-linux64/bin"
+export GIT_EDITOR=nvim
 alias oldvim="vim"
 alias v="nvim"
 alias vi="nvim"
@@ -129,6 +130,11 @@ export PATH="$(go env GOPATH)/bin:$PATH"
 
 # Powerlevel 10k
 source ~/.p10k.zsh
+
+# nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # Load private info location
 if [ -z "$ZSH_PRIVATE_LOC" ]; then
