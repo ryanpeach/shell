@@ -179,7 +179,7 @@ jobs:
           # If we are on a PR, and there are changes to the ./docker/brew-arm.docker file, use the PR branch name as the tag
           # Otherwise, use main tag
           build-args: |
-            tag="${{ github.event_name == 'pull_request' && contains(github.event.pull_request.changed_files, 'docker/brew-arm.docker') && github.event.pull_request.head.ref || 'main' }}"
+            tag=${{ github.event_name == 'pull_request' && contains(github.event.pull_request.changed_files, 'docker/brew-arm.docker') && github.event.pull_request.head.ref || 'main' }}
 
       # Sign the resulting Docker image digest except on PRs.
       # This will only write to the public Rekor transparency log when the Docker
