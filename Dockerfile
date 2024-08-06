@@ -87,7 +87,7 @@ RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/s
   chmod 700 get_helm.sh && \
   ./get_helm.sh && \
   rm get_helm.sh && \
-  helm --version
+  helm --help
 
 # Add the GitHub CLI repository and install the GitHub CLI
 RUN mkdir -p -m 755 /etc/apt/keyrings \
