@@ -7,7 +7,9 @@ FROM ubuntu:latest
 
 
 # Installs
-RUN add-apt-repository ppa:neovim-ppa/unstable && \
+RUN apt-get update && \
+  apt-get install -y software-properties-common && \
+  add-apt-repository ppa:neovim-ppa/unstable && \
   apt-get update && \
   apt-get install -y \
   linux-tools-generic \
