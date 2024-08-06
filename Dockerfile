@@ -7,7 +7,8 @@ FROM ubuntu:latest
 
 
 # Installs
-RUN apt-get update && \
+RUN sudo add-apt-repository ppa:neovim-ppa/unstable && \
+  apt-get update && \
   apt-get install -y \
   linux-tools-generic \
   build-essential \
@@ -26,6 +27,7 @@ RUN apt-get update && \
   tmux \
   vim \
   neovim \
+  python3-neovim \
   npm \
   just \
   python3 \
