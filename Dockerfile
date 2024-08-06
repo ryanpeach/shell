@@ -3,8 +3,8 @@
 #       When it does work, we can use homebrew/brew as a base image and replace
 #       a lot of the below with brew installs
 #       REF: https://github.com/orgs/Homebrew/discussions/3612
-ARG tag=main
-FROM rgpeach10/brew-arm:${tag}
+ARG BASE_TAG=main
+FROM rgpeach10/brew-arm:${BASE_TAG}
 
 
 # Installs
