@@ -13,8 +13,12 @@ on:
     branches: [ "main" ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
+    paths:
+        - 'docker/brew-arm.docker'
   pull_request:
       branches: [ "main" ]
+      paths:
+        - 'docker/brew-arm.docker'
 
 jobs:
   validate:
@@ -30,7 +34,11 @@ jobs:
       - uses: pre-commit/action@v3.0.1
 
   build-brew:
-
+    needs: validate
+    # if its cron,
+    # or its a push to path docker/brew-arm.docker
+    # or its a pull request to path docker/brew-arm.docker
+    if: ${{ github.event_name == 'schedule' || ( github.event_name == 'push' && contains(github.event.head_commit.modified, 'docker/brew-arm.docker') ) || ( github.event_name == 'pull_request' && contains(github.event.pull_request.changed_files, 'docker/brew-arm.docker') ) }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -108,7 +116,8 @@ jobs:
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
 
   build-shell:
-
+    needs: build-brew
+    if: ${{ needs.build-brew.result == 'success' || needs.build-brew.result == 'skipped' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
