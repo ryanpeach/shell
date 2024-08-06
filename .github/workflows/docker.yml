@@ -115,7 +115,8 @@ jobs:
 
   build-shell:
     needs: build-brew
-    if: ${{ needs.build-brew.result == 'success' || needs.build-brew.result == 'skipped' }}
+    # REF: https://gist.github.com/Guthers/0a9101647ef72abe03aa84ca75fec4e3
+    if: always() && !failure() && !cancelled()
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -175,6 +176,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
+          # If we are on a PR, and there are changes to the ./docker/brew-arm.docker file, use the PR branch name as the tag
+          # Otherwise, use main tag
+          build-args: |
+            tag="${{ github.event_name == 'pull_request' && contains(github.event.pull_request.changed_files, 'docker/brew-arm.docker') && github.event.pull_request.head.ref || 'main' }}"
 
       # Sign the resulting Docker image digest except on PRs.
       # This will only write to the public Rekor transparency log when the Docker
