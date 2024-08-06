@@ -69,13 +69,13 @@ ENV HOMEBREW_USE_RUBY_FROM_PATH=1
 # Error: No Homebrew ruby 2.6.10_1 available for aarch64 processors!
 # Error: Failed to install Homebrew Portable Ruby and cannot find another Ruby 2.6.10!
 # see: https://github.com/orgs/Homebrew/discussions/3612
-RUN sudo mkdir /home/linuxbrew && sudo chmod 755 /home/linuxbrew && sudo chown user: /home/linuxbrew && \
-    git clone https://github.com/Homebrew/brew.git /home/linuxbrew/.linuxbrew && \
+USER root
+RUN mkdir /home/linuxbrew && chmod 755 /home/linuxbrew && chown user: /home/linuxbrew
+USER user
+
+RUN git clone https://github.com/Homebrew/brew.git /home/linuxbrew/.linuxbrew && \
     eval "$(brew shellenv)" && \
     echo 'eval "$(brew shellenv)"' >> ${HOME}/.bashrc && \
     . $HOME/.bashrc
-
-USER root
-USER user
 
 ENTRYPOINT ["/bin/bash"]
