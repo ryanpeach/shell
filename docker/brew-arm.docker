@@ -53,8 +53,11 @@ RUN curl -fsSL https://github.com/rbenv/rbenv-installer/raw/HEAD/bin/rbenv-insta
     eval "$(rbenv init -)" && \
     . $HOME/.bashrc && \
     rbenv install 2.6.10 && \
-    rbenv global 2.6.10 && \
-    sudo ln -s $HOME/.rbenv/versions/2.6.10/bin/ruby /usr/bin/ruby
+    rbenv global 2.6.10
+
+USER root
+RUN ln -s /home/user/.rbenv/versions/2.6.10/bin/ruby /usr/bin/ruby
+USER user
 
 # this is so that brew doesn't prompt for sudo access
 ENV NONINTERACTIVE=1
