@@ -1,5 +1,5 @@
 # Start with a smaller base image
-FROM ubuntu:20.04 as builder
+FROM ubuntu:latest
 
 # Set environment variables for non-interactive apt-get
 ENV DEBIAN_FRONTEND=noninteractive
