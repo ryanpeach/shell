@@ -1,4 +1,8 @@
-# Start with a smaller base image
+# Using "noble" ubuntu as a base image at the time of writing
+# TODO: Brew does not work on ARM yet, so we have to compile a lot of things from source
+#       When it does work, we can use homebrew/brew as a base image and replace
+#       a lot of the below with brew installs
+#       REF: https://github.com/orgs/Homebrew/discussions/3612
 FROM ubuntu:latest
 
 # Set environment variables for non-interactive apt-get
