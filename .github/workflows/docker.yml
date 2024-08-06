@@ -87,8 +87,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           file: ./docker/brew-arm.docker
-          cache-from: type=registry,ref=${{ env.REGISTRY }}/rgpeach10/brew-arm:dockercache
-          cache-to: type=registry,ref=${{ env.REGISTRY }}/rgpeach10/brew-arm:dockercache,mode=max,image-manifest=true
+          cache-from: type=registry,ref=rgpeach10/brew-arm:dockercache
+          cache-to: type=registry,ref=rgpeach10/brew-arm:dockercache,mode=max,image-manifest=true
           platforms: linux/amd64,linux/arm64
 
       # Sign the resulting Docker image digest except on PRs.
@@ -125,8 +125,8 @@ jobs:
           pull: true
           tags: ${{ steps.meta2.outputs.tags }}
           labels: ${{ steps.meta2.outputs.labels }}
-          cache-from: type=registry,ref=${{ env.REGISTRY }}/rgpeach10/shell:dockercache
-          cache-to: type=registry,ref=${{ env.REGISTRY }}/rgpeach10/shell:dockercache,mode=max,image-manifest=true
+          cache-from: type=registry,ref=rgpeach10/shell:dockercache
+          cache-to: type=registry,ref=rgpeach10/shell:dockercache,mode=max,image-manifest=true
           platforms: linux/amd64,linux/arm64
           # If we are on a PR, and there are changes to the ./docker/brew-arm.docker file, use the PR branch name as the tag
           # Otherwise, use main tag
