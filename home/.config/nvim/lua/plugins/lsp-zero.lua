@@ -8,8 +8,6 @@ return {
     opts = function()
         local lsp_zero = require('lsp-zero')
 
-        lsp_zero.setup_servers({'pyright'})
-
         -- lsp_attach is where you enable features that only work
         -- if there is a language server active in the file
         local lsp_attach = function(client, bufnr)
@@ -42,6 +40,8 @@ return {
             lsp_attach = lsp_attach,
             capabilities = require('cmp_nvim_lsp').default_capabilities()
         })
+
+        lsp_zero.setup_servers({'pyright'})
 
         local cmp = require('cmp')
         local cmp_action = require('lsp-zero').cmp_action()
