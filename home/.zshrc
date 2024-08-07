@@ -3,9 +3,6 @@ if [ -z "$DEBUG" ]; then
     clear
 fi
 
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
-
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
@@ -102,7 +99,7 @@ alias grm='BRANCH=$(git rev-parse --abbrev-ref HEAD) && git checkout main && git
 alias pr="gh pr create"
 
 # Personal directories added to PATH
-export PATH=$PATH:$HOME/bin
+export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # NeoVim
 export PATH="$PATH:/opt/nvim-linux64/bin"
