@@ -34,7 +34,6 @@ RUN apt-get update && \
   python3-neovim \
   npm \
   just \
-  python3 \
   python3-pip \
   golang-go \
   fonts-powerline \
@@ -86,18 +85,16 @@ RUN pyenv install 3.11 && \
     pyenv rehash
 
 # Now default python installs in the root virtualenv
-RUN pip install \
+RUN pipx install \
   thefuck \
   aider-chat \
   pre-commit \
   poetry \
   setuptools \
   ruff \
-  numpy \
   ipython \
   ipdb \
   awscli \
-  pynvim \
   ruff-lsp \
   pyright
 
