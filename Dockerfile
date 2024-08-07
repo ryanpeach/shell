@@ -66,7 +66,7 @@ RUN brew install \
   gh \
   tfenv \
   pyenv \
-  jira \
+  go-jira \
   terraform-docs \
   nvm
 
