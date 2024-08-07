@@ -98,7 +98,6 @@ RUN pipx install \
   aider-chat \
   pre-commit \
   poetry \
-  setuptools \
   ruff \
   ipython \
   ipdb \
