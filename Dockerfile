@@ -6,6 +6,7 @@
 ARG BASE_TAG=main
 FROM rgpeach10/brew-arm:${BASE_TAG}
 
+USER root
 
 # Installs
 RUN apt-get update && \
