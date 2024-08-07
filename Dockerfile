@@ -125,18 +125,11 @@ ENV PATH="/usr/local/lib/luarocks/bin/:$HOME/.luarocks/bin/:$PATH"
 RUN luarocks config local_by_default true
 RUN luarocks install --server=https://luarocks.org/dev luaformatter
 
-# Gotta go back to root to install node
-USER root
-
 # Install node
-ENV NVM_DIR="$HOME/.nvm"
-RUN \. "$NVM_DIR/nvm.sh" nvm install node
+RUN nvm install node
 
 # Install stuff with npm
 RUN npm install -g prettier
-
-# Switch back to user
-USER user
 
 # Verify installations
 RUN node --version && \
