@@ -106,6 +106,12 @@ jobs:
         # against the sigstore community Fulcio instance.
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
 
+      - name: Get the Docker tag to use in the next build-and-push2 step
+        id: get-tag
+        run: |
+          BASE_TAG=$(echo ${{ steps.meta.outputs.tags }} | sed 's/^.*://g' | head -n 1)
+          echo "::set-output name=tag::$BASE_TAG"
+
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
       - name: Extract Docker metadata
@@ -131,7 +137,7 @@ jobs:
           # If we are on a PR, and there are changes to the ./docker/brew-arm.docker file, use the PR branch name as the tag
           # Otherwise, use main tag
           build-args: |
-            BASE_TAG=${{ split(split(steps.meta.outputs.tags, '\n')[0], ':')[1] }}
+            BASE_TAG=${{ steps.get-tag.outputs.tag }}
 
       # Sign the resulting Docker image digest except on PRs.
       # This will only write to the public Rekor transparency log when the Docker
