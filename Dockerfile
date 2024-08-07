@@ -139,6 +139,9 @@ RUN \. "$NVM_DIR/nvm.sh" && nvm install node
 # Install stuff with npm
 RUN npm install -g prettier
 
+# Switch back to user
+USER rgpeach10
+
 # Verify installations
 RUN node --version && \
     npm --version && \
