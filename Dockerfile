@@ -35,6 +35,7 @@ RUN apt-get update && \
   npm \
   just \
   python3-pip \
+  pipx \
   golang-go \
   fonts-powerline \
   tree \
@@ -67,6 +68,7 @@ RUN brew install \
   pyenv \
   go-jira \
   terraform-docs \
+  pipx \
   nvm
 
 # Install Oh My Zsh
@@ -83,6 +85,12 @@ ENV PATH="/home/user/go/bin:$PATH"
 RUN pyenv install 3.11 && \
     pyenv global 3.11 && \
     pyenv rehash
+
+# Handle pipx
+RUN pipx ensurepath
+USER root
+RUN pipx ensurepath --global
+USER user
 
 # Now default python installs in the root virtualenv
 RUN pipx install \
