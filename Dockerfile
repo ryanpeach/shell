@@ -129,7 +129,7 @@ RUN luarocks install --server=https://luarocks.org/dev luaformatter
 USER root
 
 # Install node
-RUN \. "$NVM_DIR/nvm.sh" && nvm install node
+RUN nvm install node
 
 # Install stuff with npm
 RUN npm install -g prettier
