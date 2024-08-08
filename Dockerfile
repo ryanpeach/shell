@@ -6,9 +6,21 @@
 ARG BASE_TAG=main
 FROM rgpeach10/brew-arm:${BASE_TAG}
 
+RUN brew install \
+  lua \
+  luarocks \
+  kubectl \
+  helm \
+  gh \
+  tfenv \
+  pyenv \
+  go-jira \
+  terraform-docs \
+  pipx
+
 USER root
 
-# Installs
+# Other Installs
 RUN apt-get update && \
   apt-get install -y software-properties-common && \
   add-apt-repository ppa:neovim-ppa/unstable && \
@@ -57,18 +69,6 @@ RUN locale-gen en_US.UTF-8
 USER user
 WORKDIR /home/user
 ENV HOME=/home/user
-
-RUN brew install \
-  lua \
-  luarocks \
-  kubectl \
-  helm \
-  gh \
-  tfenv \
-  pyenv \
-  go-jira \
-  terraform-docs \
-  pipx
 
 # Install Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
