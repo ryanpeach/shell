@@ -174,7 +174,7 @@ USER root
 RUN \. "$NVM_DIR/nvm.sh" && nvm install node
 
 # Install stuff with npm
-RUN npm install -g prettier
+RUN npm install -g prettier cdktf-cli@latest
 
 # Switch back to user
 USER rgpeach10
