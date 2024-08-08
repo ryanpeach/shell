@@ -52,8 +52,8 @@ ENV PATH="$HOME/.rbenv/bin:/home/linuxbrew/.linuxbrew/bin:$PATH:"
 RUN curl -fsSL https://github.com/rbenv/rbenv-installer/raw/HEAD/bin/rbenv-installer | bash && \
     eval "$(rbenv init -)" && \
     . $HOME/.bashrc && \
-    rbenv install 2.6.10 && \
-    rbenv global 2.6.10
+    rbenv install 3.3 && \
+    rbenv global 3.3
 
 USER root
 RUN ln -s /home/user/.rbenv/versions/2.6.10/bin/ruby /usr/bin/ruby
