@@ -39,6 +39,7 @@ RUN apt-get update && \
   tree \
   sed \
   gawk \
+  jq \
   libsqlite3-dev \
   unzip \
   apt-transport-https \
@@ -109,10 +110,12 @@ RUN .tfenv/bin/tfenv install latest
 
 # Go installs
 ENV PATH="/home/rgpeach10/go/bin:$PATH"
-RUN go install github.com/terraform-docs/terraform-docs@v0.18.0
-RUN terraform-docs --version
-RUN go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest
-RUN jira --help
+RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 && \
+    go install github.com/mikefarah/yq/v4@latest && \
+    go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest && \
+    terraform-docs --version && \
+    yq --version && \
+    jira --version
 
 # Install pyenv
 RUN git clone https://github.com/pyenv/pyenv.git .pyenv
