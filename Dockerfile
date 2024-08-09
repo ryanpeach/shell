@@ -87,9 +87,6 @@ RUN pyenv install 3.11 && \
 
 # Handle pipx
 RUN pipx ensurepath
-USER root
-RUN pipx ensurepath --global
-USER user
 
 # Now default python installs in the root virtualenv
 RUN pipx install \
