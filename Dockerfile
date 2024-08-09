@@ -5,7 +5,6 @@
 #       REF: https://github.com/orgs/Homebrew/discussions/3612
 FROM ubuntu:latest
 
-
 # Installs
 RUN apt-get update && \
   apt-get install -y software-properties-common && \
@@ -34,6 +33,7 @@ RUN apt-get update && \
   just \
   python3 \
   python3-pip \
+  pipx \
   golang-go \
   fonts-powerline \
   tree \
@@ -45,8 +45,14 @@ RUN apt-get update && \
   ca-certificates \
   cmake \
   graphviz \
+  fakeroot \
+  devscripts \
+  equivs \
+  munge \
+  slurm-wlm \
   libreadline-dev && \
-  apt-get clean
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
 
 # set up locale
 RUN locale-gen en_US.UTF-8
@@ -72,7 +78,9 @@ RUN curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | gpg --d
     echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list && \
     chmod 644 /etc/apt/sources.list.d/kubernetes.list && \
     apt-get update && \
-    apt-get install -y kubectl
+    apt-get install -y kubectl && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install Helm
 RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 && \
@@ -85,7 +93,9 @@ RUN mkdir -p -m 755 /etc/apt/keyrings \
     && chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
     && apt-get update \
-    && apt-get install gh -y
+    && apt-get install -y gh \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # New user
 RUN useradd -ms /bin/zsh rgpeach10
@@ -126,20 +136,23 @@ RUN pyenv install 3.11 && \
     pyenv rehash
 
 # Now default python installs in the root virtualenv
-RUN pip install \
+RUN pipx install \
   thefuck \
   aider-chat \
   pre-commit \
   poetry \
-  setuptools \
   ruff \
-  numpy \
   ipython \
   ipdb \
   awscli \
-  pynvim \
+  pyright \
   ruff-lsp \
-  pyright
+  aws-parallelcluster
+
+RUN pip install \
+  setuptools \
+  numpy \
+  pynvim
 
 # Get Rust
 RUN rustup default stable && \
