@@ -8,11 +8,9 @@ FROM ubuntu:latest
 
 # Installs
 RUN apt-get update && \
-  apt-get install -y software-properties-common && \
-  add-apt-repository ppa:neovim-ppa/unstable && \
-  apt-get update && \
   apt-get install -y \
   linux-tools-generic \
+  software-properties-common \
   build-essential \
   curl \
   git \
@@ -28,8 +26,6 @@ RUN apt-get update && \
   nano \
   tmux \
   vim \
-  neovim \
-  python3-neovim \
   npm \
   just \
   python3 \
@@ -42,15 +38,27 @@ RUN apt-get update && \
   jq \
   libsqlite3-dev \
   unzip \
+  file \
   apt-transport-https \
   ca-certificates \
   cmake \
   graphviz \
+  ninja-build \
+  gettext \
   libreadline-dev && \
   apt-get clean
 
 # set up locale
 RUN locale-gen en_US.UTF-8
+
+# Install neovim
+RUN git clone https://github.com/neovim/neovim && \
+  cd neovim && \
+  make CMAKE_BUILD_TYPE=RelWithDebInfo && \
+  cd build && \
+  cpack -G DEB && \
+  dpkg -i nvim-linux64.deb && \
+  nvim --version
 
 # Install Lua
 RUN curl -R -O -L http://www.lua.org/ftp/lua-5.3.5.tar.gz && \
