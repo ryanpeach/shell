@@ -37,6 +37,7 @@ RUN apt-get update && \
   gawk \
   libsqlite3-dev \
   unzip \
+  file \
   apt-transport-https \
   ca-certificates \
   cmake \
