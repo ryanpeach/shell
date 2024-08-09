@@ -45,6 +45,7 @@ RUN apt-get update && \
   graphviz \
   ninja-build \
   gettext \
+  libffi-dev \
   libreadline-dev && \
   apt-get clean
 
