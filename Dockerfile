@@ -12,6 +12,7 @@ RUN apt-get update && \
   add-apt-repository ppa:neovim-ppa/unstable && \
   apt-get update && \
   apt-get install -y \
+  sudo \
   linux-tools-generic \
   build-essential \
   curl \
@@ -87,11 +88,17 @@ RUN mkdir -p -m 755 /etc/apt/keyrings \
     && apt-get update \
     && apt-get install gh -y
 
-# New user
+# Switch to a non-root user
+# Give it sudo permissions
 RUN useradd -ms /bin/zsh rgpeach10
+RUN usermod -aG sudo rgpeach10
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 USER rgpeach10
 WORKDIR /home/rgpeach10
 ENV HOME=/home/rgpeach10
+
+# Verify sudo permissions
+RUN sudo echo "I have sudo permissions"
 
 # Verify installation
 RUN gh --version
