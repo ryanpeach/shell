@@ -45,6 +45,7 @@ RUN apt-get update && \
   ca-certificates \
   cmake \
   graphviz \
+  libffi-dev \
   libreadline-dev && \
   apt-get clean
 
