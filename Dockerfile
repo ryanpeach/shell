@@ -123,7 +123,7 @@ RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 && \
     go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest && \
     terraform-docs --version && \
     yq --version && \
-    jira --version
+    jira --help 
 
 # Install pyenv
 RUN git clone https://github.com/pyenv/pyenv.git .pyenv
