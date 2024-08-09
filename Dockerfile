@@ -91,8 +91,7 @@ RUN mkdir -p -m 755 /etc/apt/keyrings \
 # Switch to a non-root user
 # Give it sudo permissions
 RUN useradd -ms /bin/zsh rgpeach10
-RUN adduser --disabled-password --gecos '' rgpeach10
-RUN adduser rgpeach10 sudo
+RUN usermod -aG sudo rgpeach10
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 USER rgpeach10
 WORKDIR /home/rgpeach10
