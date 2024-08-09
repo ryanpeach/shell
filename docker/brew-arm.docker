@@ -81,9 +81,11 @@ ENV PATH="/usr/bin:$PATH"
 RUN git clone https://github.com/Homebrew/brew.git /home/linuxbrew/.linuxbrew && \
     eval "$(brew shellenv)" && \
     echo 'eval "$(brew shellenv)"' >> ${HOME}/.bashrc && \
-    . $HOME/.bashrc
+    . $HOME/.bashrc && \
+    brew update --force --quiet && \
+    chmod -R go-w "$(brew --prefix)/share/zsh"
 
 # Check brew is working and update
-RUN brew update
+RUN brew --version
 
 ENTRYPOINT ["/bin/bash"]
