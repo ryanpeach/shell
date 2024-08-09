@@ -59,6 +59,7 @@ RUN locale-gen en_US.UTF-8
 USER user
 WORKDIR /home/user
 ENV HOME=/home/user
+ENV PATH=/usr/bin:$PATH
 
 RUN brew install \
   lua \
