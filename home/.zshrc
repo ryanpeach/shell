@@ -153,3 +153,6 @@ if [ ! -f "$ZSH_PRIVATE_LOC" ]; then
 else
     source $ZSH_PRIVATE_LOC
 fi
+
+# fzf
+source <(fzf --zsh)
