@@ -141,6 +141,12 @@ export NVM_DIR="$HOME/.nvm"
 # fzf
 source <(fzf --zsh)
 
+# Keep history in a file
+HISTFILE=$HOME/mnt/.zsh_history
+HISTSIZE=1000000
+SAVEHIST=1000000
+setopt appendhistory
+
 # Load private info location
 if [ -z "$ZSH_PRIVATE_LOC" ]; then
     ZSH_PRIVATE_LOC=~/mnt/.zshrc.private
