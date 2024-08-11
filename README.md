@@ -29,17 +29,6 @@ git config --global user.email "<email>"
 git config --global user.name "<name>"
 ```
 
-### History
-
-If you want to keep your history between sessions, you can add the following to your `.zsh_history` file:
-
-```bash
-HISTFILE=$HOME/mnt/.zsh_history
-HISTSIZE=1000000
-SAVEHIST=1000000
-setopt appendhistory
-```
-
 ## Get your Terminal to launch from the container
 
 Create a `~/.docker-shell.sh` file with the following contents:
