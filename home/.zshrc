@@ -138,6 +138,9 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+# fzf
+source <(fzf --zsh)
+
 # Load private info location
 if [ -z "$ZSH_PRIVATE_LOC" ]; then
     ZSH_PRIVATE_LOC=~/mnt/.zshrc.private
@@ -153,6 +156,3 @@ if [ ! -f "$ZSH_PRIVATE_LOC" ]; then
 else
     source $ZSH_PRIVATE_LOC
 fi
-
-# fzf
-source <(fzf --zsh)
