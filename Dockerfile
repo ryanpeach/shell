@@ -108,10 +108,10 @@ RUN mkdir -p -m 755 /etc/apt/keyrings \
     && rm -rf /var/lib/apt/lists/*
 
 # New user
-RUN useradd -ms /bin/zsh rgpeach10
-USER rgpeach10
-WORKDIR /home/rgpeach10
-ENV HOME=/home/rgpeach10
+RUN useradd -ms /bin/zsh user
+USER user
+WORKDIR /home/user
+ENV HOME=/home/user
 
 # Verify installation
 RUN gh --version
@@ -128,7 +128,7 @@ RUN git clone --depth=1 https://github.com/tfutils/tfenv.git $HOME/.tfenv
 RUN .tfenv/bin/tfenv install latest
 
 # Go installs
-ENV PATH="/home/rgpeach10/go/bin:$PATH"
+ENV PATH="/home/user/go/bin:$PATH"
 RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 && \
     go install github.com/mikefarah/yq/v4@latest && \
     go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest && \
@@ -176,7 +176,7 @@ RUN cargo --version && \
     rust-analyzer --version
 
 # Install zsh plugins
-ENV ZSH_CUSTOM=/home/rgpeach10/.oh-my-zsh/custom
+ENV ZSH_CUSTOM=/home/user/.oh-my-zsh/custom
 RUN git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
 RUN git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
 RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
@@ -202,7 +202,7 @@ RUN \. "$NVM_DIR/nvm.sh" && nvm install node
 RUN npm install -g prettier
 
 # Switch back to user
-USER rgpeach10
+USER user
 
 # Verify installations
 RUN node --version && \
@@ -210,8 +210,8 @@ RUN node --version && \
     prettier --version
 
 # Copies
-COPY --chown=rgpeach10 bin bin
-COPY --chown=rgpeach10 home/ .
+COPY --chown=user bin bin
+COPY --chown=user home/ .
 RUN git config --global core.excludesFile '~/.gitignore_global'
 RUN git config --global pull.rebase true
 RUN git config --global --add --bool push.autoSetupRemote true
@@ -225,8 +225,8 @@ RUN find bin -type f -exec chmod +x {} \;
 # terminal colors with xterm
 ENV TERM=xterm-256color
 
-# Now we are going to assume you are going to mount a directory to /home/rgpeach10/mnt
-WORKDIR /home/rgpeach10/mnt
+# Now we are going to assume you are going to mount a directory to /home/user/mnt
+WORKDIR /home/user/mnt
 
 # start zsh
 CMD [ "zsh" ]

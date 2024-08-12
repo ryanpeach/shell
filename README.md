@@ -37,9 +37,9 @@ Create a `~/.docker-shell.sh` file with the following contents:
 #!/usr/bin/env bash
 
 docker run -it --rm \
-    -v $HOME/.ssh:/home/rgpeach10/.ssh \
-    -v $HOME:/home/rgpeach10/mnt \
-    -w /home/rgpeach10/mnt \
+    -v $HOME/.ssh:/home/user/.ssh \
+    -v $HOME:/home/user/mnt \
+    -w /home/user/mnt \
     -e GITHUB_TOKEN=$(gh auth token) \
     -e MNT=/home/rgpeach10/mnt \
     --pull=always \
@@ -76,7 +76,7 @@ as well as add your ssh key to your github account.
 
 Now you just need to add to your `docker run` command:
 
-`-v <YOUR_HOME>/.ssh:/home/rgpeach10/.ssh` for ssh keys
+`-v <YOUR_HOME>/.ssh:/home/user/.ssh` for ssh keys
 
 And
 
