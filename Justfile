@@ -1,20 +1,20 @@
 build:
-    docker build -t rgpeach10/shell:local .
+    docker build -t user/shell:local .
 
 run-local:
     docker run -it --rm \
-        -v $HOME/.ssh:/home/rgpeach10/.ssh \
-        -v $HOME:/home/rgpeach10/mnt \
-        -w /home/rgpeach10/mnt \
+        -v $HOME/.ssh:/home/user/.ssh \
+        -v $HOME:/home/user/mnt \
+        -w /home/user/mnt \
         -e GITHUB_TOKEN=$(gh auth token) \
         -e DEBUG=1 \
         rgpeach10/shell:local
 
 run-remote tag="local":
     docker run -it --rm \
-        -v $HOME/.ssh:/home/rgpeach10/.ssh \
-        -v $HOME:/home/rgpeach10/mnt \
-        -w /home/rgpeach10/mnt \
+        -v $HOME/.ssh:/home/user/.ssh \
+        -v $HOME:/home/user/mnt \
+        -w /home/user/mnt \
         -e GITHUB_TOKEN=$(gh auth token) \
         --pull=always \
         rgpeach10/shell:{{tag}}
