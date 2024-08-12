@@ -7,6 +7,7 @@ run-local:
         -v $HOME:/home/rgpeach10/mnt \
         -w /home/rgpeach10/mnt \
         -e GITHUB_TOKEN=$(gh auth token) \
+        -e MNT=/home/rgpeach10/mnt \
         -e DEBUG=1 \
         rgpeach10/shell:local
 
@@ -16,6 +17,7 @@ run-remote tag="local":
         -v $HOME:/home/rgpeach10/mnt \
         -w /home/rgpeach10/mnt \
         -e GITHUB_TOKEN=$(gh auth token) \
+        -e MNT=/home/rgpeach10/mnt \
         --pull=always \
         rgpeach10/shell:{{tag}}
 

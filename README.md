@@ -41,6 +41,7 @@ docker run -it --rm \
     -v $HOME:/home/rgpeach10/mnt \
     -w /home/rgpeach10/mnt \
     -e GITHUB_TOKEN=$(gh auth token) \
+    -e MNT=/home/rgpeach10/mnt \
     --pull=always \
     rgpeach10/shell:main
 ```
@@ -48,6 +49,8 @@ docker run -it --rm \
 Then set your terminal to launch this script when you open it.
 
 Or you could put it in your `~/.bash_profile`, `~/.bashrc`, or `~/.zshrc` file.
+
+It's important the MNT variable is set to the directory you want to mount your home in the container from the containers filesystem perspective.
 
 # Running from the Repo
 
