@@ -142,14 +142,14 @@ export NVM_DIR="$HOME/.nvm"
 source <(fzf --zsh)
 
 # Keep history in a file
-HISTFILE=$HOME/mnt/.zsh_history
+HISTFILE=$MNT/.zsh_history
 HISTSIZE=1000000
 SAVEHIST=1000000
 setopt appendhistory
 
 # Load private info location
 if [ -z "$ZSH_PRIVATE_LOC" ]; then
-    ZSH_PRIVATE_LOC=~/mnt/.zshrc.private
+    ZSH_PRIVATE_LOC=$MNT/.zshrc.private
 fi
 
 # If it does not exist, inform them
@@ -157,7 +157,7 @@ if [ ! -f "$ZSH_PRIVATE_LOC" ]; then
     echo "No .zshrc.private found at '$ZSH_PRIVATE_LOC'"
     echo "You should create this to add secret information to your session"
     echo "Usually you put it in your home directory or in the directory"
-    echo "mounted to this containers ~/mnt. However, wherever you put it, you can"
+    echo "mounted to this containers $MNT. However, wherever you put it, you can"
     echo "always override the location by overriding the ZSH_PRIVATE_LOC env variable"
 else
     source $ZSH_PRIVATE_LOC
