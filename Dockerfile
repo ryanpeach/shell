@@ -157,12 +157,12 @@ RUN pipx install \
   ipython \
   ipdb \
   awscli \
-  pyright \
   ruff-lsp \
   aws-parallelcluster
 
 RUN pip install \
   setuptools \
+  pyright \
   numpy \
   pynvim
 
