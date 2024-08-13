@@ -200,15 +200,17 @@ RUN \. "$NVM_DIR/nvm.sh" \
   && nvm install node
 
 # Install stuff with npm
-RUN npm install -g prettier
+RUN \. "$NVM_DIR/nvm.sh" \
+  && npm install -g prettier pyright
 
 # Switch back to user
 USER user
 
 # Verify installations
-RUN node --version && \
-    npm --version && \
-    prettier --version
+RUN \. "$NVM_DIR/nvm.sh" \
+    && node --version \
+    && npm --version \
+    && prettier --version
 
 # Copies
 COPY --chown=user bin bin
