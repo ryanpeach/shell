@@ -162,7 +162,6 @@ RUN pipx install \
 
 RUN pip install \
   setuptools \
-  pyright \
   numpy \
   pynvim
 
@@ -199,7 +198,7 @@ USER root
 RUN \. "$NVM_DIR/nvm.sh" && nvm install node
 
 # Install stuff with npm
-RUN npm install -g prettier
+RUN npm install -g prettier pyright
 
 # Switch back to user
 USER user
