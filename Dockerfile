@@ -197,8 +197,7 @@ USER root
 
 # Install node
 RUN \. "$NVM_DIR/nvm.sh" \
-  && nvm install node \
-  && chown -R 1001:1001 "$HOME/.npm"
+  && nvm install node
 
 # Install stuff with npm
 RUN npm install -g prettier
