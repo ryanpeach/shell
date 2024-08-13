@@ -133,6 +133,9 @@ export PATH="$(go env GOPATH)/bin:$PATH"
 # Powerlevel 10k
 source ~/.p10k.zsh
 
+# pipx
+export PATH="$HOME/.local/bin:$PATH"
+
 # nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
