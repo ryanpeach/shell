@@ -18,14 +18,12 @@ RUN apt-get update && \
   fzf \
   ripgrep \
   locales \
-  nodejs \
   rustup \
   zsh \
   wget \
   nano \
   tmux \
   vim \
-  npm \
   just \
   python3 \
   python3-pip \
