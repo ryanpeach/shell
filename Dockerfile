@@ -12,6 +12,8 @@ RUN apt-get update && \
   software-properties-common \
   build-essential \
   curl \
+  libssl-dev \
+  libbz2-dev \
   git \
   gnupg \
   fd-find \
