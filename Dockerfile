@@ -1,5 +1,10 @@
-# Using Arch Linux as the base image
-FROM archlinux:latest
+# Use conditional ARG to specify the base image based on the target architecture
+ARG TARGETARCH
+FROM archlinux:latest AS amd64
+FROM agners/archlinuxarm:latest AS arm64
+
+# Use build arguments to switch between architectures
+FROM ${TARGETARCH} as base
 
 # Install base dependencies and yay (AUR helper)
 RUN pacman -Syu --noconfirm && \
