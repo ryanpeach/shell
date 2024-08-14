@@ -1,24 +1,35 @@
-# syntax=docker/dockerfile:1.4
+# syntax=docker/dockerfile:1
 
-# Use conditional ARG to specify the base image based on the target architecture
-ARG TARGETARCH
-ARG BASE_IMAGE_AMD64=archlinux:latest
-ARG BASE_IMAGE_ARM64=agners/archlinuxarm:latest
+FROM alpine:latest AS base
 
-# Use build arguments to switch between architectures
-FROM ${TARGETARCH} == "amd64" ? ${BASE_IMAGE_AMD64} : ${BASE_IMAGE_ARM64} AS base
+# arm64-specific stage
+FROM base AS build-arm64
 
-# Install base dependencies and yay (AUR helper)
-RUN pacman -Syu --noconfirm && \
-  pacman -S --noconfirm \
-  base-devel \
-  git \
-  curl && \
-  git clone https://aur.archlinux.org/yay.git /opt/yay && \
-  cd /opt/yay && \
-  makepkg -si --noconfirm && \
-  rm -rf /opt/yay && \
-  pacman -Scc --noconfirm
+# Set the architecture and download Arch Linux ARM tarball
+ADD http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz /arch-root
+
+# amd64-specific stage
+FROM base AS build-amd64
+
+# Download and add the latest Arch Linux base tarball for x86_64
+ADD https://mirror.rackspace.com/archlinux/iso/latest/archlinux-bootstrap-x86_64.tar.gz /arch-root
+
+# common steps
+FROM build-${TARGETARCH} AS build
+
+# Set the working directory to the new root
+WORKDIR /arch-root
+
+# Set up pacman keyring and install yay using chroot
+RUN cd /arch-root && \
+    chroot /arch-root /bin/bash -c "pacman-key --init && \
+    pacman-key --populate archlinux && \
+    pacman -Syu --noconfirm && \
+    pacman -S --needed --noconfirm base-devel git && \
+    git clone https://aur.archlinux.org/yay.git /opt/yay && \
+    cd /opt/yay && \
+    makepkg -si --noconfirm && \
+    rm -rf /opt/yay"
 
 # Use yay to install all necessary packages, including AUR packages
 RUN yay -Syu --noconfirm && \
@@ -63,9 +74,7 @@ RUN yay -Syu --noconfirm && \
   helm \
   gh \
   neovim \
-  python-setuptools \
-  python-numpy \
-  rust \
+  rustup \
   pyenv \
   nvm \
   tfenv \
@@ -77,18 +86,6 @@ RUN yay -Syu --noconfirm && \
   k9s \
   git-delta \
   thefuck \
-  aider-chat \
-  pre-commit \
-  poetry \
-  ruff \
-  ipython \
-  ipdb \
-  awscli \
-  pyright \
-  ruff-lsp \
-  aws-parallelcluster \
-  prettier \
-  twilio-cli \
   --needed && \
   yay -Yc --noconfirm && \
   pacman -Scc --noconfirm
@@ -117,13 +114,56 @@ RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM
 ENV NVM_DIR="$HOME/.nvm"
 RUN source /usr/share/nvm/init-nvm.sh && \
     nvm install --lts && \
-    nvm use --lts
+    nvm use --lts && \
+    && npm install -g \
+      prettier \
+      pyright \
+      twilio-cli \
+    && node --version \
+    && npm --version \
+    && prettier --version \
+    && pyright --version \
+    && twilio --version
 
-# Verify installations
-RUN source /usr/share/nvm/init-nvm.sh && \
-    node --version && \
-    npm --version && \
-    prettier --version
+# Tfenv
+RUN tfenv install latest && \
+    tfenv use latest
+
+# Create some pyenv environments
+RUN pyenv install 3.11 && \
+    pyenv global 3.11 && \
+    pyenv rehash
+
+# Now default python installs in the root virtualenv
+RUN pipx install \
+  thefuck \
+  aider-chat \
+  pre-commit \
+  poetry \
+  ruff \
+  ipython \
+  ipdb \
+  awscli \
+  ruff-lsp \
+  aws-parallelcluster
+
+RUN pip install \
+  setuptools \
+  numpy \
+  pynvim
+
+# Get Rust
+RUN rustup default stable && \
+    rustup toolchain install stable && \
+    rustup component add rust-src rustfmt clippy rust-analyzer
+RUN cargo --version && \
+    cargo clippy --version && \
+    cargo fmt --version && \
+    rust-analyzer --version
+
+# Luarocks
+RUN luarocks config local_by_default true
+RUN luarocks install --server=https://luarocks.org/dev luaformatter
 
 # Copies
 COPY --chown=user bin bin
