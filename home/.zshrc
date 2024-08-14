@@ -4,7 +4,7 @@ if [ -z "$DEBUG" ]; then
 fi
 
 # If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
+export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -107,8 +107,8 @@ alias grm='BRANCH=$(git rev-parse --abbrev-ref HEAD) && git checkout main && git
 alias grc='git rebase --continue'
 alias pr='gh pr create'
 
-# Personal directories added to PATH
-export PATH=$PATH:$HOME/bin
+# Linux replacements
+alias cat='bat'
 
 # NeoVim
 export PATH="$PATH:/opt/nvim-linux64/bin"
@@ -150,6 +150,12 @@ export NVM_DIR="$HOME/.nvm"
 # fzf
 source <(fzf --zsh)
 
+# zoxide
+eval "$(zoxide init --cmd cd zsh)"
+
+# eza
+alias ls='eza'
+
 # Keep history in a file
 HISTFILE=$MNT/.zsh_history
 HISTSIZE=1000000
@@ -171,3 +177,6 @@ if [ ! -f "$ZSH_PRIVATE_LOC" ]; then
 else
     source $ZSH_PRIVATE_LOC
 fi
+
+# Neofetch
+neofetch
