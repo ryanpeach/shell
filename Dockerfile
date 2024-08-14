@@ -2,6 +2,9 @@
 
 FROM alpine:latest AS base
 
+# Install tar and Zstandard in the base image
+RUN apk add --no-cache tar zstd
+
 # arm64-specific stage
 FROM base AS build-arm64
 
