@@ -135,7 +135,7 @@ ENV PATH="/home/user/go/bin:$PATH"
 RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 && \
     go install github.com/mikefarah/yq/v4@latest && \
     go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest && \
-    go install github.com/helmfile/helmfile && \
+    go install github.com/helmfile/helmfile@latest && \
     go install github.com/jesseduffield/lazygit@latest && \
     terraform-docs --version && \
     yq --version && \
