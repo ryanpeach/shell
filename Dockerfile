@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.4
+
 # Use conditional ARG to specify the base image based on the target architecture
 ARG TARGETARCH
 FROM archlinux:latest AS amd64
