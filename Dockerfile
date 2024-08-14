@@ -11,8 +11,11 @@ ADD http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz /arch-root
 # amd64-specific stage
 FROM base AS build-amd64
 
-# Download and add the latest Arch Linux base tarball for x86_64
-ADD https://mirror.rackspace.com/archlinux/iso/latest/archlinux-bootstrap-x86_64.tar.gz /arch-root
+# Download the Arch Linux bootstrap tarball for x86_64
+ADD https://archive.archlinux.org/iso/2024.08.01/archlinux-bootstrap-x86_64.tar.zst /arch-root.tar.zst
+
+# Extract the tarball
+RUN mkdir /arch-root && tar --use-compress-program=unzstd -xvf /arch-root.tar.zst -C /arch-root
 
 # common steps
 FROM build-${TARGETARCH} AS build
