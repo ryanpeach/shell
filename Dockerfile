@@ -141,7 +141,7 @@ RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 && \
     yq --version && \
     jira --help && \
     helmfile --version && \
-    lazygit --version
+    lazygit --help
 
 # Install pyenv
 RUN git clone https://github.com/pyenv/pyenv.git .pyenv
