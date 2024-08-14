@@ -15,6 +15,9 @@ RUN apt-get update && \
   libssl-dev \
   libbz2-dev \
   git \
+  bat \
+  eza \
+  neofetch \
   gnupg \
   fd-find \
   fzf \
@@ -132,9 +135,13 @@ ENV PATH="/home/user/go/bin:$PATH"
 RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 && \
     go install github.com/mikefarah/yq/v4@latest && \
     go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest && \
+    go install https://github.com/helmfile/helmfile && \
+    go install github.com/jesseduffield/lazygit@latest && \
     terraform-docs --version && \
     yq --version && \
-    jira --help
+    jira --help && \
+    helmfile --version && \
+    lazygit --version
 
 # Install pyenv
 RUN git clone https://github.com/pyenv/pyenv.git .pyenv
@@ -201,7 +208,10 @@ RUN \. "$NVM_DIR/nvm.sh" \
 
 # Install stuff with npm
 RUN \. "$NVM_DIR/nvm.sh" \
-  && npm install -g prettier pyright
+  && npm install -g \
+    prettier \
+    pyright \
+    twilio-cli
 
 # Switch back to user
 USER user
@@ -211,6 +221,18 @@ RUN \. "$NVM_DIR/nvm.sh" \
     && node --version \
     && npm --version \
     && prettier --version
+
+# Install k9s
+RUN git clone https://github.com/derailed/k9s.git && \
+  cd k9s && \
+  make build && \
+  mv ./execs/k9s /usr/local/bin/k9s
+
+# Install delta
+RUN git clone https://github.com/dandavison/delta && \
+  cd delta && \
+  cargo build --release && \
+  mv target/release/delta /usr/local/bin/delta
 
 # Copies
 COPY --chown=user bin bin

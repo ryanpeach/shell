@@ -4,7 +4,6 @@ if [ -z "$MNT" ]; then
     export MNT=$HOME/mnt
 fi
 
->>>>>>> f50fc3c (MNT variable)
 # Create a symbolic link to some mounted files
 
 # This is our github copilot hosts file
