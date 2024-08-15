@@ -16,7 +16,7 @@ RUN emerge app-portage/gentoolkit
 # archive tools
 RUN emerge app-arch/unzip
 RUN emerge app-arch/tar
-RUN emerge app-arch/gxz
+# RUN emerge app-arch/gxz
 RUN emerge app-arch/gzip
 
 # Network tools
