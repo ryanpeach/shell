@@ -25,6 +25,9 @@ test:
     just build
     just run-local
 
+sort:
+    ./sort_dockerfile.sh
+
 clean:
     docker image prune -f
     docker container prune -f
