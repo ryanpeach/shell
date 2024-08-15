@@ -87,6 +87,11 @@ RUN emerge --depclean && \
     eclean-dist --deep && \
     eclean-pkg --deep
 
+# We don't actually need to create a new user
+# Just set a reasonable home directory
+WORKDIR /home/user
+ENV HOME=/home/user
+
 # RUN emerge app-admin/helm does not support arm
 # Install Helm
 RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 && \
@@ -159,6 +164,19 @@ RUN pipx install \
   just \
   aws-parallelcluster
 
+# Copies
+COPY --chown=user bin bin
+COPY --chown=user home/ .
+RUN git config --global core.excludesFile '~/.gitignore_global'
+RUN git config --global pull.rebase true
+RUN git config --global --add --bool push.autoSetupRemote true
+
+# Get neovim to download all its stuff
+RUN nvim --headless "+Lazy! sync" +qa
+
+# Chmod so that these files are runnable
+RUN find bin -type f -exec chmod +x {} \;
+
 # Stage 2: Final minimal image
 FROM gentoo/stage3:latest
 
@@ -167,5 +185,10 @@ COPY --from=builder / /
 
 # Set up environment variables and entry point
 ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+# terminal colors with xterm
+ENV TERM=xterm-256color
+
+WORKDIR /home/user/mnt
 
 CMD ["/bin/zsh"]
