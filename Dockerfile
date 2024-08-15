@@ -13,19 +13,49 @@ RUN eselect repository enable guru
 RUN emerge --sync guru
 RUN emerge app-portage/gentoolkit
 
-# ======= Sorted ========
+# archive tools
 RUN emerge app-arch/unzip
+RUN emerge app-arch/tar
+RUN emerge app-arch/gxz
+RUN emerge app-arch/gzip
+
+# Network tools
+RUN emerge net-misc/curl
+RUN emerge net-misc/wget
+RUN emerge net-misc/rsync
+
+# sys apps
+RUN emerge sys-apps/sed
+RUN emerge sys-apps/gawk
+RUN emerge sys-apps/bat
+RUN emerge sys-apps/eza
+RUN emerge sys-apps/fd
+RUN emerge sys-apps/ripgrep
+
+# build tools
+RUN emerge dev-build/cmake
+RUN emerge dev-build/make
+
+# languages
+# don't install python, node, or terraform here
+# We will be using pyenv, nvm, and tfenv to install these
+RUN emerge dev-lang/go
+RUN emerge dev-lang/rust
+RUN emerge dev-lang/lua
+RUN emerge dev-lua/luarocks
+
+# editors
 RUN emerge app-editors/neovim
-RUN emerge app-lang/go
-RUN emerge app-lang/lua
-RUN emerge app-lang/rust
+
+# misc
 RUN emerge app-misc/jq
 RUN emerge app-misc/neofetch
 RUN emerge app-misc/tmux
 RUN emerge app-misc/yq
+
+# shells
 RUN emerge app-shells/direnv
 RUN emerge app-shells/fzf
-RUN emerge app-shells/pyenv
 RUN emerge app-shells/thefuck
 RUN emerge app-shells/zoxide
 RUN emerge app-shells/zsh
@@ -34,32 +64,22 @@ RUN emerge app-shells/zsh-autosuggestions
 RUN emerge app-shells/zsh-completions
 RUN emerge app-shells/zsh-history-substring-search
 RUN emerge app-shells/zsh-syntax-highlighting
-RUN emerge dev-build/autoconf
-RUN emerge dev-build/cmake
-RUN emerge dev-build/make
-RUN emerge dev-build/meson
-RUN emerge dev-build/ninja
-RUN emerge dev-lua/luarocks
+
+# git
 RUN emerge dev-util/github-cli
 RUN emerge dev-utils/git-delta
 RUN emerge dev-vcs/lazygit
+
+# graphviz
 RUN emerge media-gfx/graphviz
-RUN emerge net-misc/curl
-RUN emerge net-misc/rsync
-RUN emerge net-misc/wget
-RUN emerge sys-apps/bat
-RUN emerge sys-apps/eza
-RUN emerge sys-apps/fd
-RUN emerge sys-apps/gawk
-RUN emerge sys-apps/ripgrep
-RUN emerge sys-apps/sed
+
+# clusters
 RUN emerge sys-cluster/k9scli
 RUN emerge sys-cluster/kubectl
 RUN emerge sys-cluster/slurm
-# ======= END: Sorted ========
 
 # ======= To Sort =========
-
+# Put things here to later sort into the above lists
 # ======= END: To Sort =========
 
 # Clean up unnecessary files and dependencies
