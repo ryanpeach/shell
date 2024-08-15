@@ -189,6 +189,7 @@ ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 # terminal colors with xterm
 ENV TERM=xterm-256color
 
+ENV HOME=/home/user
 WORKDIR /home/user/mnt
 
 CMD ["/bin/zsh"]
