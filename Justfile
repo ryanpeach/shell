@@ -1,5 +1,5 @@
 build:
-    docker build -t user/shell:local .
+    docker build -t rgpeach10/shell:local .
 
 run-local:
     docker run -it --rm \
