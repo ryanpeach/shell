@@ -27,7 +27,7 @@ RUN emerge net-misc/rsync
 # sys apps
 RUN emerge sys-apps/sed
 RUN emerge sys-apps/gawk
-RUN emerge sys-apps/bat
+# RUN emerge sys-apps/bat
 RUN emerge sys-apps/eza
 RUN emerge sys-apps/fd
 RUN emerge sys-apps/ripgrep
@@ -39,6 +39,11 @@ RUN emerge dev-build/make
 # languages
 # don't install python, node, or terraform here
 # We will be using pyenv, nvm, and tfenv to install these
+# sys-devel/binutils is needed for go
+RUN euse -E gold -p sys-devel/binutils && \
+    emerge sys-devel/binutils
+# needed for go
+ENV FEATURES="-sandbox -usersandbox"
 RUN emerge dev-lang/go
 RUN emerge dev-lang/rust
 RUN emerge dev-lang/lua
