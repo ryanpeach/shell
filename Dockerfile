@@ -1,121 +1,120 @@
 # Stage 1: Build environment to install emerge and perform updates
-FROM gentoo/stage3:latest as builder
+FROM alpine:latest as builder
 
 # Update the environment and install necessary tools
-RUN emerge --sync && \
-    emerge --update --deep --newuse @world && \
-    emerge sys-apps/portage
+RUN apk update && apk upgrade
 
-# Eselect
-RUN emerge app-eselect/eselect-repository
-RUN emerge dev-vcs/git
-RUN eselect repository enable guru
-RUN emerge --sync guru
-RUN emerge app-portage/gentoolkit
+# Build dependencies
+RUN apk add \
+  make \
+  cmake \
+  g++ \
+  gcc \
+  gfortran \
+  zlib-dev \
+  libffi-dev \
+  linux-headers \
+  readline-dev \
+  openssl-dev \
+  sqlite-dev \
+  bzip2-dev \
+  xz-dev
 
-# archive tools
-RUN emerge app-arch/unzip
-RUN emerge app-arch/tar
-# RUN emerge app-arch/gxz
-RUN emerge app-arch/gzip
+# Archive tools
+RUN apk add --no-cache unzip tar gzip patch
 
 # Network tools
-RUN emerge net-misc/curl
-RUN emerge net-misc/wget
-RUN emerge net-misc/rsync
+RUN apk add --no-cache curl wget rsync
 
-# sys apps
-RUN emerge sys-apps/sed
-RUN emerge sys-apps/gawk
-# RUN emerge sys-apps/bat
-RUN emerge sys-apps/eza
-RUN emerge sys-apps/fd
-RUN emerge sys-apps/ripgrep
+# System apps
+RUN apk add --no-cache sed gawk
 
-# build tools
-RUN emerge dev-build/cmake
-RUN emerge dev-build/make
+# Languages
+RUN apk add --no-cache go rust lua lua-dev luarocks
 
-# languages
-# don't install python, node, or terraform here
-# We will be using pyenv, nvm, and tfenv to install these
-# sys-devel/binutils is needed for go
-RUN euse -E gold -p sys-devel/binutils && \
-    emerge sys-devel/binutils
-# needed for go
-ENV FEATURES="-sandbox -usersandbox"
-RUN emerge dev-lang/go
-RUN emerge dev-lang/rust
-RUN emerge dev-lang/lua
-RUN emerge dev-lua/luarocks
+# Editors
+RUN apk add --no-cache neovim
 
-# editors
-RUN emerge app-editors/neovim
+# Miscellaneous tools
+RUN apk add --no-cache jq neofetch tmux
 
-# misc
-RUN emerge app-misc/jq
-RUN emerge app-misc/neofetch
-RUN emerge app-misc/tmux
-RUN emerge app-misc/yq
+# Shells and Zsh plugins
+RUN apk add --no-cache zsh zsh-autosuggestions zsh-syntax-highlighting zsh-completions
 
-# shells
-RUN emerge app-shells/direnv
-RUN emerge app-shells/fzf
-RUN emerge app-shells/thefuck
-RUN emerge app-shells/zoxide
-RUN emerge app-shells/zsh
-RUN emerge app-shells/zsh-autocomplete
-RUN emerge app-shells/zsh-autosuggestions
-RUN emerge app-shells/zsh-completions
-RUN emerge app-shells/zsh-history-substring-search
-RUN emerge app-shells/zsh-syntax-highlighting
-
-# git
-RUN emerge dev-util/github-cli
-RUN emerge dev-utils/git-delta
-RUN emerge dev-vcs/lazygit
-
-# graphviz
-RUN emerge media-gfx/graphviz
-
-# clusters
-RUN emerge sys-cluster/k9scli
-RUN emerge sys-cluster/kubectl
-RUN emerge sys-cluster/slurm
-
-# ======= To Sort =========
-# Put things here to later sort into the above lists
-# ======= END: To Sort =========
+# Git and graphviz
+RUN apk add --no-cache git graphviz
 
 # Clean up unnecessary files and dependencies
-RUN emerge --depclean && \
-    eclean-dist --deep && \
-    eclean-pkg --deep
+RUN rm -rf /var/cache/apk/*
+
+# Dont use apk below this line
+# =============================================================
 
 # We don't actually need to create a new user
 # Just set a reasonable home directory
-WORKDIR /home/user
-ENV HOME=/home/user
+WORKDIR /home/root
+ENV HOME=/home/root
 
-# RUN emerge app-admin/helm does not support arm
-# Install Helm
-RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 && \
-  chmod 700 get_helm.sh && \
-  ./get_helm.sh
+# Install pyenv
+RUN curl https://pyenv.run | bash
+ENV PYENV_ROOT=$HOME/.pyenv
+ENV PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
+
+# Create some pyenv environments
+RUN pyenv install 3.11 && \
+    pyenv global 3.11 && \
+    pyenv rehash && \
+    pip install --upgrade pip && \
+    rm -rf $PYENV_ROOT/sources
+
+# TODO: Move thiese up
+RUN apk add --no-cache openblas-dev lapack-dev
+
+# Python package installs
+RUN pip install --no-cache-dir setuptools
+RUN pip install --no-cache-dir numpy scipy pandas
+RUN pip install --no-cache-dir pynvim
+RUN pip install --no-cache-dir pipx
+RUN pip install --no-cache-dir userpath
+RUN rm -rf ~/.cache/pip
+
+# Pipx installs
+ENV PATH="$HOME/.local/bin:$PATH"
+RUN pipx install aider-chat
+RUN pipx install pre-commit
+RUN pipx install poetry
+RUN pipx install ruff
+RUN pipx install ipython
+RUN pipx install ipdb
+RUN pipx install awscli
+RUN pipx install pyright
+RUN pipx install ruff-lsp
+RUN pipx install just
+RUN pipx install thefuck
+RUN pipx install aws-parallelcluster
+RUN rm -rf /root/.local/pipx/shared ~/.cache/pipx
+
+# Clean up
+RUN find / -type f -name '*.py[co]' -delete
+RUN find $PYENV_ROOT -name 'tests' -type d -exec rm -rf {} +
+RUN find $PYENV_ROOT -name '__pycache__' -type d -exec rm -rf {} +
+
+# luarocks installs
+ENV PATH="/usr/local/lib/luarocks/bin/:$HOME/.luarocks/bin/:$PATH"
+RUN luarocks config local_by_default true
+RUN luarocks install --server=https://luarocks.org/dev luaformatter
 
 # Install nvm in the current home directory
 ENV NVM_DIR="$HOME/.nvm"
-RUN git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR" && \
-  cd "$NVM_DIR" && \
-  git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)`
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
 
 # Install node
-RUN \. "$NVM_DIR/nvm.sh" \
+RUN . "$NVM_DIR/nvm.sh" \
   && nvm install node
 
-# Install stuff with npm
-RUN \. "$NVM_DIR/nvm.sh" \
-  && npm install -g \
+# npm installs
+RUN . "$NVM_DIR/nvm.sh" \
+  npm install -g \
     prettier \
     pyright \
     twilio-cli
@@ -124,77 +123,80 @@ RUN \. "$NVM_DIR/nvm.sh" \
 RUN git clone --depth=1 https://github.com/tfutils/tfenv.git $HOME/.tfenv
 RUN .tfenv/bin/tfenv install latest
 
+# Cargo installs
+RUN cargo install git-delta
+RUN cargo install ripgrep
+RUN cargo install zoxide
+RUN cargo install bat
+RUN cargo install fd
+RUN cargo install eza
+RUN cargo clean
+
 # Go installs
-ENV PATH="/home/user/go/bin:$PATH"
-RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 && \
-    go install github.com/mikefarah/yq/v4@latest && \
-    go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest && \
-    go install github.com/helmfile/helmfile@latest && \
-    go install github.com/jesseduffield/lazygit@latest && \
-    terraform-docs --version && \
-    yq --version && \
-    jira --help && \
-    helmfile --version && \
-    lazygit --help
+ENV PATH="$HOME/go/bin:$PATH"
+RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 && terraform-docs --version
+RUN go install github.com/mikefarah/yq/v4@latest && yq --version
+RUN go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest && jira --help
+RUN go install github.com/helmfile/helmfile@latest && helmfile --version
+RUN go install github.com/jesseduffield/lazygit@latest && lazygit --help
+RUN go install github.com/direnv/direnv@latest && direnv --version
+RUN go install github.com/derailed/k9s@latest && k9s --version
+RUN go install github.com/kubernetes/kubectl@latest && kubectl version --client
+RUN go install github.com/cli/cli@latest && gh --version
+RUN go install github.com/junegunn/fzf@latest && fzf --version
+RUN go install github.com/helm/helm@latest && helm version
+RUN go clean -cache -modcache -i -r
 
-# Install pyenv
-RUN git clone https://github.com/pyenv/pyenv.git .pyenv
-RUN cd .pyenv && src/configure && make -C src || true
-ENV PYENV_ROOT=$HOME/.pyenv
-ENV PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
+# Slurm
+WORKDIR /tmp
+RUN wget https://download.schedmd.com/slurm/slurm-<version>.tar.bz2 && \
+    tar -xaf slurm-24.05.2.tar.bz2 && \
+    cd slurm-24.05.2.tar.bz2 && \
+    ./configure --prefix=/usr --sysconfdir=/etc/slurm --with-munge && \
+    make && \
+    make install && \
+    ldconfig -n /usr/lib && \
+    ldconfig -n /usr/lib64 && \
+    rm -rf /var/cache/apk/* /tmp/slurm-*
+WORKDIR /home/root
 
-# Create some pyenv environments
-RUN pyenv install 3.11 && \
-    pyenv global 3.11 && \
-    pyenv rehash
-
-RUN pip install \
-  setuptools \
-  numpy \
-  pynvim \
-  pipx \
-  ensurepath
-
-# Now default python installs in the root virtualenv
-RUN pipx install \
-  aider-chat \
-  pre-commit \
-  poetry \
-  ruff \
-  ipython \
-  ipdb \
-  awscli \
-  pyright \
-  ruff-lsp \
-  just \
-  aws-parallelcluster
+# Install Oh My Zsh
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+ENV ZSH_CUSTOM=/home/user/.oh-my-zsh/custom
+RUN git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
+RUN git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
+RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
 
 # Copies
-COPY --chown=user bin bin
-COPY --chown=user home/ .
-RUN git config --global core.excludesFile '~/.gitignore_global'
+COPY bin bin
+COPY home/ .
+RUN git config --global core.excludesFile '$HOME/.gitignore_global'
 RUN git config --global pull.rebase true
 RUN git config --global --add --bool push.autoSetupRemote true
-
-# Get neovim to download all its stuff
-RUN nvim --headless "+Lazy! sync" +qa
+RUN find $PYENV_ROOT -name '*.md' -delete
+RUN find /usr/lib/python3.*/ -name 'locale' -exec rm -rf {} +
 
 # Chmod so that these files are runnable
 RUN find bin -type f -exec chmod +x {} \;
 
-# Stage 2: Final minimal image
-FROM gentoo/stage3:latest
+# Get neovim to download all its stuff
+RUN nvim --headless "+Lazy! sync" +qa
+
+# Second stage
+# ==============================================================
+
+# Stage 2: minimal image
+FROM alpine:latest
 
 # Copy the updated system from the builder stage
 COPY --from=builder / /
 
-# Set up environment variables and entry point
-ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-
 # terminal colors with xterm
 ENV TERM=xterm-256color
 
-ENV HOME=/home/user
-WORKDIR /home/user/mnt
+# We are still using root, but from a different home directory
+# Then you are going to mount your home this home's mnt directory
+ENV HOME=/home/root
+WORKDIR /home/root/mnt
 
 CMD ["/bin/zsh"]
