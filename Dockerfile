@@ -101,8 +101,8 @@ RUN find $PYENV_ROOT -name '__pycache__' -type d -exec rm -rf {} +
 
 # luarocks installs
 ENV PATH="/usr/local/lib/luarocks/bin/:$HOME/.luarocks/bin/:$PATH"
-RUN luarocks config local_by_default true
-RUN luarocks install --server=https://luarocks.org/dev luaformatter
+RUN luarocks-5.1 config local_by_default true
+RUN luarocks-5.1 install --server=https://luarocks.org/dev luaformatter
 
 # Install nvm in the current home directory
 ENV NVM_DIR="$HOME/.nvm"
