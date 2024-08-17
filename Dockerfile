@@ -1,5 +1,5 @@
 # Stage 1: Build environment to install emerge and perform updates
-FROM alpine:latest AS builder
+FROM alpine:edge AS builder
 
 # Get the full version (e.g., 3.15.0) and major version (e.g., 3.15)
 RUN ALPINE_VERSION=$(cut -d '.' -f1,2 /etc/alpine-release) && \
@@ -181,7 +181,7 @@ RUN nvim --headless "+Lazy! sync" +qa
 # ==============================================================
 
 # Stage 2: minimal image
-FROM alpine:latest
+FROM alpine:edge
 
 # Copy the updated system from the builder stage
 COPY --from=builder / /
