@@ -1,11 +1,17 @@
 # Stage 1: Build environment to install emerge and perform updates
 FROM alpine:latest as builder
 
-# Update the environment and install necessary tools
+# Enable community and testing repositories
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/$(. /etc/alpine-release && echo ${VERSION_ID%%.*})/main" > /etc/apk/repositories && \
+    echo "http://dl-cdn.alpinelinux.org/alpine/$(. /etc/alpine-release && echo ${VERSION_ID%%.*})/community" >> /etc/apk/repositories && \
+    echo "http://dl-cdn.alpinelinux.org/alpine/$(. /etc/alpine-release && echo ${VERSION_ID%%.*})/testing" >> /etc/apk/repositories
+
+# Update package list
 RUN apk update && apk upgrade
 
 # Build dependencies
 RUN apk add \
+  git \
   make \
   cmake \
   g++ \
@@ -18,7 +24,9 @@ RUN apk add \
   openssl-dev \
   sqlite-dev \
   bzip2-dev \
-  xz-dev
+  xz-dev \
+  openblas-dev \
+  lapack-dev
 
 # Archive tools
 RUN apk add --no-cache unzip tar gzip patch
@@ -30,19 +38,20 @@ RUN apk add --no-cache curl wget rsync
 RUN apk add --no-cache sed gawk
 
 # Languages
-RUN apk add --no-cache go rust lua lua-dev luarocks nodejs
-
-# Editors
-RUN apk add --no-cache neovim
+# Not installing python, doing that via pyenv
+RUN apk add --no-cache go rust cargo lua lua-dev luarocks nodejs npm
 
 # Miscellaneous tools
-RUN apk add --no-cache jq neofetch tmux
+RUN apk add --no-cache neovim jq neofetch tmux
 
 # Shells and Zsh plugins
 RUN apk add --no-cache zsh zsh-autosuggestions zsh-syntax-highlighting zsh-completions
 
-# Git and graphviz
-RUN apk add --no-cache git graphviz
+# K8s
+RUN apk add --no-cache helm kubectl helmfile
+
+# graphviz
+RUN apk add --no-cache graphviz
 
 # Clean up unnecessary files and dependencies
 RUN rm -rf /var/cache/apk/*
@@ -67,15 +76,9 @@ RUN pyenv install 3.11 && \
     pip install --upgrade pip && \
     rm -rf $PYENV_ROOT/sources
 
-# TODO: Move thiese up
-RUN apk add --no-cache openblas-dev lapack-dev
-
 # Python package installs
-RUN pip install --no-cache-dir setuptools
 RUN pip install --no-cache-dir numpy scipy pandas
-RUN pip install --no-cache-dir pynvim
 RUN pip install --no-cache-dir pipx
-RUN pip install --no-cache-dir userpath
 RUN rm -rf ~/.cache/pip
 
 # Pipx installs
@@ -115,28 +118,35 @@ RUN git clone --depth=1 https://github.com/tfutils/tfenv.git $HOME/.tfenv
 RUN .tfenv/bin/tfenv install latest
 
 # Cargo installs
+ENV PATH="/home/root/.cargo/bin:$PATH"
 RUN cargo install git-delta
 RUN cargo install ripgrep
 RUN cargo install zoxide
 RUN cargo install bat
-RUN cargo install fd
+RUN cargo install fd-find
 RUN cargo install eza
-RUN cargo clean
 
 # Go installs
 ENV PATH="$HOME/go/bin:$PATH"
 RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 && terraform-docs --version
 RUN go install github.com/mikefarah/yq/v4@latest && yq --version
 RUN go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest && jira --help
-RUN go install github.com/helmfile/helmfile@latest && helmfile --version
 RUN go install github.com/jesseduffield/lazygit@latest && lazygit --help
 RUN go install github.com/direnv/direnv@latest && direnv --version
 RUN go install github.com/derailed/k9s@latest && k9s --version
-RUN go install github.com/kubernetes/kubectl@latest && kubectl version --client
-RUN go install github.com/cli/cli@latest && gh --version
 RUN go install github.com/junegunn/fzf@latest && fzf --version
-RUN go install github.com/helm/helm@latest && helm version
+RUN apk add --no-cache 
 RUN go clean -cache -modcache -i -r
+
+# Install gh
+RUN curl -sS https://webi.sh/gh | sh
+
+# Install Oh My Zsh
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+ENV ZSH_CUSTOM=/home/user/.oh-my-zsh/custom
+RUN git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
+RUN git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
+RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
 
 # Slurm
 WORKDIR /tmp
@@ -150,13 +160,6 @@ RUN wget https://download.schedmd.com/slurm/slurm-<version>.tar.bz2 && \
     ldconfig -n /usr/lib64 && \
     rm -rf /var/cache/apk/* /tmp/slurm-*
 WORKDIR /home/root
-
-# Install Oh My Zsh
-RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-ENV ZSH_CUSTOM=/home/user/.oh-my-zsh/custom
-RUN git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
-RUN git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
-RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
 
 # Copies
 COPY bin bin
