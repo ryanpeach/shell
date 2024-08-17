@@ -1,16 +1,10 @@
 # Stage 1: Build environment to install emerge and perform updates
-FROM alpine:latest as builder
+FROM alpine:latest AS builder
 
 # Enable community and testing repositories
 RUN echo "http://dl-cdn.alpinelinux.org/alpine/v$(cut -d '.' -f1 /etc/alpine-release)/main" > /etc/apk/repositories && \
     echo "http://dl-cdn.alpinelinux.org/alpine/v$(cut -d '.' -f1 /etc/alpine-release)/community" >> /etc/apk/repositories && \
     echo "http://dl-cdn.alpinelinux.org/alpine/v$(cut -d '.' -f1 /etc/alpine-release)/testing" >> /etc/apk/repositories
-
-# Update package list
-RUN apk update
-
-# Install any packages you need
-# RUN apk add <your-packages>
 
 # Update package list
 RUN apk update && apk upgrade
