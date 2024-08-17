@@ -149,15 +149,15 @@ RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM
 
 # Slurm
 WORKDIR /tmp
-RUN wget https://download.schedmd.com/slurm/slurm-<version>.tar.bz2 && \
-    tar -xaf slurm-24.05.2.tar.bz2 && \
-    cd slurm-24.05.2.tar.bz2 && \
-    ./configure --prefix=/usr --sysconfdir=/etc/slurm --with-munge && \
-    make && \
-    make install && \
-    ldconfig -n /usr/lib && \
-    ldconfig -n /usr/lib64 && \
-    rm -rf /var/cache/apk/* /tmp/slurm-*
+# RUN wget https://download.schedmd.com/slurm/slurm-<version>.tar.bz2 && \
+#    tar -xaf slurm-24.05.2.tar.bz2 && \
+#    cd slurm-24.05.2.tar.bz2 && \
+#    ./configure --prefix=/usr --sysconfdir=/etc/slurm --with-munge && \
+#    make && \
+#    make install && \
+#    ldconfig -n /usr/lib && \
+#    ldconfig -n /usr/lib64 && \
+#    rm -rf /var/cache/apk/* /tmp/slurm-*
 WORKDIR /home/root
 
 # Copies
