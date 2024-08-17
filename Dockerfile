@@ -167,7 +167,6 @@ RUN git config --global core.excludesFile '$HOME/.gitignore_global'
 RUN git config --global pull.rebase true
 RUN git config --global --add --bool push.autoSetupRemote true
 RUN find $PYENV_ROOT -name '*.md' -delete
-RUN find /usr/lib/python3.*/ -name 'locale' -exec rm -rf {} +
 
 # Chmod so that these files are runnable
 RUN find bin -type f -exec chmod +x {} \;
