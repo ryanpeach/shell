@@ -30,7 +30,7 @@ RUN apk add --no-cache curl wget rsync
 RUN apk add --no-cache sed gawk
 
 # Languages
-RUN apk add --no-cache go rust lua lua-dev luarocks
+RUN apk add --no-cache go rust lua lua-dev luarocks nodejs
 
 # Editors
 RUN apk add --no-cache neovim
@@ -104,17 +104,8 @@ ENV PATH="/usr/local/lib/luarocks/bin/:$HOME/.luarocks/bin/:$PATH"
 RUN luarocks-5.1 config local_by_default true
 RUN luarocks-5.1 install --server=https://luarocks.org/dev luaformatter
 
-# Install nvm in the current home directory
-ENV NVM_DIR="$HOME/.nvm"
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
-
-# Install node
-RUN . "$NVM_DIR/nvm.sh" \
-  && nvm install node
-
 # npm installs
-RUN . "$NVM_DIR/nvm.sh" \
-  npm install -g \
+RUN npm install -g \
     prettier \
     pyright \
     twilio-cli
