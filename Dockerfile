@@ -3,9 +3,9 @@ FROM alpine:edge AS builder
 
 # Get the full version (e.g., 3.15.0) and major version (e.g., 3.15)
 RUN ALPINE_VERSION=$(cut -d '.' -f1,2 /etc/alpine-release) && \
-    echo "http://dl-cdn.alpinelinux.org/alpine/v${ALPINE_VERSION}/main" > /etc/apk/repositories && \
-    echo "http://dl-cdn.alpinelinux.org/alpine/v${ALPINE_VERSION}/community" >> /etc/apk/repositories && \
-    echo "http://dl-cdn.alpinelinux.org/alpine/v${ALPINE_VERSION}/testing" >> /etc/apk/repositories
+    echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" > /etc/apk/repositories && \
+    echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
+    echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
 
 # Update package list
 RUN apk update && apk upgrade
