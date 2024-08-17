@@ -136,8 +136,6 @@ RUN go install github.com/jesseduffield/lazygit@latest && lazygit --help
 RUN go install github.com/direnv/direnv@latest && direnv --version
 RUN go install github.com/derailed/k9s@latest && k9s --version
 RUN go install github.com/junegunn/fzf@latest && fzf --version
-RUN apk add --no-cache 
-RUN go clean -cache -modcache -i -r
 
 # Install gh
 RUN curl -sS https://webi.sh/gh | sh
