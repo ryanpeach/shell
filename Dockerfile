@@ -2,9 +2,15 @@
 FROM alpine:latest as builder
 
 # Enable community and testing repositories
-RUN echo "http://dl-cdn.alpinelinux.org/alpine/$(. /etc/alpine-release && echo ${VERSION_ID%%.*})/main" > /etc/apk/repositories && \
-    echo "http://dl-cdn.alpinelinux.org/alpine/$(. /etc/alpine-release && echo ${VERSION_ID%%.*})/community" >> /etc/apk/repositories && \
-    echo "http://dl-cdn.alpinelinux.org/alpine/$(. /etc/alpine-release && echo ${VERSION_ID%%.*})/testing" >> /etc/apk/repositories
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/v$(cut -d '.' -f1 /etc/alpine-release)/main" > /etc/apk/repositories && \
+    echo "http://dl-cdn.alpinelinux.org/alpine/v$(cut -d '.' -f1 /etc/alpine-release)/community" >> /etc/apk/repositories && \
+    echo "http://dl-cdn.alpinelinux.org/alpine/v$(cut -d '.' -f1 /etc/alpine-release)/testing" >> /etc/apk/repositories
+
+# Update package list
+RUN apk update
+
+# Install any packages you need
+# RUN apk add <your-packages>
 
 # Update package list
 RUN apk update && apk upgrade
