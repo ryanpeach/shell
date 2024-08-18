@@ -5,7 +5,7 @@
 #       REF: https://github.com/orgs/Homebrew/discussions/3612
 FROM ubuntu:latest
 
-# New user
+# Home
 WORKDIR /home/root
 ENV HOME=/home/root
 
