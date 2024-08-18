@@ -3,7 +3,7 @@
 #       When it does work, we can use homebrew/brew as a base image and replace
 #       a lot of the below with brew installs
 #       REF: https://github.com/orgs/Homebrew/discussions/3612
-FROM debian:latest
+FROM ubuntu:latest
 
 # New user
 WORKDIR /home/root
