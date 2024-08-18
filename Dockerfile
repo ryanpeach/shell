@@ -1,6 +1,11 @@
 # Stage 1: Build environment to install emerge and perform updates
 FROM alpine:edge AS builder
 
+# We don't actually need to create a new user
+# Just set a reasonable home directory
+WORKDIR /home/root
+ENV HOME=/home/root
+
 # Get the full version (e.g., 3.15.0) and major version (e.g., 3.15)
 RUN ALPINE_VERSION=$(cut -d '.' -f1,2 /etc/alpine-release) && \
     echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" > /etc/apk/repositories && \
@@ -11,7 +16,7 @@ RUN ALPINE_VERSION=$(cut -d '.' -f1,2 /etc/alpine-release) && \
 RUN apk update && apk upgrade
 
 # Build dependencies
-RUN apk add \
+RUN apk add --no-cache \
   git \
   make \
   iputils \
@@ -30,44 +35,47 @@ RUN apk add \
   xz-dev \
   openblas-dev \
   sshpass \
-  lapack-dev
-
-# Archive tools
-RUN apk add --no-cache unzip tar gzip patch
-
-# Network tools
-RUN apk add --no-cache curl wget rsync
-
-# System apps
-RUN apk add --no-cache sed gawk
-
-# Languages
-# Not installing python, doing that via pyenv
-RUN apk add --no-cache go rust cargo lua lua-dev luarocks nodejs npm
-
-# Miscellaneous tools
-RUN apk add --no-cache neovim jq neofetch tmux
-
-# Shells and Zsh plugins
-RUN apk add --no-cache zsh zsh-autosuggestions zsh-syntax-highlighting zsh-completions
+  lapack-dev \
+  # Archive tools \
+    unzip \
+    tar \
+    gzip \
+    patch \
+  # Network tools \
+    curl \
+    wget \
+    rsync \
+  # System apps \
+    sed \
+    gawk \
+    graphviz \
+  # Languages \
+    go \
+    rust \
+    cargo \
+    lua \
+    lua-dev \
+    luarocks \
+    nodejs \
+    npm \
+  # Miscellaneous tools \
+    neovim \
+    jq \
+    neofetch \
+    tmux \
+  # Shells and Zsh plugins \
+    zsh \
+    zsh-autosuggestions \
+    zsh-syntax-highlighting \
+    zsh-completions \
+  # K8s tools \
+    kubectl \
+    helm \
+    helmfile \
+  && rm -rf /var/cache/apk/*
 
 # K8s
-RUN apk add --no-cache helm kubectl helmfile
 RUN helm plugin install https://github.com/databus23/helm-diff
-
-# graphviz
-RUN apk add --no-cache graphviz
-
-# Clean up unnecessary files and dependencies
-RUN rm -rf /var/cache/apk/*
-
-# Dont use apk below this line
-# =============================================================
-
-# We don't actually need to create a new user
-# Just set a reasonable home directory
-WORKDIR /home/root
-ENV HOME=/home/root
 
 # Install pyenv
 RUN curl https://pyenv.run | bash
@@ -82,31 +90,26 @@ RUN pyenv install 3.11 && \
     rm -rf $PYENV_ROOT/sources
 
 # Python package installs
-RUN pip install --no-cache-dir numpy scipy pandas
-RUN pip install --no-cache-dir pipx
-RUN rm -rf ~/.cache/pip
+RUN pip install --no-cache-dir numpy scipy pandas pipx \
+  && rm -rf ~/.cache/pip
 
 # Pipx installs
 ENV PATH="$HOME/.local/bin:$PATH"
-RUN pipx install aider-chat
-RUN pipx install pre-commit
-RUN pipx install poetry
-RUN pipx install ruff
-RUN pipx install ipython
-RUN pipx install ipdb
-RUN pipx install awscli
-RUN pipx install pyright
-RUN pipx install ruff-lsp
-RUN pipx install just
-RUN pipx install thefuck
-RUN pipx install aws-parallelcluster
-RUN pipx install ansible
-RUN rm -rf /root/.local/pipx/shared ~/.cache/pipx
-
-# Clean up
-RUN find / -type f -name '*.py[co]' -delete
-RUN find $PYENV_ROOT -name 'tests' -type d -exec rm -rf {} +
-RUN find $PYENV_ROOT -name '__pycache__' -type d -exec rm -rf {} +
+RUN pipx install \
+    aider-chat \
+    pre-commit \
+    poetry \
+    ruff \
+    ipython \
+    ipdb \
+    awscli \
+    pyright \
+    ruff-lsp \
+    just \
+    thefuck \
+    aws-parallelcluster \
+    ansible \
+    && rm -rf /root/.local/pipx/shared ~/.cache/pipx
 
 # luarocks installs
 ENV PATH="/usr/local/lib/luarocks/bin/:$HOME/.luarocks/bin/:$PATH"
@@ -125,22 +128,31 @@ RUN .tfenv/bin/tfenv install latest
 
 # Cargo installs
 ENV PATH="/home/root/.cargo/bin:$PATH"
-RUN cargo install git-delta
-RUN cargo install ripgrep
-RUN cargo install zoxide
-RUN cargo install bat
-RUN cargo install fd-find
-RUN cargo install eza
+RUN cargo install \
+    git-delta \
+    ripgrep \
+    zoxide \
+    bat \
+    fd-find \
+    eza
 
 # Go installs
 ENV PATH="$HOME/go/bin:$PATH"
-RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 && terraform-docs --version
-RUN go install github.com/mikefarah/yq/v4@latest && yq --version
-RUN go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest && jira --help
-RUN go install github.com/jesseduffield/lazygit@latest && lazygit --help
-RUN go install github.com/direnv/direnv@latest && direnv --version
-RUN go install github.com/derailed/k9s@latest && k9s --version
-RUN go install github.com/junegunn/fzf@latest && fzf --version
+RUN go install \
+    github.com/terraform-docs/terraform-docs@v0.18.0 \
+    github.com/mikefarah/yq/v4@latest \
+    github.com/ankitpokhrel/jira-cli/cmd/jira@latest \
+    github.com/jesseduffield/lazygit@latest \
+    github.com/direnv/direnv@latest \
+    github.com/derailed/k9s@latest \
+    github.com/junegunn/fzf@latest \
+    && terraform-docs --version \
+    && yq --version \
+    && jira --help \
+    && lazygit --help \
+    && direnv --version \
+    && k9s --version \
+    && fzf --version
 
 # Install gh
 RUN curl -sS https://webi.sh/gh | sh
@@ -179,21 +191,7 @@ RUN find bin -type f -exec chmod +x {} \;
 # Get neovim to download all its stuff
 RUN nvim --headless "+Lazy! sync" +qa
 
-# Second stage
-# ==============================================================
-
-# Stage 2: minimal image
-FROM alpine:edge
-
-# Copy the updated system from the builder stage
-COPY --from=builder / /
-
 # terminal colors with xterm
 ENV TERM=xterm-256color
-
-# We are still using root, but from a different home directory
-# Then you are going to mount your home this home's mnt directory
-ENV HOME=/home/root
-WORKDIR /home/root/mnt
 
 CMD ["/bin/zsh"]
