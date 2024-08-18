@@ -9,10 +9,6 @@ FROM debian:latest
 WORKDIR /home/root
 ENV HOME=/home/root
 
-# kubectl stuff
-RUN curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key | sudo tee /etc/apt/trusted.gpg.d/kubernetes.gpg > /dev/null
-RUN echo "deb https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-
 # Installs
 RUN apt-get update && \
   apt-get install -y \
@@ -60,7 +56,6 @@ RUN apt-get update && \
   devscripts \
   rsync \
   equivs \
-  kubectl \
   munge \
   slurm-wlm \
   libreadline-dev && \
@@ -69,6 +64,22 @@ RUN apt-get update && \
 
 # set up locale
 RUN locale-gen en_US.UTF-8
+
+# Get kubectl
+RUN curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg && \
+    chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg && \
+    echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list && \
+    chmod 644 /etc/apt/sources.list.d/kubernetes.list && \
+    apt-get update && \
+    apt-get install -y kubectl && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Helm
+RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 && \
+  chmod 700 get_helm.sh && \
+  ./get_helm.sh && \
+  helm version
 
 # Install neovim
 # This is to get latest
@@ -80,15 +91,8 @@ RUN git clone https://github.com/neovim/neovim && \
   dpkg -i nvim-linux64.deb && \
   nvim --version
 
-# Install Helm
-RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 && \
-  chmod 700 get_helm.sh && \
-  ./get_helm.sh && \
-  helm version
-
 # Install GitHub CLI
 RUN curl -sS https://webi.sh/gh | sh && gh --version
-
 
 # Install tfenv
 RUN git clone --depth=1 https://github.com/tfutils/tfenv.git $HOME/.tfenv
@@ -180,7 +184,7 @@ RUN \. "$NVM_DIR/nvm.sh" \
 
 # Install stuff with npm
 RUN \. "$NVM_DIR/nvm.sh" \
-  && npm install -g prettier pyright twilio-cli 
+  && npm install -g prettier pyright twilio-cli
 
 # Verify installations
 RUN \. "$NVM_DIR/nvm.sh" \
