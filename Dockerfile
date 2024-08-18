@@ -27,6 +27,7 @@ RUN apk add \
   bzip2-dev \
   xz-dev \
   openblas-dev \
+  sshpass \
   lapack-dev
 
 # Archive tools
@@ -96,6 +97,7 @@ RUN pipx install ruff-lsp
 RUN pipx install just
 RUN pipx install thefuck
 RUN pipx install aws-parallelcluster
+RUN pipx install ansible
 RUN rm -rf /root/.local/pipx/shared ~/.cache/pipx
 
 # Clean up
