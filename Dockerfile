@@ -32,9 +32,6 @@ RUN apt-get update && \
   tmux \
   vim \
   just \
-  python3 \
-  python3-pip \
-  pipx \
   golang-go \
   fonts-powerline \
   tree \
@@ -136,6 +133,7 @@ RUN pipx install \
   pyright \
   ruff-lsp \
   ansible \
+  pipx \
   aws-parallelcluster
 
 RUN pip install \
