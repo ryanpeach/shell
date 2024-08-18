@@ -23,7 +23,7 @@ RUN apt-get update && \
   libssl-dev \
   libbz2-dev \
   git \
-  lua5.2 \
+  lua5.1 \
   gnupg \
   fd-find \
   fzf \
@@ -58,6 +58,7 @@ RUN apt-get update && \
   luarocks \
   fakeroot \
   devscripts \
+  rsync \
   equivs \
   kubectl \
   munge \
@@ -94,13 +95,19 @@ RUN git clone --depth=1 https://github.com/tfutils/tfenv.git $HOME/.tfenv
 RUN .tfenv/bin/tfenv install latest
 
 # Go installs
-ENV PATH="/home/user/go/bin:$PATH"
-RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 && \
-    go install github.com/mikefarah/yq/v4@latest && \
-    go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest && \
-    terraform-docs --version && \
-    yq --version && \
-    jira --help
+ENV PATH="$HOME/go/bin:$PATH"
+RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 \
+  && terraform-docs --version \
+  && go install github.com/mikefarah/yq/v4@latest \
+	&& yq --version \
+  && go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest \
+	&& jira --help \
+  && go install github.com/jesseduffield/lazygit@latest \
+	&& lazygit --help \
+  && go install github.com/direnv/direnv@latest \
+	&& direnv --version \
+	&& go install github.com/derailed/k9s@latest \
+	&& k9s --version \
 
 # Install pyenv
 RUN curl https://pyenv.run | bash
@@ -141,6 +148,14 @@ RUN cargo --version && \
     cargo fmt --version && \
     rust-analyzer --version
 
+# Install rust things
+ENV PATH="/home/root/.cargo/bin:$PATH"
+RUN cargo install \
+    git-delta \
+    zoxide \
+    bat \
+    eza
+
 # Install Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ENV ZSH_CUSTOM=/home/user/.oh-my-zsh/custom
@@ -165,7 +180,7 @@ RUN \. "$NVM_DIR/nvm.sh" \
 
 # Install stuff with npm
 RUN \. "$NVM_DIR/nvm.sh" \
-  && npm install -g prettier pyright
+  && npm install -g prettier pyright twilio-cli 
 
 # Verify installations
 RUN \. "$NVM_DIR/nvm.sh" \
