@@ -138,21 +138,20 @@ RUN cargo install \
 
 # Go installs
 ENV PATH="$HOME/go/bin:$PATH"
-RUN go install \
-    github.com/terraform-docs/terraform-docs@v0.18.0 \
-    github.com/mikefarah/yq/v4@latest \
-    github.com/ankitpokhrel/jira-cli/cmd/jira@latest \
-    github.com/jesseduffield/lazygit@latest \
-    github.com/direnv/direnv@latest \
-    github.com/derailed/k9s@latest \
-    github.com/junegunn/fzf@latest \
-    && terraform-docs --version \
-    && yq --version \
-    && jira --help \
-    && lazygit --help \
-    && direnv --version \
-    && k9s --version \
-    && fzf --version
+RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 \
+  && terraform-docs --version \
+  && go install github.com/mikefarah/yq/v4@latest \
+	&& yq --version \
+  && go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest \
+	&& jira --help \
+  && go install github.com/jesseduffield/lazygit@latest \
+	&& lazygit --help \
+  && go install github.com/direnv/direnv@latest \
+	&& direnv --version \
+	&& go install github.com/derailed/k9s@latest \
+	&& k9s --version \
+	&& go install github.com/junegunn/fzf@latest \
+	&& fzf --version
 
 # Install gh
 RUN curl -sS https://webi.sh/gh | sh
