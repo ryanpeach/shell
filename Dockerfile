@@ -51,6 +51,7 @@ RUN apk add --no-cache zsh zsh-autosuggestions zsh-syntax-highlighting zsh-compl
 
 # K8s
 RUN apk add --no-cache helm kubectl helmfile
+RUN helm plugin install https://github.com/databus23/helm-diff
 
 # graphviz
 RUN apk add --no-cache graphviz
