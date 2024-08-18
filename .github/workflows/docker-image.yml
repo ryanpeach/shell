@@ -12,10 +12,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/setup-python@v3
-    - uses: leafo/gh-actions-lua@v9
-    - uses: leafo/gh-actions-luarocks@v4
-    - uses: pre-commit/action@v3.0.1
 
     # Set up BuildKit Docker container builder to be able to build
     # multi-platform images and export cache
@@ -32,6 +28,6 @@ jobs:
         context: .
         push: false
         tags: latest
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        cache-from: type=registry,ref=rgpeach10/shell:buildcache
+        cache-to: type=registry,ref=rgpeach10/shell:buildcache,mode=max
         platforms: linux/amd64,linux/arm64
