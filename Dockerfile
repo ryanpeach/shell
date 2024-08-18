@@ -3,7 +3,15 @@
 #       When it does work, we can use homebrew/brew as a base image and replace
 #       a lot of the below with brew installs
 #       REF: https://github.com/orgs/Homebrew/discussions/3612
-FROM ubuntu:latest
+FROM debian:latest
+
+# New user
+WORKDIR /home/root
+ENV HOME=/home/root
+
+# kubectl stuff
+RUN curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key | sudo tee /etc/apt/trusted.gpg.d/kubernetes.gpg > /dev/null
+RUN echo "deb https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
 # Installs
 RUN apt-get update && \
@@ -15,6 +23,7 @@ RUN apt-get update && \
   libssl-dev \
   libbz2-dev \
   git \
+  lua5.2 \
   gnupg \
   fd-find \
   fzf \
@@ -46,9 +55,11 @@ RUN apt-get update && \
   ninja-build \
   gettext \
   libffi-dev \
+  luarocks \
   fakeroot \
   devscripts \
   equivs \
+  kubectl \
   munge \
   slurm-wlm \
   libreadline-dev && \
@@ -59,6 +70,7 @@ RUN apt-get update && \
 RUN locale-gen en_US.UTF-8
 
 # Install neovim
+# This is to get latest
 RUN git clone https://github.com/neovim/neovim && \
   cd neovim && \
   make CMAKE_BUILD_TYPE=RelWithDebInfo && \
@@ -67,61 +79,15 @@ RUN git clone https://github.com/neovim/neovim && \
   dpkg -i nvim-linux64.deb && \
   nvim --version
 
-# Install Lua
-RUN curl -R -O -L http://www.lua.org/ftp/lua-5.3.5.tar.gz && \
-  tar -zxf lua-5.3.5.tar.gz && \
-  cd lua-5.3.5 && \
-  make linux test && \
-  make install
-
-# Install Luarocks
-RUN wget https://luarocks.github.io/luarocks/releases/luarocks-3.11.1.tar.gz && \
-  tar -zxf luarocks-3.11.1.tar.gz && \
-  cd luarocks-3.11.1 && \
-  ./configure --with-lua-include=/usr/local/include && \
-  make && \
-  make install
-
-# Get kubectl
-RUN curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg && \
-    chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg && \
-    echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list && \
-    chmod 644 /etc/apt/sources.list.d/kubernetes.list && \
-    apt-get update && \
-    apt-get install -y kubectl && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
 # Install Helm
 RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 && \
   chmod 700 get_helm.sh && \
-  ./get_helm.sh
+  ./get_helm.sh && \
+  helm version
 
-# Add the GitHub CLI repository and install the GitHub CLI
-RUN mkdir -p -m 755 /etc/apt/keyrings \
-    && wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
-    && chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
-    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-    && apt-get update \
-    && apt-get install -y gh \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# Install GitHub CLI
+RUN curl -sS https://webi.sh/gh | sh && gh --version
 
-# New user
-RUN useradd -ms /bin/zsh user
-USER user
-WORKDIR /home/user
-ENV HOME=/home/user
-
-# Verify installation
-RUN gh --version
-
-# Verify installations
-RUN kubectl version --client && \
-    helm version
-
-# Install Oh My Zsh
-RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 # Install tfenv
 RUN git clone --depth=1 https://github.com/tfutils/tfenv.git $HOME/.tfenv
@@ -137,8 +103,7 @@ RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 && \
     jira --help
 
 # Install pyenv
-RUN git clone https://github.com/pyenv/pyenv.git .pyenv
-RUN cd .pyenv && src/configure && make -C src || true
+RUN curl https://pyenv.run | bash
 ENV PYENV_ROOT=$HOME/.pyenv
 ENV PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
 
@@ -159,12 +124,13 @@ RUN pipx install \
   awscli \
   pyright \
   ruff-lsp \
+  ansible \
   aws-parallelcluster
 
 RUN pip install \
   setuptools \
   numpy \
-  pynvim
+  scipy
 
 # Get Rust
 RUN rustup default stable && \
@@ -175,7 +141,8 @@ RUN cargo --version && \
     cargo fmt --version && \
     rust-analyzer --version
 
-# Install zsh plugins
+# Install Oh My Zsh
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ENV ZSH_CUSTOM=/home/user/.oh-my-zsh/custom
 RUN git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
 RUN git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
@@ -192,9 +159,6 @@ RUN git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR" && \
   cd "$NVM_DIR" && \
   git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)`
 
-# Gotta go back to root to install node
-USER root
-
 # Install node
 RUN \. "$NVM_DIR/nvm.sh" \
   && nvm install node
@@ -203,9 +167,6 @@ RUN \. "$NVM_DIR/nvm.sh" \
 RUN \. "$NVM_DIR/nvm.sh" \
   && npm install -g prettier pyright
 
-# Switch back to user
-USER user
-
 # Verify installations
 RUN \. "$NVM_DIR/nvm.sh" \
     && node --version \
@@ -213,8 +174,8 @@ RUN \. "$NVM_DIR/nvm.sh" \
     && prettier --version
 
 # Copies
-COPY --chown=user bin bin
-COPY --chown=user home/ .
+COPY bin bin
+COPY home/ .
 RUN git config --global core.excludesFile '~/.gitignore_global'
 RUN git config --global pull.rebase true
 RUN git config --global --add --bool push.autoSetupRemote true
