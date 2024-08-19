@@ -15,6 +15,8 @@ RUN apt-get update && \
   linux-tools-generic \
   software-properties-common \
   build-essential \
+  openssh-server \
+  openssh-client \
   curl \
   libssl-dev \
   libbz2-dev \
@@ -190,6 +192,10 @@ RUN \. "$NVM_DIR/nvm.sh" \
     && node --version \
     && npm --version \
     && prettier --version
+
+# ngrok
+RUN wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz && \
+    sudo tar xvzf ./ngrok-v3-stable-linux-amd64.tgz -C /usr/local/bin
 
 # Copies
 COPY bin bin
