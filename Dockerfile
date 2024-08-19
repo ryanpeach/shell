@@ -43,6 +43,7 @@ RUN apk add --no-cache \
     rust \
     cargo \
     python3 \
+    py3-pip \
     lua \
     lua-dev \
     luarocks \
