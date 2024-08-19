@@ -36,6 +36,9 @@ RUN apk add --no-cache \
   openblas-dev \
   sshpass \
   lapack-dev \
+	patch \
+	build-base \
+	gcc-doc \
   # Archive tools \
     unzip \
     tar \
