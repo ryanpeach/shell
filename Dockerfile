@@ -19,40 +19,12 @@ RUN apk update && apk upgrade
 RUN apk add --no-cache \
   git \
   make \
-  # Python Depenencies \
-    bzip2-dev \
-    coreutils \
-    dpkg-dev dpkg \
-    expat-dev \
-    gdbm-dev \
-    libc-dev \
-    libffi-dev \
-    libnsl-dev \
-    libtirpc-dev \
-    linux-headers \
-    sqlite-dev \
-    tcl-dev \
-    tk \
-    tk-dev \
-    util-linux-dev \
-    xz-dev \
-    zlib-dev \
   # Uncategorized dependencies \
     iputils \
     bind-tools \
-    cmake \
-    g++ \
-    gcc \
-    gfortran \
-    readline-dev \
-    openssl-dev \
-    sqlite-dev \
-    openblas-dev \
     sshpass \
-    lapack-dev \
-    patch \
-    build-base \
-    gcc-doc \
+    openssh-client \
+    openssh-server \
   # Archive tools \
     unzip \
     tar \
@@ -70,6 +42,7 @@ RUN apk add --no-cache \
     go \
     rust \
     cargo \
+    python3.11 \
     lua \
     lua-dev \
     luarocks \
@@ -89,25 +62,20 @@ RUN apk add --no-cache \
     kubectl \
     helm \
     helmfile \
+  && python3.11 -m ensurepip \
+  && python3.11 -m pip install --upgrade pip \
   && rm -rf /var/cache/apk/*
 
 # K8s
 RUN helm plugin install https://github.com/databus23/helm-diff
 
-# Install pyenv
-RUN curl https://pyenv.run | bash
-ENV PYENV_ROOT=$HOME/.pyenv
-ENV PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
-
-# Create some pyenv environments
-RUN pyenv install 3.11 && \
-    pyenv global 3.11 && \
-    pyenv rehash && \
-    pip install --upgrade pip && \
-    rm -rf $PYENV_ROOT/sources
-
 # Python package installs
-RUN pip install --no-cache-dir numpy scipy pandas pipx \
+RUN python3.11 -m pip install --no-cache-dir \
+  numpy \
+  scipy \
+  pandas \
+  pipx \
+  jmespath \
   && rm -rf ~/.cache/pip
 
 # Pipx installs
@@ -193,6 +161,12 @@ WORKDIR /tmp
 #    ldconfig -n /usr/lib64 && \
 #    rm -rf /var/cache/apk/* /tmp/slurm-*
 WORKDIR /home/root
+
+# Stage 2: Copy over the built environment
+FROM alpine:edge
+
+# Copy over the built environment
+COPY --from=builder / /
 
 # Copies
 COPY bin bin
