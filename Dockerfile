@@ -154,6 +154,7 @@ RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 \
 	&& fzf --version
 
 # Install gh
+ENV PATH=$HOME/.local/bin:$PATH
 RUN curl -sS https://webi.sh/gh | sh
 
 # Install Oh My Zsh
