@@ -3,9 +3,9 @@ build:
 
 run-local:
     docker run -it --rm \
-        -v $HOME/.ssh:/home/user/.ssh \
-        -v $HOME:/home/user/mnt \
-        -w /home/user/mnt \
+        -v $HOME/.ssh:/home/root/.ssh \
+        -v $HOME:/home/root/mnt \
+        -w /home/root/mnt \
         -e GITHUB_TOKEN=$(gh auth token) \
         -e MNT=/home/rgpeach10/mnt \
         -e DEBUG=1 \
@@ -13,9 +13,9 @@ run-local:
 
 run-remote tag="local":
     docker run -it --rm \
-        -v $HOME/.ssh:/home/user/.ssh \
-        -v $HOME:/home/user/mnt \
-        -w /home/user/mnt \
+        -v $HOME/.ssh:/home/root/.ssh \
+        -v $HOME:/home/root/mnt \
+        -w /home/root/mnt \
         -e GITHUB_TOKEN=$(gh auth token) \
         -e MNT=/home/rgpeach10/mnt \
         --pull=always \

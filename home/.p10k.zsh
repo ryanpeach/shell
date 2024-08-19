@@ -611,7 +611,7 @@
   #
   # - shell   `asdf current` says "set by ASDF_${TOOL}_VERSION environment variable"
   # - local   `asdf current` says "set by /some/not/home/directory/file"
-  # - global  `asdf current` says "set by /home/username/file"
+  # - global  `asdf current` says "set by /home/rootname/file"
   #
   # Note: If this parameter is set to (shell local global), it won't hide tools.
   # Tip:  Override this parameter for ${TOOL} with POWERLEVEL9K_ASDF_${TOOL}_SOURCES.

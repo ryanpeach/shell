@@ -19,26 +19,12 @@ RUN apk update && apk upgrade
 RUN apk add --no-cache \
   git \
   make \
-  iputils \
-  bind-tools \
-  cmake \
-  g++ \
-  gcc \
-  gfortran \
-  zlib-dev \
-  libffi-dev \
-  linux-headers \
-  readline-dev \
-  openssl-dev \
-  sqlite-dev \
-  bzip2-dev \
-  xz-dev \
-  openblas-dev \
-  sshpass \
-  lapack-dev \
-	patch \
-	build-base \
-	gcc-doc \
+  # Uncategorized dependencies \
+    iputils \
+    bind-tools \
+    sshpass \
+    openssh-client \
+    openssh-server \
   # Archive tools \
     unzip \
     tar \
@@ -56,6 +42,14 @@ RUN apk add --no-cache \
     go \
     rust \
     cargo \
+    python3 \
+    python3-dev \
+    py3-setuptools \
+    py3-pip \
+    py3-numpy \
+    py3-scipy \
+    py3-pandas \
+    pipx \
     lua \
     lua-dev \
     luarocks \
@@ -80,44 +74,42 @@ RUN apk add --no-cache \
 # K8s
 RUN helm plugin install https://github.com/databus23/helm-diff
 
-# Install pyenv
-RUN curl https://pyenv.run | bash
-ENV PYENV_ROOT=$HOME/.pyenv
-ENV PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
-
-# Create some pyenv environments
-RUN pyenv install 3.11 && \
-    pyenv global 3.11 && \
-    pyenv rehash && \
-    pip install --upgrade pip && \
-    rm -rf $PYENV_ROOT/sources
-
-# Python package installs
-RUN pip install --no-cache-dir numpy scipy pandas pipx \
-  && rm -rf ~/.cache/pip
-
 # Pipx installs
 ENV PATH="$HOME/.local/bin:$PATH"
-RUN pipx install \
-    aider-chat \
-    pre-commit \
-    poetry \
-    ruff \
-    ipython \
-    ipdb \
-    awscli \
-    pyright \
-    ruff-lsp \
-    just \
-    thefuck \
-    aws-parallelcluster \
-    ansible \
-    && rm -rf /root/.local/pipx/shared ~/.cache/pipx
+RUN apk --no-cache --virtual .build-deps add \
+      gcc \
+      g++ \
+      gfortran \
+      openblas-dev \
+      lapack-dev \
+      pkgconfig \
+      linux-headers \
+      musl-dev \
+    && pipx install \
+      aider-chat \
+      pre-commit \
+      poetry \
+      ruff \
+      ipython \
+      ipdb \
+      awscli \
+      pyright \
+      ruff-lsp \
+      just \
+      thefuck \
+      aws-parallelcluster \
+      ansible \
+    && rm -rf /root/.local/pipx/shared ~/.cache/pipx \
+    && apk del .build-deps
 
 # luarocks installs
 ENV PATH="/usr/local/lib/luarocks/bin/:$HOME/.luarocks/bin/:$PATH"
 RUN luarocks-5.1 config local_by_default true
-RUN luarocks-5.1 install --server=https://luarocks.org/dev luaformatter
+RUN apk --no-cache --virtual .build-deps add \
+      g++ \
+      cmake \
+    && luarocks-5.1 install --server=https://luarocks.org/dev luaformatter \
+    && apk del .build-deps
 
 # npm installs
 RUN npm install -g \
@@ -162,7 +154,7 @@ RUN curl -sS https://webi.sh/gh | sh
 
 # Install Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-ENV ZSH_CUSTOM=/home/user/.oh-my-zsh/custom
+ENV ZSH_CUSTOM=/home/root/.oh-my-zsh/custom
 RUN git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
 RUN git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
 RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
