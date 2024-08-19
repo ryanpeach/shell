@@ -62,7 +62,6 @@ RUN apk add --no-cache \
     kubectl \
     helm \
     helmfile \
-  && python3 -m ensurepip \
   && python3 -m pip install --upgrade pip \
   && rm -rf /var/cache/apk/*
 
