@@ -94,7 +94,7 @@ jobs:
           cache-from: type=registry,ref=rgpeach10/shell:buildcache
           cache-to: type=registry,ref=rgpeach10/shell:buildcache,mode=max
           platforms: linux/arm64
-					
+
 		 	- name: Build and push Docker image amd
         id: build-and-push
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
