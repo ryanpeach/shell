@@ -44,6 +44,7 @@ RUN apk add --no-cache \
     cargo \
     python3 \
     python3-dev \
+    py3-setuptools \
     py3-pip \
     py3-numpy \
     py3-scipy \
@@ -153,7 +154,7 @@ RUN curl -sS https://webi.sh/gh | sh
 
 # Install Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-ENV ZSH_CUSTOM=/home/user/.oh-my-zsh/custom
+ENV ZSH_CUSTOM=/home/root/.oh-my-zsh/custom
 RUN git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
 RUN git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
 RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
