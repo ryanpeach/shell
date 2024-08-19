@@ -171,12 +171,6 @@ WORKDIR /tmp
 #    rm -rf /var/cache/apk/* /tmp/slurm-*
 WORKDIR /home/root
 
-# Stage 2: Copy over the built environment
-FROM alpine:edge
-
-# Copy over the built environment
-COPY --from=builder / /
-
 # Copies
 COPY bin bin
 COPY home/ .
