@@ -114,8 +114,8 @@ RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 \
 	&& k9s --version \
 
 # Install pyenv
-RUN curl https://pyenv.run | bash
 ENV PYENV_ROOT=$HOME/.pyenv
+RUN curl https://pyenv.run | bash
 ENV PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
 
 # Create some pyenv environments
