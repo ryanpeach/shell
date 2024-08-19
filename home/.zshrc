@@ -76,7 +76,7 @@ zstyle ':omz:update' mode disabled  # disable automatic updates
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git wd aws direnv branch github golang helm kubectl python pyenv virtualenv poetry-env vi-mode zsh-autosuggestions zsh-syntax-highlighting)
+plugins=(git wd aws direnv branch github golang helm kubectl python virtualenv poetry-env vi-mode zsh-autosuggestions zsh-syntax-highlighting)
 
 # Gotta source the oh-my-zsh script
 export ZSH="$HOME/.oh-my-zsh"
@@ -85,9 +85,6 @@ source $ZSH/oh-my-zsh.sh
 # ========================
 # Non ZSH-Related Configs
 # ========================
-
-# Set up thefuck
-eval $(thefuck --alias)
 
 # Aliases
 alias tf='terraform'
@@ -129,12 +126,6 @@ export POETRY_VIRTUALENVS_PREFER_ACTIVE_PYTHON=true
 alias venv="python3 -m venv .venv"
 alias activate="source .venv/bin/activate"
 
-# Pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
-
 # nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
@@ -153,8 +144,8 @@ export PATH="$(go env GOPATH)/bin:$PATH"
 source ~/.p10k.zsh
 
 # fzf
-source /usr/share/bash-completion/completions/fzf
-source /usr/share/fzf/key-bindings.bash
+# source /usr/share/bash-completion/completions/fzf
+# source /usr/share/fzf/key-bindings.bash
 source <(fzf --zsh)
 alias fzfp='fzf --preview "bat --color=always --style=numbers --line-range=:500 {}"'
 
