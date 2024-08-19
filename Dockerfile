@@ -42,7 +42,7 @@ RUN apk add --no-cache \
     go \
     rust \
     cargo \
-    python3.11 \
+    python3 \
     lua \
     lua-dev \
     luarocks \
@@ -62,15 +62,15 @@ RUN apk add --no-cache \
     kubectl \
     helm \
     helmfile \
-  && python3.11 -m ensurepip \
-  && python3.11 -m pip install --upgrade pip \
+  && python3 -m ensurepip \
+  && python3 -m pip install --upgrade pip \
   && rm -rf /var/cache/apk/*
 
 # K8s
 RUN helm plugin install https://github.com/databus23/helm-diff
 
 # Python package installs
-RUN python3.11 -m pip install --no-cache-dir \
+RUN python3 -m pip install --no-cache-dir \
   numpy \
   scipy \
   pandas \
