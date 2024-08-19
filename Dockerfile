@@ -130,7 +130,7 @@ ENV PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
 RUN pyenv install 3.11 && \
     pyenv global 3.11 && \
     pyenv rehash
-		
+
 RUN pip install \
   setuptools \
   numpy \
