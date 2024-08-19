@@ -46,9 +46,6 @@ RUN apk add --no-cache \
     python3-dev \
     py3-setuptools \
     py3-pip \
-    py3-numpy \
-    py3-scipy \
-    py3-pandas \
     pipx \
     lua \
     lua-dev \
@@ -85,8 +82,20 @@ RUN apk --no-cache --virtual .build-deps add \
       pkgconfig \
       linux-headers \
       musl-dev \
-    && pipx install \
-      aider-chat \
+      cmake \
+      zlib-dev \
+      libffi-dev \
+      readline-dev \
+      openssl-dev \
+      sqlite-dev \
+      bzip2-dev \
+      xz-dev \
+      sshpass \
+      patch \
+      build-base \
+      gcc-doc \
+    && pipx install --verbose \
+      # aider-chat \ TODO: Fix this, something to do with scipy
       pre-commit \
       poetry \
       ruff \
@@ -96,7 +105,6 @@ RUN apk --no-cache --virtual .build-deps add \
       pyright \
       ruff-lsp \
       just \
-      thefuck \
       aws-parallelcluster \
       ansible \
     && rm -rf /root/.local/pipx/shared ~/.cache/pipx \
@@ -178,7 +186,6 @@ COPY home/ .
 RUN git config --global core.excludesFile '$HOME/.gitignore_global'
 RUN git config --global pull.rebase true
 RUN git config --global --add --bool push.autoSetupRemote true
-RUN find $PYENV_ROOT -name '*.md' -delete
 
 # Chmod so that these files are runnable
 RUN find bin -type f -exec chmod +x {} \;
