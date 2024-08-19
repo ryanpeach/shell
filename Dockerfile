@@ -111,7 +111,7 @@ RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 \
   && go install github.com/direnv/direnv@latest \
 	&& direnv --version \
 	&& go install github.com/derailed/k9s@latest \
-	&& k9s --version \
+	&& k9s --version
 
 # Install pyenv
 ENV PYENV_ROOT=$HOME/.pyenv
