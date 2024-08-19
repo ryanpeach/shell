@@ -19,26 +19,40 @@ RUN apk update && apk upgrade
 RUN apk add --no-cache \
   git \
   make \
-  iputils \
-  bind-tools \
-  cmake \
-  g++ \
-  gcc \
-  gfortran \
-  zlib-dev \
-  libffi-dev \
-  linux-headers \
-  readline-dev \
-  openssl-dev \
-  sqlite-dev \
-  bzip2-dev \
-  xz-dev \
-  openblas-dev \
-  sshpass \
-  lapack-dev \
-	patch \
-	build-base \
-	gcc-doc \
+  # Python Depenencies \
+    bzip2-dev \
+    coreutils \
+    dpkg-dev dpkg \
+    expat-dev \
+    gdbm-dev \
+    libc-dev \
+    libffi-dev \
+    libnsl-dev \
+    libtirpc-dev \
+    linux-headers \
+    sqlite-dev \
+    tcl-dev \
+    tk \
+    tk-dev \
+    util-linux-dev \
+    xz-dev \
+    zlib-dev \
+  # Uncategorized dependencies \
+    iputils \
+    bind-tools \
+    cmake \
+    g++ \
+    gcc \
+    gfortran \
+    readline-dev \
+    openssl-dev \
+    sqlite-dev \
+    openblas-dev \
+    sshpass \
+    lapack-dev \
+    patch \
+    build-base \
+    gcc-doc \
   # Archive tools \
     unzip \
     tar \
