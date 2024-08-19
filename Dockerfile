@@ -57,9 +57,17 @@ RUN apt-get update && \
   equivs \
   munge \
   slurm-wlm \
-  libreadline-dev && \
-  apt-get clean && \
-  rm -rf /var/lib/apt/lists/*
+  libreadline-dev \
+	zlib1g-dev \
+  libncursesw5-dev \
+  xz-utils \
+  tk-dev \
+  libxml2-dev \
+  libxmlsec1-dev \
+  libffi-dev \
+  liblzma-dev \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
 # set up locale
 RUN locale-gen en_US.UTF-8
@@ -122,6 +130,11 @@ ENV PATH=$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
 RUN pyenv install 3.11 && \
     pyenv global 3.11 && \
     pyenv rehash
+		
+RUN pip install \
+  setuptools \
+  numpy \
+  scipy
 
 # Now default python installs in the root virtualenv
 RUN pipx install \
@@ -138,11 +151,6 @@ RUN pipx install \
   ansible \
   pipx \
   aws-parallelcluster
-
-RUN pip install \
-  setuptools \
-  numpy \
-  scipy
 
 # Get Rust
 RUN rustup default stable && \
