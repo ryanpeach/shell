@@ -44,6 +44,10 @@ RUN apk add --no-cache \
     cargo \
     python3 \
     py3-pip \
+    py3-numpy \
+    py3-scipy \
+    py3-pandas \
+    pipx \
     lua \
     lua-dev \
     luarocks \
@@ -68,15 +72,6 @@ RUN apk add --no-cache \
 
 # K8s
 RUN helm plugin install https://github.com/databus23/helm-diff
-
-# Python package installs
-RUN python3 -m pip install --no-cache-dir \
-  numpy \
-  scipy \
-  pandas \
-  pipx \
-  jmespath \
-  && rm -rf ~/.cache/pip
 
 # Pipx installs
 ENV PATH="$HOME/.local/bin:$PATH"
