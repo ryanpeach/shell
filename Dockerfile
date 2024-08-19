@@ -89,6 +89,7 @@ RUN git clone https://github.com/neovim/neovim && \
   nvim --version
 
 # Install GitHub CLI
+ENV PATH=$HOME/.local/bin:$PATH
 RUN curl -sS https://webi.sh/gh | sh && gh --version
 
 # Install tfenv
