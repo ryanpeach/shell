@@ -43,6 +43,7 @@ RUN apk add --no-cache \
     rust \
     cargo \
     python3 \
+    python3-dev \
     py3-pip \
     py3-numpy \
     py3-scipy \
@@ -74,26 +75,40 @@ RUN helm plugin install https://github.com/databus23/helm-diff
 
 # Pipx installs
 ENV PATH="$HOME/.local/bin:$PATH"
-RUN pipx install \
-    aider-chat \
-    pre-commit \
-    poetry \
-    ruff \
-    ipython \
-    ipdb \
-    awscli \
-    pyright \
-    ruff-lsp \
-    just \
-    thefuck \
-    aws-parallelcluster \
-    ansible \
-    && rm -rf /root/.local/pipx/shared ~/.cache/pipx
+RUN apk --no-cache --virtual .build-deps add \
+      gcc \
+      g++ \
+      gfortran \
+      openblas-dev \
+      lapack-dev \
+      pkgconfig \
+      linux-headers \
+      musl-dev \
+    && pipx install \
+      aider-chat \
+      pre-commit \
+      poetry \
+      ruff \
+      ipython \
+      ipdb \
+      awscli \
+      pyright \
+      ruff-lsp \
+      just \
+      thefuck \
+      aws-parallelcluster \
+      ansible \
+    && rm -rf /root/.local/pipx/shared ~/.cache/pipx \
+    && apk del .build-deps
 
 # luarocks installs
 ENV PATH="/usr/local/lib/luarocks/bin/:$HOME/.luarocks/bin/:$PATH"
 RUN luarocks-5.1 config local_by_default true
-RUN luarocks-5.1 install --server=https://luarocks.org/dev luaformatter
+RUN apk --no-cache --virtual .build-deps add \
+      g++ \
+      cmake \
+    && luarocks-5.1 install --server=https://luarocks.org/dev luaformatter \
+    && apk del .build-deps
 
 # npm installs
 RUN npm install -g \
