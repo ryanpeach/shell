@@ -21,7 +21,7 @@ jobs:
       run: luarocks install --server=https://luarocks.org/dev luaformatter
 
     - name: Run luaformatter
-      run: luaformatter -i **/*.lua
+      run: lua-format -i **/*.lua
 
     - name: Check for formatting changes
       run: git diff --exit-code
