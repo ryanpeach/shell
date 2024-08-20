@@ -44,4 +44,3 @@ done
 
 # Checkout back to the original branch
 git checkout -
-
