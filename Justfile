@@ -1,5 +1,5 @@
 build:
-    docker build -t rgpeach10/shell:local .
+    docker buildx build -t rgpeach10/shell:local . --load
 
 run-local:
     docker run -it --rm \
