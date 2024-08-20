@@ -134,9 +134,6 @@ export NVM_DIR="$HOME/.nvm"
 # TFEnv
 export PATH="$HOME/.tfenv/bin:$PATH"
 
-# Rust
-source $HOME/.cargo/env
-
 # Go
 export PATH="$(go env GOPATH)/bin:$PATH"
 
