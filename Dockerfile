@@ -18,6 +18,7 @@ RUN apk update && apk upgrade
 # Build dependencies
 RUN apk add --no-cache \
   git \
+	lazygit \
   make \
   # Uncategorized dependencies \
     iputils \
@@ -42,6 +43,9 @@ RUN apk add --no-cache \
 		ripgrep \
 		eza \
 		bat \
+		fzf \
+		direnv \
+		yq \
 		fd \
 		thefuck \
 		delta \
@@ -73,6 +77,7 @@ RUN apk add --no-cache \
     kubectl \
     helm \
     helmfile \
+		k9s \
   && rm -rf /var/cache/apk/*
 
 # K8s
@@ -143,18 +148,8 @@ ENV PATH="/home/root/.cargo/bin:$PATH"
 ENV PATH="$HOME/go/bin:$PATH"
 RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 \
   && terraform-docs --version \
-  && go install github.com/mikefarah/yq/v4@latest \
-	&& yq --version \
   && go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest \
-	&& jira --help \
-  && go install github.com/jesseduffield/lazygit@latest \
-	&& lazygit --help \
-  && go install github.com/direnv/direnv@latest \
-	&& direnv --version \
-	&& go install github.com/derailed/k9s@latest \
-	&& k9s --version \
-	&& go install github.com/junegunn/fzf@latest \
-	&& fzf --version
+	&& jira --help 
 
 # Install gh
 ENV PATH=$HOME/.local/bin:$PATH
