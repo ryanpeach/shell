@@ -109,6 +109,7 @@ RUN apk --no-cache --virtual .build-deps add \
     && pipx install --verbose \
       # aider-chat \ TODO: Fix this, something to do with scipy
       pre-commit \
+      cookiecutter \
       poetry \
       ruff \
       ipython \
@@ -161,6 +162,12 @@ ENV ZSH_CUSTOM=/home/root/.oh-my-zsh/custom
 RUN git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
 RUN git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
 RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
+
+# Install ngrok cli
+ARG TARGETPLATFORM
+RUN ARCH=$(echo "$TARGETPLATFORM" | sed 's/linux\///') \
+  && wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-${ARCH}.tgz \
+  && tar -xvf ngrok-v3-stable-linux-${ARCH}.tgz -C /usr/local/bin
 
 # Slurm
 # WORKDIR /tmp
