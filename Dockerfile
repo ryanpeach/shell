@@ -149,7 +149,7 @@ ENV PATH="$HOME/go/bin:$PATH"
 RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 \
   && terraform-docs --version \
   && go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest \
-	&& jira --help 
+	&& jira --help
 
 # Install gh
 ENV PATH=$HOME/.local/bin:$PATH
@@ -163,7 +163,7 @@ RUN git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUST
 RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
 
 # Slurm
-WORKDIR /tmp
+# WORKDIR /tmp
 # RUN wget https://download.schedmd.com/slurm/slurm-<version>.tar.bz2 && \
 #    tar -xaf slurm-24.05.2.tar.bz2 && \
 #    cd slurm-24.05.2.tar.bz2 && \
@@ -173,7 +173,7 @@ WORKDIR /tmp
 #    ldconfig -n /usr/lib && \
 #    ldconfig -n /usr/lib64 && \
 #    rm -rf /var/cache/apk/* /tmp/slurm-*
-WORKDIR /home/root
+# WORKDIR /home/root
 
 # Copies
 COPY bin bin
