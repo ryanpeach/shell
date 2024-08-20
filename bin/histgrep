@@ -1,0 +1,47 @@
+#!/bin/bash
+# histgrep - search through the history of a git repository
+# Usage: like ripgrep
+
+# Ensure you are in the git repository
+if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+    echo "Not inside a git repository"
+    exit 1
+fi
+
+# Check if working directory is clean
+if [[ -n $(git status --porcelain) ]]; then
+    echo "Your working directory is not clean. Please commit or stash your changes before running this script."
+    exit 1
+fi
+
+# Check if at least one argument is provided
+if [ $# -eq 0 ]; then
+    echo "Usage: histgrep <ripgrep-pattern>"
+    exit 1
+fi
+
+# Get all commit hashes, sorted by timestamp
+commits=$(git log --all --date-order --pretty=format:"%H")
+
+for commit in $commits; do
+    # Get commit message and branch name
+    commit_message=$(git log -n 1 --format=%B $commit | tr -d '\n')
+    branch_name=$(git branch --contains $commit | grep '*' | awk '{print $2}')
+
+    echo "Commit: $commit"
+    echo "Message: $commit_message"
+    echo "Branch: $branch_name"
+    echo "-------------------------"
+
+    # Checkout the commit
+    git checkout $commit > /dev/null 2>&1
+
+    # Run batgrep on the current state
+    batgrep "$@"
+
+    echo ""
+done
+
+# Checkout back to the original branch
+git checkout -
+
