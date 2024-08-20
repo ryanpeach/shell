@@ -38,6 +38,13 @@ RUN apk add --no-cache \
     sed \
     gawk \
     graphviz \
+		zoxide \
+		ripgrep \
+		eza \
+		bat \
+		fd \
+		thefuck \
+		delta \
   # Languages \
     go \
     rust \
@@ -131,13 +138,6 @@ RUN .tfenv/bin/tfenv install latest
 
 # Cargo installs
 ENV PATH="/home/root/.cargo/bin:$PATH"
-RUN cargo install \
-    git-delta \
-    ripgrep \
-    zoxide \
-    bat \
-    fd-find \
-    eza
 
 # Go installs
 ENV PATH="$HOME/go/bin:$PATH"
