@@ -17,6 +17,9 @@ jobs:
     - uses: leafo/gh-actions-luarocks@v4
     - uses: pre-commit/action@v3.0.1
 
+    - name: Install luaformatter
+      run: luarocks install luaformatter
+
     - name: Run luaformatter
       run: luaformatter -i **/*.lua
 
