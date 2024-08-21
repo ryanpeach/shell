@@ -164,6 +164,12 @@ RUN git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugi
 RUN git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
 RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
 
+# Install bat-extras
+RUN git clone https://github.com/eth-p/bat-extras.git \
+  && cd bat-extras \
+  && ./build.sh \
+  && cp -r ./bin/* /usr/local/bin/
+
 # Install ngrok cli
 ARG TARGETPLATFORM
 RUN ARCH=$(echo "$TARGETPLATFORM" | sed 's/linux\///') \
