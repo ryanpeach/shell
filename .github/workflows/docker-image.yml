@@ -9,6 +9,7 @@ env:
   REGISTRY: docker.io
   # github.repository as <account>/<repo>
   IMAGE_NAME: rgpeach10/shell
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
 
 jobs:
 
@@ -55,6 +56,8 @@ jobs:
         context: .
         push: false
         tags: latest
-        cache-from: type=registry,ref=rgpeach10/shell:buildcache-arm64
-        cache-to: type=registry,ref=rgpeach10/shell:buildcache-arm64,mode=max
+        cache-from: |
+          type=registry,ref=rgpeach10/shell:${BRANCH_NAME}
+          type=registry,ref=rgpeach10/shell:buildcache-arm64
+        cache-to: type=registry,ref=rgpeach10/shell:${BRANCH_NAME},mode=max
         platforms: linux/arm64
