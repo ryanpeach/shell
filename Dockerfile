@@ -26,6 +26,7 @@ RUN apk add --no-cache \
     sshpass \
     openssh-client \
     openssh-server \
+    stow \
   # Archive tools \
     unzip \
     tar \
@@ -183,11 +184,12 @@ RUN ARCH=$(echo "$TARGETPLATFORM" | sed 's/linux\///') \
 # WORKDIR /home/root
 
 # Copies
-COPY bin bin
-COPY home/ .
+ENV SHELL_DIR="$HOME/shell"
+COPY . $SHELL_DIR
 RUN git config --global core.excludesFile '$HOME/.gitignore_global'
 RUN git config --global pull.rebase true
 RUN git config --global --add --bool push.autoSetupRemote true
+RUN stow $SHELL_DIR/home
 
 # Chmod so that these files are runnable
 RUN find bin -type f -exec chmod +x {} \;
