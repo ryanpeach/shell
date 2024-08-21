@@ -177,5 +177,10 @@ else
     source $ZSH_PRIVATE_LOC
 fi
 
+# I am going to set up neofetch to run on clear, because I often have a local terminal and this terminal open at the same time
+# and I want to clearly see which is which
+alias trueclear="clear"
+alias clear="clear && neofetch"
+
 # Neofetch
 neofetch
