@@ -161,6 +161,31 @@ HISTSIZE=1000000
 SAVEHIST=1000000
 setopt appendhistory
 
+# This is a function you can run in your terminal to add build dependencies to your environment
+build-deps () {
+  apk add \
+      gcc \
+      g++ \
+      gfortran \
+      openblas-dev \
+      lapack-dev \
+      pkgconfig \
+      linux-headers \
+      musl-dev \
+      cmake \
+      zlib-dev \
+      libffi-dev \
+      readline-dev \
+      openssl-dev \
+      sqlite-dev \
+      bzip2-dev \
+      xz-dev \
+      sshpass \
+      patch \
+      build-base \
+      gcc-doc
+}
+
 # Load private info location
 if [ -z "$ZSH_PRIVATE_LOC" ]; then
     ZSH_PRIVATE_LOC=$MNT/.zshrc.private
