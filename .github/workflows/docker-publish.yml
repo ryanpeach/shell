@@ -109,12 +109,12 @@ jobs:
 
       - name: Clean docker
         run: |
-          docker buildx prune
+          docker buildx prune -f
           docker stop $(docker ps -a -q)
           docker rm $(docker ps -a -q)
           docker rmi $(docker images -a -q)
-          docker system prune -a
-          docker volume prune
+          docker system prune -a -f
+          docker volume prune -f
 
       - name: Build and push Docker image amd
         id: build-and-push-amd
