@@ -107,6 +107,15 @@ jobs:
         # against the sigstore community Fulcio instance.
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
 
+      - name: Clean docker
+        run: |
+          docker buildx prune
+          docker stop $(docker ps -a -q)
+          docker rm $(docker ps -a -q)
+          docker rmi $(docker images -a -q)
+          docker system prune -a
+          docker volume prune
+
       - name: Build and push Docker image amd
         id: build-and-push-amd
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
