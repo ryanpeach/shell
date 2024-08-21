@@ -17,9 +17,9 @@ RUN apk update && apk upgrade
 
 # Build dependencies
 RUN apk add --no-cache \
-  git \
-	lazygit \
-  make \
+    git \
+    lazygit \
+    make \
   # Uncategorized dependencies \
     iputils \
     bind-tools \
@@ -39,16 +39,16 @@ RUN apk add --no-cache \
     sed \
     gawk \
     graphviz \
-		zoxide \
-		ripgrep \
-		eza \
-		bat \
-		fzf \
-		direnv \
-		yq \
-		fd \
-		thefuck \
-		delta \
+    zoxide \
+    ripgrep \
+    eza \
+    bat \
+    fzf \
+    direnv \
+    yq \
+    fd \
+    thefuck \
+    delta \
   # Languages \
     go \
     rust \
@@ -77,7 +77,7 @@ RUN apk add --no-cache \
     kubectl \
     helm \
     helmfile \
-		k9s \
+    k9s \
   && rm -rf /var/cache/apk/*
 
 # K8s
@@ -150,7 +150,7 @@ ENV PATH="$HOME/go/bin:$PATH"
 RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 \
   && terraform-docs --version \
   && go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest \
-	&& jira --help
+  && jira --help
 
 # Install gh
 ENV PATH=$HOME/.local/bin:$PATH

@@ -38,3 +38,6 @@ vim.cmd([[
     autocmd BufWritePost BufWritePost ~/.config/nvim/**/*.lua source ~/.config/nvim/init.lua
   augroup END
 ]])
+-- Show tabs as characters
+vim.o.list = true
+vim.o.listchars = 'tab:→ '
