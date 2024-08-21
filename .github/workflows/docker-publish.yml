@@ -89,8 +89,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=rgpeach10/shell:buildcache
-          cache-to: type=registry,ref=rgpeach10/shell:buildcache,mode=max
+          cache-from: type=registry,ref=rgpeach10/shell:buildcache-arm64
+          cache-to: type=registry,ref=rgpeach10/shell:buildcache-arm64,mode=max
           platforms: linux/arm64
 
       # Sign the resulting Docker image digest except on PRs.
@@ -124,8 +124,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=rgpeach10/shell:buildcache
-          cache-to: type=registry,ref=rgpeach10/shell:buildcache,mode=max
+          cache-from: type=registry,ref=rgpeach10/shell:buildcache-amd64
+          cache-to: type=registry,ref=rgpeach10/shell:buildcache-amd64,mode=max
           platforms: linux/amd64
 
       # Sign the resulting Docker image digest except on PRs.
