@@ -190,6 +190,7 @@ RUN git config --global core.excludesFile '$HOME/.gitignore_global'
 RUN git config --global pull.rebase true
 RUN git config --global --add --bool push.autoSetupRemote true
 RUN stow $SHELL_DIR/home
+RUN cd $SHELL_DIR && wd add shell
 
 # Chmod so that these files are runnable
 RUN find bin -type f -exec chmod +x {} \;
