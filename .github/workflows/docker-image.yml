@@ -66,6 +66,8 @@ jobs:
           context: .
           push: false
           tags: latest
-          cache-from: type=registry,ref=rgpeach10/shell:${SAFE_BRANCH_NAME},type=registry,ref=rgpeach10/shell:buildcache-arm64
+          cache-from: |
+            type=registry,ref=rgpeach10/shell:${SAFE_BRANCH_NAME}
+            type=registry,ref=rgpeach10/shell:buildcache-arm64
           cache-to: type=registry,ref=rgpeach10/shell:${SAFE_BRANCH_NAME},mode=max
           platforms: linux/arm64
