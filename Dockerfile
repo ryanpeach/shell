@@ -20,6 +20,7 @@ RUN apk add --no-cache \
     git \
     lazygit \
     make \
+    shfmt \
   # Uncategorized dependencies \
     iputils \
     bind-tools \
@@ -167,7 +168,7 @@ RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM
 # Install bat-extras
 RUN git clone https://github.com/eth-p/bat-extras.git \
   && cd bat-extras \
-  && ./build.sh \
+  && ./build.sh --install \
   && cp -r ./bin/* /usr/local/bin/
 
 # Install ngrok cli
