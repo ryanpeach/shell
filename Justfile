@@ -31,7 +31,7 @@ clean:
     docker system prune -f
     docker volume prune -f
 
-push-local:
+push-local: build
     echo $(git symbolic-ref --short HEAD | sed 's/\//__/g')
     docker tag rgpeach10/shell:local rgpeach10/shell:$(git symbolic-ref --short HEAD | sed 's/\//__/g')
     docker push rgpeach10/shell:$(git symbolic-ref --short HEAD | sed 's/\//__/g')
