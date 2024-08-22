@@ -216,7 +216,7 @@ stow-shell() {
 # I am going to set up neofetch to run on clear, because I often have a local terminal and this terminal open at the same time
 # and I want to clearly see which is which
 alias trueclear="clear"
-alias clear="clear && neofetch"
+alias clear="trueclear && neofetch"
 
 # It's useful to automatically add these wd's and repos
 wd add shell $SHELL_DIR
