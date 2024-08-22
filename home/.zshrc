@@ -199,7 +199,7 @@ stow-shell() {
     if [ -d "$SHELL_MNT_DIR" ]; then
         cd $SHELL_MNT_DIR
         if [ -z "$(git status --porcelain)" ]; then
-            stow --adopt $SHELL_MNT_DIR/home
+            stow --adopt home
             git --reset hard
 
             # home/.gitconfig is the one thing we dont want reflecting changes as git changes it a lot
