@@ -166,10 +166,11 @@ RUN git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUST
 RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
 
 # Install bat-extras
+# TODO: Remove --no-verify
+# REF: https://github.com/eth-p/bat-extras/issues/126
 RUN git clone https://github.com/eth-p/bat-extras.git \
   && cd bat-extras \
-  && ./build.sh --install \
-  && cp -r ./bin/* /usr/local/bin/
+  && ./build.sh --install --no-verify
 
 # Install ngrok cli
 ARG TARGETPLATFORM
@@ -192,15 +193,20 @@ RUN ARCH=$(echo "$TARGETPLATFORM" | sed 's/linux\///') \
 
 # Copies
 ENV SHELL_DIR="$HOME/shell"
+ENV PATH="$PATH:$SHELL_DIR/bin"
 COPY . $SHELL_DIR
+RUN cd $SHELL_DIR \
+  && stow --adopt home \
+  && git restore .
+
+# Git configs
+# TODO: Replace by putting in home/.gitconfig
 RUN git config --global core.excludesFile '$HOME/.gitignore_global'
 RUN git config --global pull.rebase true
 RUN git config --global --add --bool push.autoSetupRemote true
-RUN stow $SHELL_DIR/home
-RUN cd $SHELL_DIR && wd add shell
 
 # Chmod so that these files are runnable
-RUN find bin -type f -exec chmod +x {} \;
+RUN find $SHELL_DIR/bin -type f -exec chmod +x {} \;
 
 # Get neovim to download all its stuff
 RUN nvim --headless "+Lazy! sync" +qa
