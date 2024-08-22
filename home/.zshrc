@@ -240,4 +240,4 @@ else
 fi
 
 # Neofetch
-neofetch
+clear
