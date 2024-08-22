@@ -52,6 +52,16 @@ Or you could put it in your `~/.bash_profile`, `~/.bashrc`, or `~/.zshrc` file.
 
 It's important the MNT variable is set to the directory you want to mount your home in the container from the containers filesystem perspective.
 
+# Other condsiderations
+
+It is best to clone THIS REPO into your home directory
+
+`git clone git@github.com:ryanpeach/shell.git $HOME/shell`
+
+The `.zshrc` will detect this directory mounted to $SHELL_MNT_DIR which defaults to $HOME/mnt/shell inside the container, and stow files from its ./home directory.
+
+This will allow you to safely edit your config from within your docker container, even within multiple running instances.
+
 # Running from the Repo
 
 `just run <tag>`
