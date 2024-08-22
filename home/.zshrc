@@ -153,7 +153,8 @@ alias fzfp='fzf --preview "bat --color=always --style=numbers --line-range=:500 
 eval "$(zoxide init --cmd cd zsh)"
 
 # eza
-alias ls='eza'
+alias ls='eza -A'
+alias tree='ls --tree'
 
 # ripgrep
 alias rg='batgrep'
@@ -209,6 +210,11 @@ fi
 # and I want to clearly see which is which
 alias trueclear="clear"
 alias clear="clear && neofetch"
+
+# It's useful to automatically add these wd's
+wd add shell $SHELL_DIR
+wd add nvim .config/nvim
+wd add neovim .config/neovim
 
 # Neofetch
 neofetch

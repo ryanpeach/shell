@@ -15,7 +15,7 @@ vim.opt.hidden = false -- equivalent to nohidden, prevents unsaved hidden buffer
 
 -- Make editing lua better
 local shell_dir = os.getenv("SHELL_DIR") or os.getenv("HOME")
-wk.register({
+wk.add({
     l = {
         name = "lua",
         i = {":e ~/.config/nvim/init.lua<CR>", "Edit init.lua"},
