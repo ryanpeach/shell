@@ -211,10 +211,12 @@ fi
 alias trueclear="clear"
 alias clear="clear && neofetch"
 
-# It's useful to automatically add these wd's
+# It's useful to automatically add these wd's and repos
+git clone https://github.com/ryanpeach/logseq $HOME/notes
 wd add shell $SHELL_DIR
 wd add nvim .config/nvim
 wd add neovim .config/neovim
+wd add neorg $HOME/notes
 
 # Neofetch
 neofetch
