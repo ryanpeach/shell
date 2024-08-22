@@ -190,6 +190,39 @@ build-deps () {
       gcc-doc
 }
 
+# We need to make sure we don't loose our changes to our dotfiles when we close our docker container
+# We also need to support running more than one docker container at a time
+stow-shell() {
+    if [ -z "$SHELL_MNT_DIR" ]; then
+        SHELL_MNT_DIR="$HOME/mnt/shell"
+    fi
+    if [ -d "$SHELL_MNT_DIR" ]; then
+        cd $SHELL_MNT_DIR
+        if [ -z "$(git status --porcelain)" ]; then
+            stow --adopt $SHELL_MNT_DIR/home
+            git --reset hard
+
+            # home/.gitconfig is the one thing we dont want reflecting changes as git changes it a lot
+            cp $SHELL_MNT_DIR/home/.gitconfig $HOME/.gitconfig
+        else
+            echo "Please git commit $SHELL_MNT_DIR then run stow-shell to make safely editing your shell files possible."
+        fi
+    else
+        echo "WARNING: $SHELL_MNT_DIR not found. Editing shell files is not safe."
+    fi
+}
+
+
+# I am going to set up neofetch to run on clear, because I often have a local terminal and this terminal open at the same time
+# and I want to clearly see which is which
+alias trueclear="clear"
+alias clear="clear && neofetch"
+
+# It's useful to automatically add these wd's and repos
+wd add shell $SHELL_DIR
+wd add nvim .config/nvim
+wd add neovim .config/neovim
+
 # Load private info location
 if [ -z "$ZSH_PRIVATE_LOC" ]; then
     ZSH_PRIVATE_LOC=$MNT/.zshrc.private
@@ -205,18 +238,6 @@ if [ ! -f "$ZSH_PRIVATE_LOC" ]; then
 else
     source $ZSH_PRIVATE_LOC
 fi
-
-# I am going to set up neofetch to run on clear, because I often have a local terminal and this terminal open at the same time
-# and I want to clearly see which is which
-alias trueclear="clear"
-alias clear="clear && neofetch"
-
-# It's useful to automatically add these wd's and repos
-git clone https://github.com/ryanpeach/logseq $HOME/notes
-wd add shell $SHELL_DIR
-wd add nvim .config/nvim
-wd add neovim .config/neovim
-wd add neorg $HOME/notes
 
 # Neofetch
 neofetch

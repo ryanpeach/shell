@@ -192,18 +192,7 @@ RUN ARCH=$(echo "$TARGETPLATFORM" | sed 's/linux\///') \
 # WORKDIR /home/root
 
 # Copies
-ENV SHELL_DIR="$HOME/shell"
-ENV PATH="$PATH:$SHELL_DIR/bin"
-COPY . $SHELL_DIR
-RUN cd $SHELL_DIR \
-  && stow --adopt home \
-  && git restore .
-
-# Git configs
-# TODO: Replace by putting in home/.gitconfig
-RUN git config --global core.excludesFile '$HOME/.gitignore_global'
-RUN git config --global pull.rebase true
-RUN git config --global --add --bool push.autoSetupRemote true
+COPY ./home/ .
 
 # Chmod so that these files are runnable
 RUN find $SHELL_DIR/bin -type f -exec chmod +x {} \;
