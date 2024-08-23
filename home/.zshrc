@@ -3,8 +3,10 @@ if [ -z "$DEBUG" ]; then
     clear
 fi
 
+# This where you typically mount your home directory
+# but it can be overwritten in your .zprofile
 if [ -z "$MNT" ]; then
-    MNT=$HOME
+    export MNT=$HOME/mnt
 fi
 
 # If you come from bash you might have to change your $PATH.
@@ -218,14 +220,17 @@ stow-shell() {
 alias trueclear="clear"
 alias clear="trueclear && neofetch"
 
+# This is our github copilot hosts file
+# make a symbolic link to $MNT
+if [[ "$MNT" != "$HOME" ]]; then
+    mkdir -p ~/.config/github-copilot
+    ln -s $MNT/.config/github-copilot/hosts.json ~/.config/github-copilot/hosts.json
+fi
+
 ## =============== NOTES ========================
 ## Keep all your edits above this line, these
 ## should be executed last
 ## ==============================================
-
-# Uncomment this line to get this zshrc file to work on a local machine!
-# First obviously you need to make a $HOME/.zshrc.private.local to source
-# export ZSH_PRIVATE_LOC=$HOME/.zshrc.private.local
 
 # Load private info location
 if [ -z "$ZSH_PRIVATE_LOC" ]; then
