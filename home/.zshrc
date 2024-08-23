@@ -218,11 +218,6 @@ stow-shell() {
 alias trueclear="clear"
 alias clear="trueclear && neofetch"
 
-# It's useful to automatically add these wd's and repos
-wd add shell $SHELL_DIR
-wd add nvim .config/nvim
-wd add neovim .config/neovim
-
 # Load private info location
 if [ -z "$ZSH_PRIVATE_LOC" ]; then
     ZSH_PRIVATE_LOC=$MNT/.zshrc.private
