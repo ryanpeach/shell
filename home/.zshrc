@@ -225,7 +225,7 @@ alias clear="trueclear && neofetch"
 
 # Uncomment this line to get this zshrc file to work on a local machine!
 # First obviously you need to make a $HOME/.zshrc.private.local to source
-# export ZSHRC_PRIVATE_LOC=$HOME/.zshrc.private.local
+# export ZSH_PRIVATE_LOC=$HOME/.zshrc.private.local
 
 # Load private info location
 if [ -z "$ZSH_PRIVATE_LOC" ]; then
