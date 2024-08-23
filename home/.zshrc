@@ -196,7 +196,7 @@ build-deps () {
 # We also need to support running more than one docker container at a time
 stow-shell() {
     if [ -z "$SHELL_MNT_DIR" ]; then
-        SHELL_MNT_DIR="$HOME/mnt/shell"
+        SHELL_MNT_DIR="$MNT/shell"
     fi
     if [ -d "$SHELL_MNT_DIR" ]; then
         cd $SHELL_MNT_DIR
@@ -213,7 +213,9 @@ stow-shell() {
         echo "WARNING: $SHELL_MNT_DIR not found. Editing shell files is not safe."
     fi
 }
-
+if [[ "$MNT" != "$HOME" ]]; then
+    stow-shell
+fi
 
 # I am going to set up neofetch to run on clear, because I often have a local terminal and this terminal open at the same time
 # and I want to clearly see which is which
