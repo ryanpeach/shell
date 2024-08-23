@@ -52,7 +52,7 @@ Or you could put it in your `~/.bash_profile`, `~/.bashrc`, or `~/.zshrc` file.
 
 It's important the MNT variable is set to the directory you want to mount your home in the container from the containers filesystem perspective.
 
-# Other condsiderations
+# Editing this repo from within this container
 
 It is best to clone THIS REPO into your home directory
 
@@ -61,6 +61,23 @@ It is best to clone THIS REPO into your home directory
 The `.zshrc` will detect this directory mounted to $SHELL_MNT_DIR which defaults to $HOME/mnt/shell inside the container, and stow files from its ./home directory.
 
 This will allow you to safely edit your config from within your docker container, even within multiple running instances.
+
+# If you want to use this zshrc file and other configs on your local!
+
+**I MAKE NO GUARENTEES, I ONLY TEST THIS ON MY OWN MACHINES!!! DO NOT TRY AT HOME. COULD CAUSE DATA LOSS.**
+
+Just make a `.zprofile` that looks like this
+
+```bash
+export ZSH_PRIVATE_LOC=$HOME/.zshrc.private.local
+export MNT=$HOME
+```
+
+And make a `$HOME/.zshrc.private.local` (like your `$HOME/.zshrc.private` but will only be sourced by your local copy of the zshrc file)
+
+In general, `if [[ "$MNT" == "$HOME" ]]` this repo will assume you have copied it to a local machine.
+
+**I MAKE NO GUARENTEES, I ONLY TEST THIS ON MY OWN MACHINES!!! DO NOT TRY AT HOME. COULD CAUSE DATA LOSS.**
 
 # Running from the Repo
 
