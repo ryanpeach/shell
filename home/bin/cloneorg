@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+
+ORGANIZATION=$1
+BASE_DIR=$2
+
+# --help
+if [ "$1" = "--help" ]; then
+  echo "cloneorg - Clone or update all repositories from a GitHub organization"
+  echo "Usage: cloneorg <organization> <base_dir>"
+  echo "Arguments:"
+  echo "  organization: The GitHub organization to clone repositories from"
+  echo "  base_dir: The base directory to clone repositories into"
+  exit 0
+fi
+
+if [ -z "$ORGANIZATION" ]; then
+  echo "cloneorg - Clone or update all repositories from a GitHub organization"
+  echo "Usage: cloneorg <organization> <base_dir>"
+  echo "Please provide an organization"
+  exit 1
+fi
+
+if [ -z "$BASE_DIR" ]; then
+  echo "cloneorg - Clone or update all repositories from a GitHub organization"
+  echo "Usage: cloneorg <organization> <base_dir>"
+  echo "Please provide a base directory"
+  exit 1
+fi
+
+if [ ! -d "$BASE_DIR" ]; then
+  echo "Base directory $BASE_DIR does not exist"
+  exit 1
+fi
+
+# Check that gh is installed
+if ! command -v gh &> /dev/null; then
+  echo "gh is required to run this script"
+  echo "Please install gh from https://cli.github.com/"
+  exit 1
+fi
+
+# Check that git is installed
+if ! command -v git &> /dev/null; then
+  echo "git is required to run this script"
+  echo "Please install git from https://git-scm.com/"
+  exit 1
+fi
+
+# Check that jq is installed
+if ! command -v jq &> /dev/null; then
+  echo "jq is required to run this script"
+  echo "Please install jq from https://stedolan.github.io/jq/"
+  exit 1
+fi
+
+echo "Cloning repositories from $ORGANIZATION"
+
+mkdir -p "$BASE_DIR/archives" "$BASE_DIR/private" "$BASE_DIR/forks" "$BASE_DIR/public"
+
+repos=$(gh repo list ryanpeach --limit 1000 --json name,url,isArchived,isPrivate,isFork)
+
+# Function to clone or update a repository
+clone_or_update_repo() {
+    local repo_url=$1
+    local repo_name=$2
+    local target_dir=$3
+
+    # Check if the repository already exists
+    if [ -d "$target_dir/$repo_name" ]; then
+        echo "Updating $repo_name in $target_dir"
+        cd "$target_dir/$repo_name" || exit
+        if [ -n "$(git status --porcelain)" ]; then
+            echo "Repository $target_dir/$repo_name has uncommitted changes, skipping"
+            cd - || exit
+            return
+        fi
+        git fetch --all
+        git pull --all
+        cd - || exit
+    else
+        echo "Cloning $repo_name into $target_dir"
+        gh repo clone git@github.com:$ORGANIZATION/$repo_name.git "$target_dir/$repo_name"
+        cd "$target_dir/$repo_name" || exit
+        git fetch --all
+        git pull --all
+        cd - || exit
+    fi
+}
+
+# Iterate over each repository
+echo "$repos" | jq -c '.[]' | while read -r repo; do
+    repo_name=$(echo "$repo" | jq -r '.name')
+    repo_url=$(echo "$repo" | jq -r '.url')
+    is_archived=$(echo "$repo" | jq -r '.isArchived')
+    is_private=$(echo "$repo" | jq -r '.isPrivate')
+    is_fork=$(echo "$repo" | jq -r '.isFork')
+
+    if [ "$is_archived" = "true" ]; then
+        clone_or_update_repo "$repo_url" "$repo_name" "$BASE_DIR/archives"
+    elif [ "$is_private" = "true" ]; then
+        clone_or_update_repo "$repo_url" "$repo_name" "$BASE_DIR/private"
+    elif [ "$is_fork" = "true" ]; then
+        clone_or_update_repo "$repo_url" "$repo_name" "$BASE_DIR/forks"
+    else
+        clone_or_update_repo "$repo_url" "$repo_name" "$BASE_DIR/public"
+    fi
+done
+
+echo "All repositories have been cloned or updated."

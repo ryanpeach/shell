@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # histgrep - search through the history of a git repository
 # Usage: like ripgrep
 
