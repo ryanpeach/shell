@@ -69,26 +69,19 @@ clone_or_update_repo() {
     if [ -d "$target_dir/$repo_name" ]; then
         echo "Updating $repo_name in $target_dir"
         cd "$target_dir/$repo_name" || exit
-        if [ -n "$(git status --porcelain)" ]; then
-            echo "Repository $target_dir/$repo_name has uncommitted changes, skipping"
-            cd - || exit
-            return
-        fi
-        git fetch --all
-        git pull --all
+        git remote update
         cd - || exit
     else
         echo "Cloning $repo_name into $target_dir"
-        gh repo clone git@github.com:$ORGANIZATION/$repo_name.git "$target_dir/$repo_name"
-        cd "$target_dir/$repo_name" || exit
-        git fetch --all
-        git pull --all
-        cd - || exit
+        git clone git@github.com:$ORGANIZATION/$repo_name.git "$target_dir/$repo_name" --mirror
     fi
 }
 
 # Iterate over each repository
+len=$(echo "$repos" | jq length)
+i=0
 echo "$repos" | jq -c '.[]' | while read -r repo; do
+    echo "Processing repository $((++i)) of $len"
     repo_name=$(echo "$repo" | jq -r '.name')
     repo_url=$(echo "$repo" | jq -r '.url')
     is_archived=$(echo "$repo" | jq -r '.isArchived')
