@@ -96,4 +96,3 @@ echo "$repos" | jq -c '.[]' | while read -r repo; do
     echo "Skipping fork: $repo_url (status: $comparison)"
   fi
 done
-
