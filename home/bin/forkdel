@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+
+# Usage function
+usage() {
+  echo "Usage: $0 <organization> [options]"
+  echo "Options:"
+  echo "  --execute   Actually delete the repositories (default is dry run)"
+  exit 1
+}
+
+# Check if an organization was provided
+if [ -z "$1" ]; then
+  usage
+fi
+
+ORGANIZATION=$1
+shift
+
+# Enable dry run by default
+dry_run=true
+
+# Check for arguments to disable dry run
+if [[ "$1" == "--execute" ]]; then
+  dry_run=false
+fi
+
+# Fetch all repositories for the specified organization
+repos=$(gh repo list "$ORGANIZATION" --fork --json name,owner,url,parent --limit 1000)
+
+# Iterate over each repository
+echo "$repos" | jq -c '.[]' | while read -r repo; do
+  # Extract repository details
+  repo_name=$(echo "$repo" | jq -r '.name')
+  repo_owner=$(echo "$repo" | jq -r '.owner.login')
+  repo_url=$(echo "$repo" | jq -r '.url')
+  parent_name=$(echo "$repo" | jq -r '.parent.name')
+  parent_owner=$(echo "$repo" | jq -r '.parent.owner.login')
+
+  # Ensure the repository belongs to the specified organization
+  if [[ "$repo_owner" != "$ORGANIZATION" ]]; then
+    echo "Skipping repository: $repo_url, not in organization $ORGANIZATION"
+    continue
+  fi
+
+  # Check if parent_name and parent_owner are non-empty
+  if [ -z "$parent_name" ] || [ -z "$parent_owner" ]; then
+    echo "Skipping repository: $repo_url, no valid parent repository found."
+    continue
+  fi
+
+  # Construct the parent repository's full name in owner/repo format
+  parent_full_name="${parent_owner}/${parent_name}"
+
+  # Fetch the default branch of the parent repository
+  default_branch=$(gh api "repos/$parent_full_name" --jq '.default_branch')
+
+  # Check if the default branch is fetched successfully
+  if [ -z "$default_branch" ]; then
+    echo "Skipping repository: $repo_url, unable to fetch the default branch."
+    continue
+  fi
+
+  # Fetch the comparison between the fork and the upstream (parent) repository
+  comparison=$(gh api -X GET "repos/$parent_full_name/compare/$default_branch...$repo_owner:$default_branch" | jq -r '.status')
+
+  # Fetch the list of branches in the fork
+  fork_branches=$(gh api "repos/$repo_owner/$repo_name/branches" --jq '.[].name')
+
+  # Fetch the list of branches in the parent repository
+  parent_branches=$(gh api "repos/$parent_full_name/branches" --jq '.[].name')
+
+  # Check if there are any branches in the fork that are not in the parent repository
+  unique_branches=""
+  for branch in $fork_branches; do
+    if ! echo "$parent_branches" | grep -q "^$branch$"; then
+      unique_branches+="$branch "
+    fi
+  done
+
+  # If there are unique branches, skip deletion
+  if [ -n "$unique_branches" ]; then
+    echo "Skipping repository: $repo_url, it has unique branches:"
+    echo "$unique_branches"
+    continue
+  fi
+
+  # Determine whether to delete the fork
+  if [[ "$comparison" == "identical" || "$comparison" == "behind" ]]; then
+    if $dry_run; then
+      echo "Dry run: Would delete fork: $repo_url (status: $comparison)"
+    else
+      echo "Deleting fork: $repo_url (status: $comparison)"
+      gh repo delete "$repo_url" --yes
+    fi
+  else
+    echo "Skipping fork: $repo_url (status: $comparison)"
+  fi
+done
+
