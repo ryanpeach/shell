@@ -194,28 +194,28 @@ build-deps () {
 
 # We need to make sure we don't loose our changes to our dotfiles when we close our docker container
 # We also need to support running more than one docker container at a time
-stow-shell() {
-    if [ -z "$SHELL_MNT_DIR" ]; then
-        SHELL_MNT_DIR="$MNT/shell"
-    fi
-    if [ -d "$SHELL_MNT_DIR" ]; then
-        cd $SHELL_MNT_DIR
-        if [ -z "$(git status --porcelain)" ]; then
-            stow --adopt home
-            git reset head --hard
+# stow-shell() {
+#     if [ -z "$SHELL_MNT_DIR" ]; then
+#         SHELL_MNT_DIR="$MNT/shell"
+#     fi
+#     if [ -d "$SHELL_MNT_DIR" ]; then
+#         cd $SHELL_MNT_DIR
+#         if [ -z "$(git status --porcelain)" ]; then
+#             stow --adopt home
+#             git reset head --hard
 
-            # home/.gitconfig is the one thing we dont want reflecting changes as git changes it a lot
-            cp $SHELL_MNT_DIR/home/.gitconfig $HOME/.gitconfig
-        else
-            echo "Please git commit $SHELL_MNT_DIR then run stow-shell to make safely editing your shell files possible."
-        fi
-    else
-        echo "WARNING: $SHELL_MNT_DIR not found. Editing shell files is not safe."
-    fi
-}
-if [[ "$MNT" != "$HOME" ]]; then
-    stow-shell
-fi
+#             # home/.gitconfig is the one thing we dont want reflecting changes as git changes it a lot
+#             cp $SHELL_MNT_DIR/home/.gitconfig $HOME/.gitconfig
+#         else
+#             echo "Please git commit $SHELL_MNT_DIR then run stow-shell to make safely editing your shell files possible."
+#         fi
+#     else
+#         echo "WARNING: $SHELL_MNT_DIR not found. Editing shell files is not safe."
+#     fi
+# }
+# if [[ "$MNT" != "$HOME" ]]; then
+#     stow-shell
+# fi
 
 # I am going to set up neofetch to run on clear, because I often have a local terminal and this terminal open at the same time
 # and I want to clearly see which is which
@@ -251,4 +251,6 @@ else
 fi
 
 # Neofetch
-clear
+if [ -z "$DEBUG" ]; then
+    clear
+fi
