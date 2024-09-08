@@ -37,15 +37,7 @@ end
 
 -- Load all packages into a list
 local mason_stuff = {}
-
--- lsp packages installed via nvim-lspconfig
-local servers = nvim_lsp._.cache.opts.servers
-for server_name, _ in pairs(servers) do
-    server_name = alias_to_name[server_name]
-    if not contains(already_installed, server_name) then
-        table.insert(mason_stuff, server_name)
-    end
-end
+local lsp_stuff = {}
 
 -- mason apps installed
 local mason_apps = mason._.cache.opts.ensure_installed
@@ -56,23 +48,29 @@ for _, mason_app in pairs(mason_apps) do
     end
 end
 
-local function install_mason_package(package_name)
-    local job_id = vim.fn.jobstart(vim.cmd("MasonInstall " .. package_name), {
-        on_exit = function(_, code)
-            if code == 0 then
-                print("Installed " .. package_name)
-            else
-                error("Failed to install " .. package_name)
-            end
-        end
-    })
+-- lsp packages installed via nvim-lspconfig
+local servers = nvim_lsp._.cache.opts.servers
+for server_name, _ in pairs(servers) do
+    server_name = alias_to_name[server_name]
+    if not contains(already_installed, server_name) then
+        table.insert(lsp_stuff, server_name)
+    end
+end
 
-    if job_id > 0 then
-        vim.fn.jobwait({job_id}, -1)
+local function install_package(install_cmd, package_name)
+    local success, result = pcall(function()
+        vim.cmd(install_cmd .. " " .. package_name)
+    end)
+
+    if success then
+        print("Installed " .. package_name)
     else
-        error("Failed to start job for " .. package_name)
+        error("Failed to install " .. package_name .. ": " .. result)
+        vim.cmd('qa!')  -- Close Neovim
+        os.exit(1)      -- Exit with non-zero code
     end
 end
 
 -- install them one by one
-for _, v in ipairs(mason_stuff) do install_mason_package(v) end
+for _, v in ipairs(mason_stuff) do install_package("MasonInstall", v) end
+for _, v in ipairs(lsp_stuff) do install_package("LspInstall", v) end

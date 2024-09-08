@@ -223,7 +223,8 @@ RUN find $SHELL_DIR/home/bin -type f -exec chmod +x {} \;
 
 # Get neovim to download all its stuff
 COPY ./scripts/install.lua /tmp/install.lua
-RUN nvim --headless -c 'luafile /tmp/install.lua' -c 'qall' \
+RUN set -e \
+  && nvim --headless -c 'luafile /tmp/install.lua' -c 'qall' \
   && rm /tmp/install.lua
 
 # terminal colors with xterm
