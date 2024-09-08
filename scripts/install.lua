@@ -62,7 +62,7 @@ local function install_mason_package(package_name)
             if code == 0 then
                 print("Installed " .. package_name)
             else
-                print("Failed to install " .. package_name)
+                error("Failed to install " .. package_name)
             end
         end
     })
@@ -70,7 +70,7 @@ local function install_mason_package(package_name)
     if job_id > 0 then
         vim.fn.jobwait({job_id}, -1)
     else
-        print("Failed to start job for " .. package_name)
+        error("Failed to start job for " .. package_name)
     end
 end
 
