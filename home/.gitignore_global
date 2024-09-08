@@ -1,4 +1,6 @@
 .python-version
+lazy-lock.json
+lazyvim.json
 
 #nvim
 ## Swap
