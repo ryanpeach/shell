@@ -210,10 +210,16 @@ RUN apk --no-cache --virtual .build-deps add \
   && apk del .build-deps
 
 # Copies
-COPY ./home/ .
+ENV SHELL_DIR=$HOME/shell
+COPY . $SHELL_DIR
+RUN cd $SHELL_DIR \
+  && stow --adopt home \
+  && git reset HEAD --hard \
+  && stow home \
+  && cp $SHELL_DIR/home/.gitconfig $HOME/.gitconfig
 
 # Chmod so that these files are runnable
-RUN find $SHELL_DIR/bin -type f -exec chmod +x {} \;
+RUN find $SHELL_DIR/home/bin -type f -exec chmod +x {} \;
 
 # Get neovim to download all its stuff
 COPY ./scripts/install.lua /tmp/install.lua

@@ -1,3 +1,5 @@
+.python-version
+
 #nvim
 ## Swap
 [._]*.s[a-v][a-z]
@@ -28,6 +30,7 @@ tags
 .idea
 
 # Direnv
+.env
 .envrc
 .aliases
 
