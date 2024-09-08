@@ -1,5 +1,5 @@
 build:
-    docker buildx build -t rgpeach10/shell:local . --load
+    docker buildx build --progress=plain -t rgpeach10/shell:local . --load
 
 run-local:
     docker run -it --rm \
@@ -20,6 +20,9 @@ run-remote tag="local":
         -e MNT=/home/root/mnt \
         --pull=always \
         rgpeach10/shell:{{tag}}
+
+build-all tag="local":
+    docker buildx build --progress=plain -t rgpeach10/shell:{{tag}} --platform linux/amd64,linux/arm64 . --push
 
 test:
     just build
