@@ -27,7 +27,6 @@ RUN apk add --no-cache \
     sshpass \
     openssh-client \
     openssh-server \
-    stow \
   # Archive tools \
     unzip \
     tar \
@@ -54,6 +53,7 @@ RUN apk add --no-cache \
   # Languages \
     go \
     rust \
+    rust-analyzer \
     cargo \
     python3 \
     python3-dev \
@@ -65,6 +65,8 @@ RUN apk add --no-cache \
     luarocks \
     nodejs \
     npm \
+    perl \
+    texlive \
   # Miscellaneous tools \
     neovim \
     jq \
@@ -78,6 +80,7 @@ RUN apk add --no-cache \
   # K8s tools \
     kubectl \
     helm \
+    helm-ls \
     helmfile \
     k9s \
   && rm -rf /var/cache/apk/*
@@ -191,6 +194,21 @@ RUN ARCH=$(echo "$TARGETPLATFORM" | sed 's/linux\///') \
 #    rm -rf /var/cache/apk/* /tmp/slurm-*
 # WORKDIR /home/root
 
+# Stow
+RUN apk --no-cache --virtual .build-deps add \
+    build-base \
+    automake \
+    autoconf \
+    texinfo \
+  && git clone https://github.com/aspiers/stow.git \
+  && cd stow \
+  && sed '131,143d' -i Makefile.am \
+  && sed -i '/check_pmdir/d' Makefile.am \
+  && set -x && autoreconf -iv \
+  && ./configure \
+  &&  make install \
+  && apk del .build-deps
+
 # Copies
 COPY ./home/ .
 
@@ -198,7 +216,9 @@ COPY ./home/ .
 RUN find $SHELL_DIR/bin -type f -exec chmod +x {} \;
 
 # Get neovim to download all its stuff
-RUN nvim --headless "+Lazy! sync" +qa
+COPY ./scripts/install.lua /tmp/install.lua
+RUN nvim --headless -c 'luafile /tmp/install.lua' -c 'qall' \
+  && rm /tmp/install.lua
 
 # terminal colors with xterm
 ENV TERM=xterm-256color
