@@ -64,8 +64,6 @@ This will allow you to safely edit your config from within your docker container
 
 # If you want to use this zshrc file and other configs on your local!
 
-**I MAKE NO GUARENTEES, I ONLY TEST THIS ON MY OWN MACHINES!!! DO NOT TRY AT HOME. COULD CAUSE DATA LOSS.**
-
 Just make a `.zprofile` that looks like this
 
 ```bash
@@ -73,11 +71,26 @@ export ZSH_PRIVATE_LOC=$HOME/.zshrc.private.local
 export MNT=$HOME
 ```
 
-And make a `$HOME/.zshrc.private.local` (like your `$HOME/.zshrc.private` but will only be sourced by your local copy of the zshrc file)
+And make a `$HOME/.zshrc.private.local` (like your `$HOME/.zshrc.private` but will only be sourced by your local copy of the zshrc file) 
 
-In general, `if [[ "$MNT" == "$HOME" ]]` this repo will assume you have copied it to a local machine.
+If you have nothing Docker Container specific (and usually even if you do), this can just say:
 
-**I MAKE NO GUARENTEES, I ONLY TEST THIS ON MY OWN MACHINES!!! DO NOT TRY AT HOME. COULD CAUSE DATA LOSS.**
+```bash
+source $HOME/.zshrc.private
+```
+
+A reason you might put something in here that's NOT in your `.zshrc.private` is if you have an os-specific command that you would run privately but WOULD NOT want to run in the container.
+
+In general, `if [[ $IS_DOCKER ]]` this repo will assume you are running in the container.
+
+Now, `stow home`
+
+IF YOU WANT TO GET RID OF YOUR LOCAL CONFIGS IN FAVOR OF THOSE IN THIS REPO
+
+```bash
+stow --adopt home
+git reset HEAD --hard
+```
 
 # Running from the Repo
 
