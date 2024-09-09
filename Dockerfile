@@ -226,7 +226,8 @@ RUN cd $SHELL_DIR \
 RUN find $SHELL_DIR/home/bin -type f -exec chmod +x {} \;
 
 # Get neovim to download all its stuff
-RUN nvim --headless '+Lazy install' +qall
+RUN nvim --headless '+Lazy install' +qall \
+  && nvim --headless '+TSUpdate' +qall
 
 # terminal colors with xterm
 ENV TERM=xterm-256color
