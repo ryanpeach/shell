@@ -17,6 +17,33 @@ fi
 # If you come from bash you might have to change your $PATH.
 export PATH=$HOME/bin:/usr/local/bin:$HOME/.local/bin:$PATH:/opt/homebrew/bin
 
+# Load private info location
+if [ -z "$ZSH_PRIVATE_LOC" ]; then
+    ZSH_PRIVATE_LOC=$MNT/.zshrc.private
+fi
+
+# If it does not exist, inform them
+if [ ! -f "$ZSH_PRIVATE_LOC" ]; then
+    echo "No .zshrc.private found at '$ZSH_PRIVATE_LOC'"
+    echo "You should create this to add secret information to your session"
+    echo "Usually you put it in your home directory or in the directory"
+    echo "mounted to this containers $MNT. However, wherever you put it, you can"
+    echo "always override the location by overriding the ZSH_PRIVATE_LOC env variable"
+else
+    source $ZSH_PRIVATE_LOC
+fi
+
+# This is our github copilot hosts file
+# make a symbolic link to $MNT
+if [[ $IS_DOCKER ]]; then
+    mkdir -p ~/.config/github-copilot
+    if ! [ -f "$MNT/.config/github-copilot/hosts.json" ]; then
+        echo "No hosts.json found in $MNT/.config/github-copilot/hosts.json"
+    else
+        ln -s $MNT/.config/github-copilot/hosts.json ~/.config/github-copilot/hosts.json
+    fi
+fi
+
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
@@ -266,31 +293,6 @@ fi
 # Neofetch
 if [ -z "$DEBUG" ]; then
     clear
-fi
-
-# This is our github copilot hosts file
-# make a symbolic link to $MNT
-if [[ $IS_DOCKER ]]; then
-    mkdir -p ~/.config/github-copilot
-    if ! [ -f "$MNT/.config/github-copilot/hosts.json" ]; then
-        echo "No hosts.json found in $MNT/.config/github-copilot/hosts.json"
-    else
-        ln -s $MNT/.config/github-copilot/hosts.json ~/.config/github-copilot/hosts.json
-    fi
-fi
-
-# Load private info location
-if [ -z "$ZSH_PRIVATE_LOC" ]; then
-    ZSH_PRIVATE_LOC=$MNT/.zshrc.private
-fi
-
-# If it does not exist, inform them
-if [ ! -f "$ZSH_PRIVATE_LOC" ]; then
-    echo "No .zshrc.private found at '$ZSH_PRIVATE_LOC'"
-    echo "You should create this to add secret information to your session"
-    echo "Usually you put it in your home directory or in the directory"
-    echo "mounted to this containers $MNT. However, wherever you put it, you can"
-    echo "always override the location by overriding the ZSH_PRIVATE_LOC env variable"
 else
-    source $ZSH_PRIVATE_LOC
+    neofetch
 fi
