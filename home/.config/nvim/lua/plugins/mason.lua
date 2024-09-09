@@ -22,7 +22,7 @@ return {
     opts = function(_, opts)
       -- Create user command to synchronously install all LSP servers in `opts.servers`.
       vim.api.nvim_create_user_command("LspInstallAll", function()
-        for server, _ in pairs(opts.servers) do
+        for _, tool in pairs(opts.ensure_installed) do
           vim.cmd("LspInstall " .. server)
         end
       end, {})
