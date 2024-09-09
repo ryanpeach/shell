@@ -38,3 +38,10 @@ push-local: build
     echo $(git symbolic-ref --short HEAD | sed 's/\//__/g')
     docker tag rgpeach10/shell:local rgpeach10/shell:$(git symbolic-ref --short HEAD | sed 's/\//__/g')
     docker push rgpeach10/shell:$(git symbolic-ref --short HEAD | sed 's/\//__/g')
+
+stow: 
+    stow -t $HOME -d ./home
+
+stow-hard:
+    stow -t $HOME -d ./home --adopt
+    git reset --hard
