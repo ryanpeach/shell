@@ -223,7 +223,6 @@ RUN cd $SHELL_DIR \
 RUN find $SHELL_DIR/home/bin -type f -exec chmod +x {} \;
 
 # Get neovim to download all its stuff
-COPY ./scripts/install.lua /tmp/install.lua
 RUN set -e \
   && nvim --headless '+Lazy install' +MasonInstallAll +LspInstallAll +qall \
   && rm /tmp/install.lua
