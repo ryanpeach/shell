@@ -68,6 +68,7 @@ Just make a `.zprofile` that looks like this
 
 ```bash
 export ZSH_PRIVATE_LOC=$HOME/.zshrc.private.local
+export SHELL_MNT_DIR=$HOME/shell # or wherever you cloned this repo
 export MNT=$HOME
 ```
 
