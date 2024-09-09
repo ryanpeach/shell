@@ -21,7 +21,7 @@ require("lazy").setup({
 
     -- coding
     -- { import = "lazyvim.plugins.extras.coding.copilot-chat" },
-    { import = "lazyvim.plugins.extras.coding.copilot" },
+    -- { import = "lazyvim.plugins.extras.coding.copilot" },
     { import = "lazyvim.plugins.extras.coding.mini-comment" },
 
     -- editor
