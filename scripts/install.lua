@@ -65,9 +65,9 @@ local function install_package(install_cmd, package_name)
     if success then
         print("Installed " .. package_name)
     else
-        error("Failed to install " .. package_name .. ": " .. result)
-        vim.cmd('qa!')  -- Close Neovim
-        os.exit(1)      -- Exit with non-zero code
+        print("Failed to install " .. package_name .. ": " .. result)
+        -- vim.cmd('qa!')  -- Close Neovim
+        -- os.exit(1)      -- Exit with non-zero code
     end
 end
 
