@@ -214,7 +214,7 @@ ENV SHELL_DIR=$HOME/shell
 COPY . $SHELL_DIR
 RUN set -e \
   && cd $SHELL_DIR \
-  && if [ -z "$(git status --porcelain)" ]; then echo "No changes"; else echo "Changes"; exit 1; fi
+  && if [ -z "$(git status --porcelain)" ]; then echo "No changes"; else git status --porcelain; exit 1; fi
 
 RUN cd $SHELL_DIR \
   && stow --adopt home \
