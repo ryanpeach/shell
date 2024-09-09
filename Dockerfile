@@ -212,7 +212,7 @@ RUN apk --no-cache --virtual .build-deps add \
 # Copies
 ENV SHELL_DIR=$HOME/shell
 COPY . $SHELL_DIR
-RUN cd $SHELL_DIR && git diff-index --quiet HEAD -- || { echo "Unclean working directory"; exit 1; } 
+RUN cd $SHELL_DIR && git diff-index --quiet --cached HEAD -- || { echo "Unclean working directory"; git status; exit 1; } 
 RUN cd $SHELL_DIR \
   && stow --adopt home \
   && git reset HEAD --hard \
