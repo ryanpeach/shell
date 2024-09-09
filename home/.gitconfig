@@ -25,3 +25,6 @@
 
 [push]
     autoSetupRemote=true
+[user]
+	email = rgpeach10@gmail.com
+	name = Ryan Peach
