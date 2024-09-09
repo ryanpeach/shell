@@ -212,7 +212,10 @@ RUN apk --no-cache --virtual .build-deps add \
 # Copies
 ENV SHELL_DIR=$HOME/shell
 COPY . $SHELL_DIR
-RUN cd $SHELL_DIR && git diff-index --quiet --cached HEAD -- || { echo "Unclean working directory"; git status; exit 1; } 
+RUN set -e \
+  && cd $SHELL_DIR \
+  && if [ -z "$(git status --porcelain)" ]; then echo "No changes"; else echo "Changes"; exit 1; fi
+
 RUN cd $SHELL_DIR \
   && stow --adopt home \
   && git reset HEAD --hard \
