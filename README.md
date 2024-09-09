@@ -64,29 +64,23 @@ This will allow you to safely edit your config from within your docker container
 
 # If you want to use this zshrc file and other configs on your local!
 
-Create a `.zshrc.private.local` file in your home directory.
+Create a `.zshrc.private.local` file in your home directory. Anything that you want to source specific to your os or local machine should go in here.
 
-It may source your `.zshrc.private` file, if you'd like everything in it (which is usually applied to docker containers) to be applied to your local shell as well.
+Creating this file will prevent the sourcing of the `.zshrc.private` file in this repo.
 
-Just add the following to your `.zshrc.private.local` file:
+If you ALSO want to source the `.zshrc.private` file in this repo, you can do so by adding the following to your `.zshrc.private.local` file:
 
 ```bash
-export ZSH_PRIVATE_LOC=$HOME/.zshrc.private.local
+source /path/to/.zshrc.private
+```
+
+Also please move the `shell `directory itself as a subdirectory of `$HOME`, or else set:
+
+```bash
 export SHELL_MNT_DIR=$HOME/shell # or wherever you cloned this repo
-export MNT=$HOME
 ```
 
-If you have nothing Docker Container specific (and usually even if you do), this can just say:
-
-```bash
-source $HOME/.zshrc.private
-```
-
-A reason you might put something in here that's NOT in your `.zshrc.private` is if you have an os-specific command that you would run privately but WOULD NOT want to run in the container.
-
-In general, `if [[ $IS_DOCKER ]]` this repo will assume you are running in the container.
-
-IF YOU WANT TO GET RID OF YOUR LOCAL CONFIGS IN FAVOR OF THOSE IN THIS REPO
+IF YOU WANT TO GET RID OF YOUR LOCAL CONFIGS IN FAVOR OF THOSE IN THIS REPO, go into the `shell` directory and run:
 
 ```bash
 just stow-hard

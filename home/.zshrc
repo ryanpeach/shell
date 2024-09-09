@@ -1,12 +1,11 @@
-# clear at the beginning
-if [ -z "$DEBUG" ]; then
-    clear
-fi
-
 # This where you typically mount your home directory
 # but it can be overwritten in your .zprofile
 if [ -z "$MNT" ]; then
-    export MNT=$HOME/mnt
+    export MNT=$HOME
+fi
+
+if [ -z "$SHELL_MNT_DIR" ]; then
+    SHELL_MNT_DIR="$MNT/shell"
 fi
 
 # If $MNT is not $HOME, then we are running in docker
@@ -19,18 +18,20 @@ export PATH=$HOME/bin:/usr/local/bin:$HOME/.local/bin:$PATH:/opt/homebrew/bin
 
 # Load private info location
 if [ -z "$ZSH_PRIVATE_LOC" ]; then
-    ZSH_PRIVATE_LOC=$MNT/.zshrc.private
+    ZSH_PRIVATE_LOC=$MNT
 fi
 
-# If it does not exist, inform them
-if [ ! -f "$ZSH_PRIVATE_LOC" ]; then
-    echo "No .zshrc.private found at '$ZSH_PRIVATE_LOC'"
+# Load private info location
+if [ -f "$ZSH_PRIVATE_LOC/.zshrc.private.local" ]; then
+    source $ZSH_PRIVATE_LOC/.zshrc.private.local
+elif [ -f "$ZSH_PRIVATE_LOC/.zshrc.private" ]; then
+    source $ZSH_PRIVATE_LOC/.zshrc.private
+else
+    echo "No .zshrc.private or .zshrc.private.local found at '$ZSH_PRIVATE_LOC'"
     echo "You should create this to add secret information to your session"
     echo "Usually you put it in your home directory or in the directory"
     echo "mounted to this containers $MNT. However, wherever you put it, you can"
     echo "always override the location by overriding the ZSH_PRIVATE_LOC env variable"
-else
-    source $ZSH_PRIVATE_LOC
 fi
 
 # This is our github copilot hosts file
@@ -227,9 +228,7 @@ build-deps () {
 # We need to make sure we don't loose our changes to our dotfiles when we close our docker container
 # We also need to support running more than one docker container at a time
 # stow-shell() {
-#     if [ -z "$SHELL_MNT_DIR" ]; then
-#         SHELL_MNT_DIR="$MNT/shell"
-#     fi
+
 #     if [ -d "$SHELL_MNT_DIR" ]; then
 #         cd $SHELL_MNT_DIR
 #         if [ -z "$(git status --porcelain)" ]; then
@@ -291,8 +290,4 @@ fi
 ## ==============================================
 
 # Neofetch
-if [ -z "$DEBUG" ]; then
-    clear
-else
-    neofetch
-fi
+neofetch

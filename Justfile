@@ -40,8 +40,8 @@ push-local: build
     docker push rgpeach10/shell:$(git symbolic-ref --short HEAD | sed 's/\//__/g')
 
 stow: 
-    stow -t $HOME -d ./home
+    stow -t $HOME home
 
 stow-hard:
-    stow -t $HOME -d ./home --adopt
+    stow -t $HOME --adopt home
     git reset --hard
