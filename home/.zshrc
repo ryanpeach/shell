@@ -233,10 +233,6 @@ alias clear="trueclear && neofetch"
 ## This will prevent you from exiting the shell if you have uncommitted changes in ~/shell
 ## ==============================================
 
-if [[ $IS_DOCKER ]]; then
-    trap on_exit SIGHUP EXIT
-fi
-
 function on_exit() {
     # Check if ~/shell is a git repository
     if [ -d ~/shell/.git ]; then
@@ -258,20 +254,8 @@ function on_exit() {
     fi
 }
 
-# Override exit command to call on_exit first
-function exit_cmd() {
-    on_exit
-    if [ $? -eq 0 ]; then
-        # Only exit if on_exit returned 0 (clean state or non-git repo)
-        builtin exit
-    else
-        # Do not exit if on_exit returned non-zero (unclean state)
-        echo "Exit canceled due to uncommitted changes."
-    fi
-}
-
 if [[ $IS_DOCKER ]]; then
-    alias exit="exit_cmd"
+    trap on_exit SIGHUP EXIT
 fi
 
 ## =============== NOTES ========================
