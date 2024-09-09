@@ -39,7 +39,7 @@ push-local: build
     docker tag rgpeach10/shell:local rgpeach10/shell:$(git symbolic-ref --short HEAD | sed 's/\//__/g')
     docker push rgpeach10/shell:$(git symbolic-ref --short HEAD | sed 's/\//__/g')
 
-stow: 
+stow:
     stow -t $HOME home
 
 stow-hard:
