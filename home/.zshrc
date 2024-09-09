@@ -9,6 +9,11 @@ if [ -z "$MNT" ]; then
     export MNT=$HOME/mnt
 fi
 
+# If $MNT is not $HOME, then we are running in docker
+if [[ "$MNT" != "$HOME" ]]; then
+    export IS_DOCKER=true
+fi
+
 # If you come from bash you might have to change your $PATH.
 export PATH=$HOME/bin:/usr/local/bin:$HOME/.local/bin:$PATH:/opt/homebrew/bin
 
@@ -213,7 +218,7 @@ build-deps () {
 #         echo "WARNING: $SHELL_MNT_DIR not found. Editing shell files is not safe."
 #     fi
 # }
-# if [[ "$MNT" != "$HOME" ]]; then
+# if [[ $IS_DOCKER ]]; then
 #     stow-shell
 # fi
 
@@ -222,17 +227,73 @@ build-deps () {
 alias trueclear="clear"
 alias clear="trueclear && neofetch"
 
-# This is our github copilot hosts file
-# make a symbolic link to $MNT
-if [[ "$MNT" != "$HOME" ]]; then
-    mkdir -p ~/.config/github-copilot
-    ln -s $MNT/.config/github-copilot/hosts.json ~/.config/github-copilot/hosts.json
+## =============== Exit =========================
+## Because the shell has ~/shell inside its own filesystem
+## we want to protect any work we are doing in this filesystem
+## This will prevent you from exiting the shell if you have uncommitted changes in ~/shell
+## ==============================================
+
+if [[ $IS_DOCKER ]]; then
+    trap on_exit SIGHUP EXIT
+fi
+
+function on_exit() {
+    # Check if ~/shell is a git repository
+    if [ -d ~/shell/.git ]; then
+        cd ~/shell
+        # Check if working directory is clean (porcelain state)
+        if [ -z "$(git status --porcelain)" ]; then
+            # Working directory is clean, allow exit
+            echo "Exiting, ~/shell is clean."
+            return 0  # Proceed with exit
+        else
+            # Working directory has uncommitted changes
+            echo "~/shell has uncommitted changes. Exit canceled."
+            return 1  # Prevent exit
+        fi
+    else
+        # ~/shell is not a git repository, allow exit
+        echo "~/shell is not a git repository."
+        return 0  # Proceed with exit
+    fi
+}
+
+# Override exit command to call on_exit first
+function exit_cmd() {
+    on_exit
+    if [ $? -eq 0 ]; then
+        # Only exit if on_exit returned 0 (clean state or non-git repo)
+        builtin exit
+    else
+        # Do not exit if on_exit returned non-zero (unclean state)
+        echo "Exit canceled due to uncommitted changes."
+    fi
+}
+
+if [[ $IS_DOCKER ]]; then
+    alias exit="exit_cmd"
 fi
 
 ## =============== NOTES ========================
 ## Keep all your edits above this line, these
 ## should be executed last
 ## ==============================================
+
+# Neofetch
+if [ -z "$DEBUG" ]; then
+    clear
+fi
+
+# This is our github copilot hosts file
+# make a symbolic link to $MNT
+if [[ $IS_DOCKER ]]; then
+    mkdir -p ~/.config/github-copilot
+    if ! [ -f "$MNT/.config/github-copilot/hosts.json" ]; then
+        echo "No hosts.json found in $MNT/.config/github-copilot/hosts.json"
+    else
+        ln -s $MNT/.config/github-copilot/hosts.json ~/.config/github-copilot/hosts.json
+    fi
+fi
 
 # Load private info location
 if [ -z "$ZSH_PRIVATE_LOC" ]; then
@@ -248,9 +309,4 @@ if [ ! -f "$ZSH_PRIVATE_LOC" ]; then
     echo "always override the location by overriding the ZSH_PRIVATE_LOC env variable"
 else
     source $ZSH_PRIVATE_LOC
-fi
-
-# Neofetch
-if [ -z "$DEBUG" ]; then
-    clear
 fi
