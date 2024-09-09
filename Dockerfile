@@ -213,7 +213,7 @@ RUN apk --no-cache --virtual .build-deps add \
 ENV SHELL_DIR=$HOME/shell
 COPY . $SHELL_DIR
 RUN cd $SHELL_DIR \
-  && if [ -n "$(git status --porcelain)" ]; then echo "Unclean git repo, make a commit"; exit 1; fi \
+  && git diff-index --quiet HEAD -- || { echo "Unclean working directory"; exit 1; } \
   && stow --adopt home \
   && git reset HEAD --hard \
   && stow home \
