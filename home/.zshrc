@@ -14,7 +14,7 @@ if [[ "$MNT" != "$HOME" ]]; then
 fi
 
 # If you come from bash you might have to change your $PATH.
-export PATH=$HOME/bin:/usr/local/bin:$HOME/.local/bin:$PATH:/opt/homebrew/bin:$HOME/.cargo/bin
+export PATH=$HOME/bin:/usr/local/bin:$HOME/.local/bin:$PATH:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin:$HOME/.cargo/bin
 
 # Load private info location
 if [ -z "$ZSH_PRIVATE_LOC" ]; then
