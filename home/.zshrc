@@ -192,6 +192,7 @@ alias ls='eza -A'
 alias tree='ls --tree'
 
 # ripgrep
+alias ripgrep='rg'
 alias rg='batgrep'
 
 # Keep history in a file
