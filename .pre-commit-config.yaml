@@ -14,3 +14,10 @@ repos:
     rev: v8.18.4
     hooks:
       - id: gitleaks
+  - repo: local
+    hooks:
+      - id: luaformatter
+        name: LuaFormatter
+        entry: lua-format -i
+        language: system
+        types: [lua]
