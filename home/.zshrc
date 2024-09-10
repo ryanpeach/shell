@@ -157,9 +157,6 @@ export POETRY_VIRTUALENVS_CREATE=true
 export POETRY_VIRTUALENVS_IN_PROJECT=true
 export POETRY_VIRTUALENVS_PREFER_ACTIVE_PYTHON=true
 
-# Luarocks
-alias luarocks="luarocks-5.1"
-
 # Venv
 alias venv="python3 -m venv .venv"
 alias activate="source .venv/bin/activate"
