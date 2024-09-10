@@ -17,21 +17,21 @@ fi
 export PATH=$HOME/bin:/usr/local/bin:$HOME/.local/bin:$PATH:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin:$HOME/.cargo/bin
 
 # Load private info location
-if [ -z "$ZSH_PRIVATE_LOC" ]; then
-    ZSH_PRIVATE_LOC=$MNT
+if [ -z "$ZSHRC_PRIVATE_LOC" ]; then
+    ZSHRC_PRIVATE_LOC=$MNT
 fi
 
 # Load private info location
-if [ -f "$ZSH_PRIVATE_LOC/.zshrc.private.local" ]; then
-    source $ZSH_PRIVATE_LOC/.zshrc.private.local
-elif [ -f "$ZSH_PRIVATE_LOC/.zshrc.private" ]; then
-    source $ZSH_PRIVATE_LOC/.zshrc.private
+if [ -f "$ZSHRC_PRIVATE_LOC/.zshrc.private.local" ]; then
+    source $ZSHRC_PRIVATE_LOC/.zshrc.private.local
+elif [ -f "$ZSHRC_PRIVATE_LOC/.zshrc.private" ]; then
+    source $ZSHRC_PRIVATE_LOC/.zshrc.private
 else
-    echo "No .zshrc.private or .zshrc.private.local found at '$ZSH_PRIVATE_LOC'"
+    echo "No .zshrc.private or .zshrc.private.local found at '$ZSHRC_PRIVATE_LOC'"
     echo "You should create this to add secret information to your session"
     echo "Usually you put it in your home directory or in the directory"
     echo "mounted to this containers $MNT. However, wherever you put it, you can"
-    echo "always override the location by overriding the ZSH_PRIVATE_LOC env variable"
+    echo "always override the location by overriding the ZSHRC_PRIVATE_LOC env variable"
 fi
 
 # This is our github copilot hosts file
