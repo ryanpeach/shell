@@ -1,2 +1,5 @@
 [font]
 size = 8
+
+[scrolling]
+history = 100000
