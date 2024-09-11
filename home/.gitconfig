@@ -1,3 +1,6 @@
+[alias]
+  commit = "pre-commit install && git commit"
+
 [core]
     pager = delta
     excludesFile = ~/.gitignore_global
