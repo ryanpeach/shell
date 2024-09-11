@@ -223,29 +223,6 @@ build-deps () {
       gcc-doc
 }
 
-# We need to make sure we don't loose our changes to our dotfiles when we close our docker container
-# We also need to support running more than one docker container at a time
-# stow-shell() {
-
-#     if [ -d "$SHELL_MNT_DIR" ]; then
-#         cd $SHELL_MNT_DIR
-#         if [ -z "$(git status --porcelain)" ]; then
-#             stow --adopt home
-#             git reset head --hard
-
-#             # home/.gitconfig is the one thing we dont want reflecting changes as git changes it a lot
-#             cp $SHELL_MNT_DIR/home/.gitconfig $HOME/.gitconfig
-#         else
-#             echo "Please git commit $SHELL_MNT_DIR then run stow-shell to make safely editing your shell files possible."
-#         fi
-#     else
-#         echo "WARNING: $SHELL_MNT_DIR not found. Editing shell files is not safe."
-#     fi
-# }
-# if [[ $IS_DOCKER ]]; then
-#     stow-shell
-# fi
-
 # I am going to set up neofetch to run on clear, because I often have a local terminal and this terminal open at the same time
 # and I want to clearly see which is which
 alias trueclear="clear"
@@ -282,10 +259,30 @@ if [[ $IS_DOCKER ]]; then
     trap on_exit SIGHUP EXIT
 fi
 
-## =============== NOTES ========================
-## Keep all your edits above this line, these
-## should be executed last
-## ==============================================
+# I have a problem with not installing pre-commit on all my repos
+# So this will force me to
+check_pre_commit() {
+    # Check for the presence of .pre-commit-config.yaml or .pre-commit-config.yml
+    if [[ -f ".pre-commit-config.yaml" || -f ".pre-commit-config.yml" ]]; then
+        # Check if .pre-commit-installed exists
+        if [[ ! -f ".pre-commit-installed" ]]; then
+            echo "Found pre-commit config file. Running pre-commit install..."
+            pre-commit install  # Run the pre-commit install command
+
+            if [[ $? -eq 0 ]]; then  # Check if the pre-commit install was successful
+                touch ".pre-commit-installed"  # Create .pre-commit-installed file
+                echo "Pre-commit installed and marked as installed in this directory."
+            else
+                echo "Pre-commit installation failed."
+            fi
+        else
+            echo "Pre-commit already installed in this directory."
+        fi
+    fi
+}
+
+# Add the function to run every time you change directories using chpwd hook
+add-zsh-hook chpwd check_pre_commit
 
 # Neofetch
 neofetch

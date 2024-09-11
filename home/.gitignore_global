@@ -1,5 +1,6 @@
 .python-version
 pyrightconfig.json
+.pre-commit-installed
 lazy-lock.json
 lazyvim.json
 
