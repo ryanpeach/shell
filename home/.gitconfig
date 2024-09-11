@@ -1,5 +1,5 @@
 [alias]
-  commit = "pre-commit install && git commit"
+    commit = "pre-commit install && git commit"
 
 [core]
     pager = delta
