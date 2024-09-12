@@ -6,4 +6,6 @@ update_readme() {
     cd -
 }
 
+export -f update_readme
+
 find . -type f -name "*.tf" -execdir bash -c 'update_readme "$(pwd)"' \;
