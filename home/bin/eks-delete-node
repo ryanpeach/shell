@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+
+# Exit immediately if a command exits with a non-zero status.
+set -e
+
+# Ensure that AWS CLI and kubectl are installed
+if ! command -v kubectl &> /dev/null || ! command -v aws &> /dev/null
+then
+    echo "Error: kubectl and aws CLI are required but not installed."
+    exit 1
+fi
+
+# Define the EC2 instance ID
+INSTANCE_ID="$1"  # EC2 instance ID as input
+
+if [ -z "$INSTANCE_ID" ]; then
+    echo "Usage: $0 <ec2-instance-id>"
+    exit 1
+fi
+
+# Fetch the private DNS name (hostname) of the EC2 instance
+HOSTNAME=$(aws ec2 describe-instances \
+    --instance-ids "$INSTANCE_ID" \
+    --query "Reservations[0].Instances[0].PrivateDnsName" \
+    --output text)
+
+if [ -z "$HOSTNAME" ]; then
+    echo "Error: Could not find hostname for EC2 instance $INSTANCE_ID."
+    exit 1
+fi
+
+echo "Found hostname: $HOSTNAME for EC2 instance: $INSTANCE_ID"
+
+# Cordon the Kubernetes node
+echo "Cordoning the node: $HOSTNAME"
+kubectl cordon "$HOSTNAME"
+
+# Drain the Kubernetes node
+echo "Draining the node: $HOSTNAME"
+kubectl drain "$HOSTNAME" --ignore-daemonsets --delete-emptydir-data --force
+
+# Wait for the node to be in NotReady state
+echo "Waiting for the node: $HOSTNAME to be drained and in 'NotReady' state..."
+while kubectl get nodes "$HOSTNAME" | grep -q 'Ready'; do
+    echo "Node $HOSTNAME is still in 'Ready' state. Waiting..."
+    sleep 10
+done
+
+echo "Node $HOSTNAME has been drained and is in 'NotReady' state."
+
+# Terminate the EC2 instance
+echo "Terminating the EC2 instance: $INSTANCE_ID"
+aws ec2 terminate-instances --instance-ids "$INSTANCE_ID"
+
+# Wait for the EC2 instance to terminate
+echo "Waiting for the EC2 instance to be terminated..."
+aws ec2 wait instance-terminated --instance-ids "$INSTANCE_ID"
+
+echo "EC2 instance $INSTANCE_ID has been terminated."
