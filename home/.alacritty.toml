@@ -1,0 +1,3 @@
+import = [
+    "~/.alacritty/profiles/tmux.toml"
+]

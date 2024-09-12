@@ -1,0 +1,11 @@
+import = [
+    "~/.alacritty/includes/shared.toml"
+]
+
+[shell]
+program = "/bin/zsh"
+args = [
+    "-l",
+    "-c",
+    "source ~/.zshrc; clear; /usr/local/bin/docker run -it --rm -v $HOME/.ssh:/home/root/.ssh -v $HOME:/home/root/mnt -w /home/root/mnt -e MNT=/home/root/mnt -e GITHUB_TOKEN=$(/opt/homebrew/bin/gh auth token) --pull=always rgpeach10/shell:main"
+]
