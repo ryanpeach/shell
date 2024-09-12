@@ -142,7 +142,7 @@ alias grc='git rebase --continue'
 alias pr='gh pr create'
 
 # Linux replacements
-alias cat='batcat'
+alias cat='bat'
 
 # NeoVim
 export PATH="$PATH:/opt/nvim-linux64/bin"

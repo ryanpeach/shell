@@ -1,0 +1,6 @@
+import = [
+    "../../includes/shared.toml"
+]
+
+[shell]
+program = "/opt/homebrew/bin/tmux"
