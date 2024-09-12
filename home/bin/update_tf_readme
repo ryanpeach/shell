@@ -1,0 +1,11 @@
+#/usr/bin/env bash
+
+update_readme() {
+    cd $1
+    terraform-docs markdown table --indent 2 --output-mode inject --output-file README.md --output-template "<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->\n{{ .Content }}\n<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->" .
+    cd -
+}
+
+export -f update_readme
+
+find . -type f -name "*.tf" -execdir bash -c 'update_readme "$(pwd)"' \;
