@@ -1,0 +1,11 @@
+import = [
+    "~/.alacritty/includes/shared.toml"
+]
+
+[shell]
+program = "/bin/zsh"
+args = [
+    "-l",
+    "-c",
+    "source ~/.zshrc; tmux attach 2> /dev/null || tmux"
+]
