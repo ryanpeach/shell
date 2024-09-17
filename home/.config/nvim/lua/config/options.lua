@@ -7,3 +7,4 @@ local opt = vim.opt
 
 opt.shiftwidth = 4 -- size of an indent
 opt.tabstop = 4 -- number of spaces tabs count for
+opt.autowriteall = true -- autosave
