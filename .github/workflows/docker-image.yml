@@ -31,7 +31,7 @@ jobs:
       - name: Git Setup
         run: |
           mkdir -p ~/.ssh
-          echo 'Host your_host_url ' >> ~/.ssh/config
+          echo 'Host ${{ vars.SERVER_IP }} ' >> ~/.ssh/config
           echo '    HostName ${{ vars.SERVER_IP }}' >> ~/.ssh/config
           echo '    Port ${{ vars.SERVER_SSH_PORT }}' >> ~/.ssh/config
           cat  ~/.ssh/config
