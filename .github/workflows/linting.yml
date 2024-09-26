@@ -31,7 +31,7 @@ jobs:
     - name: Install luaformatter
       run: |
         apt-get update
-        apt-get install cmake
+        apt-get install cmake -y
         luarocks install --server=https://luarocks.org/dev luaformatter
 
     - uses: pre-commit/action@v3.0.1
