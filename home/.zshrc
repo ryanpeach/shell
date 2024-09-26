@@ -141,6 +141,16 @@ alias gds='git diff --staged'
 alias grc='git rebase --continue'
 alias pr='gh pr create'
 
+# uv aliases
+alias pip='uv pip'
+alias pipx='uv tool'
+alias poetry='uv'
+alias pyenv='uv python'
+alias virtualenv='uv venv'
+alias venv='uv venv'
+alias flake8='ruff check'
+alias black='ruff format'
+
 # Linux replacements
 alias cat='bat'
 
