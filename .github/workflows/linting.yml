@@ -30,6 +30,7 @@ jobs:
     - uses: leafo/gh-actions-luarocks@v4
     - name: Install luaformatter
       run: |
+        apt-get update
         apt-get install cmake
         luarocks install --server=https://luarocks.org/dev luaformatter
 
