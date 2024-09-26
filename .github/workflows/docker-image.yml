@@ -33,6 +33,7 @@ jobs:
           ssh-key: ${{ secrets.DEPLOY_PRIVATE_KEY }} 
           token: ${{ secrets.GITEA_TOKEN }}
           ssh-known-hosts: ${{ secrets.KNOWN_HOSTS }}
+          github-server-url: ${{ vars.SERVER_URL }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
