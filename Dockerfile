@@ -1,6 +1,8 @@
 # Stage 1: Build environment to install emerge and perform updates
 FROM alpine:edge AS builder
 
+ARG TARGETPLATFORM
+
 # We don't actually need to create a new user
 # Just set a reasonable home directory
 WORKDIR /home/root
@@ -58,6 +60,8 @@ RUN apk add --no-cache \
     lua \
     lua-dev \
     luarocks \
+    python3 \
+    python3-dev \
     nodejs \
     npm \
     perl \
@@ -83,10 +87,12 @@ RUN apk add --no-cache \
 # K8s
 RUN helm plugin install https://github.com/databus23/helm-diff
 
+# Cargo installs
+ENV PATH="/home/root/.cargo/bin:$PATH"
+
 # uv installs
 ENV PATH="$HOME/.local/bin:$PATH"
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-RUN uv python install 3.10
 RUN apk --no-cache --virtual .build-deps add \
       gcc \
       g++ \
@@ -110,21 +116,19 @@ RUN apk --no-cache --virtual .build-deps add \
       sshpass \
       patch \
       build-base \
-      gcc-doc \
-    && uv tool install --verbose \
-      # aider-chat \ TODO: Fix this, something to do with scipy
-      pre-commit \
-      cookiecutter \
-      ruff \
-      uv \
-      ipython \
-      ipdb \
-      awscli \
-      pyright \
-      ruff-lsp \
-      just \
-      aws-parallelcluster \
-      ansible 
+      gcc-doc && \
+      # uv tool install aider-chat && \ TODO: Fix this, something to do with scipy
+      uv tool install --verbose pre-commit && \
+      uv tool install --verbose cookiecutter && \
+      uv tool install --verbose ruff && \
+      uv tool install --verbose ipython && \
+      uv tool install --verbose ipdb && \
+      uv tool install --verbose awscli && \
+      uv tool install --verbose pyright && \
+      uv tool install --verbose ruff-lsp && \
+      uv tool install --verbose just && \
+      uv tool install --verbose aws-parallelcluster && \
+      uv tool install --verbose ansible
 
 # luarocks installs
 ENV PATH="/usr/local/lib/luarocks/bin/:$HOME/.luarocks/bin/:$PATH"
@@ -144,9 +148,6 @@ RUN npm install -g \
 # Install tfenv
 RUN git clone --depth=1 https://github.com/tfutils/tfenv.git $HOME/.tfenv
 RUN .tfenv/bin/tfenv install latest
-
-# Cargo installs
-ENV PATH="/home/root/.cargo/bin:$PATH"
 
 # Go installs
 ENV PATH="$HOME/go/bin:$PATH"
@@ -174,7 +175,6 @@ RUN git clone https://github.com/eth-p/bat-extras.git \
   && ./build.sh --install --no-verify
 
 # Install ngrok cli
-ARG TARGETPLATFORM
 RUN ARCH=$(echo "$TARGETPLATFORM" | sed 's/linux\///') \
   && wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-${ARCH}.tgz \
   && tar -xvf ngrok-v3-stable-linux-${ARCH}.tgz -C /usr/local/bin
