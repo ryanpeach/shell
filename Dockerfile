@@ -115,8 +115,8 @@ RUN apk --no-cache --virtual .build-deps add \
       # aider-chat \ TODO: Fix this, something to do with scipy
       pre-commit \
       cookiecutter \
-      poetry \
       ruff \
+      uv \
       ipython \
       ipdb \
       awscli \
