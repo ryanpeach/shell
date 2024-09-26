@@ -11,7 +11,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Git Setup
+      run: |
+        mkdir -p ~/.ssh
+        echo 'Host ${{ vars.SERVER_IP }} ' >> ~/.ssh/config
+        echo '    HostName ${{ vars.SERVER_IP }}' >> ~/.ssh/config
+        echo '    Port ${{ vars.SERVER_SSH_PORT }}' >> ~/.ssh/config
+        cat  ~/.ssh/config
+
     - uses: actions/checkout@v4
+      with:
+        ssh-key: ${{ secrets.DEPLOY_PRIVATE_KEY }} 
+        token: ${{ secrets.GITEA_TOKEN }}
+        ssh-known-hosts: ${{ secrets.KNOWN_HOSTS }}
+
     - uses: actions/setup-python@v3
     - uses: leafo/gh-actions-lua@v9
     - uses: leafo/gh-actions-luarocks@v4
