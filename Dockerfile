@@ -55,11 +55,6 @@ RUN apk add --no-cache \
     rust \
     rust-analyzer \
     cargo \
-    python3 \
-    python3-dev \
-    py3-setuptools \
-    py3-pip \
-    pipx \
     lua \
     lua-dev \
     luarocks \
@@ -88,8 +83,10 @@ RUN apk add --no-cache \
 # K8s
 RUN helm plugin install https://github.com/databus23/helm-diff
 
-# Pipx installs
+# uv installs
 ENV PATH="$HOME/.local/bin:$PATH"
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+RUN uv python install 3.10
 RUN apk --no-cache --virtual .build-deps add \
       gcc \
       g++ \
@@ -106,12 +103,15 @@ RUN apk --no-cache --virtual .build-deps add \
       openssl-dev \
       sqlite-dev \
       bzip2-dev \
+      python3-dev \
+      py3-setuptools \
+      py3-pip \
       xz-dev \
       sshpass \
       patch \
       build-base \
       gcc-doc \
-    && pipx install --verbose \
+    && uv tool install --verbose \
       # aider-chat \ TODO: Fix this, something to do with scipy
       pre-commit \
       cookiecutter \
@@ -124,9 +124,7 @@ RUN apk --no-cache --virtual .build-deps add \
       ruff-lsp \
       just \
       aws-parallelcluster \
-      ansible \
-    && rm -rf /root/.local/pipx/shared ~/.cache/pipx \
-    && apk del .build-deps
+      ansible 
 
 # luarocks installs
 ENV PATH="/usr/local/lib/luarocks/bin/:$HOME/.luarocks/bin/:$PATH"
