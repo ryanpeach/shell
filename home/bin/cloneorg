@@ -57,7 +57,7 @@ echo "Cloning repositories from $ORGANIZATION"
 
 mkdir -p "$BASE_DIR/archives" "$BASE_DIR/private" "$BASE_DIR/forks" "$BASE_DIR/public"
 
-repos=$(gh repo list ryanpeach --limit 1000 --json name,url,isArchived,isPrivate,isFork)
+repos=$(gh repo list $ORGANIZATION --limit 1000 --json name,url,isArchived,isPrivate,isFork)
 
 # Function to clone or update a repository
 clone_or_update_repo() {
