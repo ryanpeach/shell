@@ -1,0 +1,122 @@
+#!/bin/bash
+
+# Function to display usage instructions
+show_usage() {
+    echo "Usage: $0 [--dry-run] /path/to/your/folder"
+    echo "Options:"
+    echo "  --dry-run    Perform a trial run with no changes made."
+    echo "  -h, --help   Display this help message."
+    echo "Example:"
+    echo "  $0 --dry-run /Users/username/Documents/TargetFolder"
+    echo "  $0 /Users/username/Documents/TargetFolder"
+}
+
+# Initialize dry_run flag
+dry_run=false
+
+# Parse command-line arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --dry-run)
+            dry_run=true
+            shift
+            ;;
+        -h|--help)
+            show_usage
+            exit 0
+            ;;
+        *)
+            # Assume the first non-option argument is the folder path
+            if [ -z "$FOLDER_PATH" ]; then
+                FOLDER_PATH="$1"
+            else
+                echo "Error: Multiple folder paths provided."
+                show_usage
+                exit 1
+            fi
+            shift
+            ;;
+    esac
+done
+
+# Check if the folder path is provided
+if [ -z "$FOLDER_PATH" ]; then
+    echo "Error: No folder path provided."
+    show_usage
+    exit 1
+fi
+
+# Verify that the provided path exists and is a directory
+if [ ! -d "$FOLDER_PATH" ]; then
+    echo "Error: The path '$FOLDER_PATH' does not exist or is not a directory."
+    show_usage
+    exit 1
+fi
+
+# Define forbidden characters pattern
+FORBIDDEN_CHARS='[:/*?"<>|]'
+
+# Loop through all files and directories in the specified folder
+for item in "$FOLDER_PATH"/*; do
+    # Check if the glob didn't match any files
+    if [ ! -e "$item" ]; then
+        echo "No files or directories found in '$FOLDER_PATH'."
+        break
+    fi
+
+    # Get the base name of the item
+    basename=$(basename "$item")
+
+    # Get the path of the item
+    item_path=$(dirname "$item")
+
+    # Remove bracketed parts (e.g., " [B003IWX9DW]")
+    new_name=$(echo "$basename" | sed 's/ \[[^]]*\]//g')
+
+    # Replace forbidden characters with '_'
+    # Using '|' as the delimiter to avoid conflicts with '/'
+    new_name=$(echo "$new_name" | sed "s|$FORBIDDEN_CHARS|_|g")
+
+    # Remove leading "._"
+    new_name=$(echo "$new_name" | sed 's/^._//')
+
+    # Remove all periods except the one before the extension
+    if [[ "$new_name" == *.* ]]; then
+        base="${new_name%.*}"
+        extension="${new_name##*.}"
+        # Remove all periods from the base
+        base="${base//./}"
+        # Reconstruct the new name
+        new_name="${base}.${extension}"
+    else
+        # If there's no extension, remove all periods
+        new_name="${new_name//./}"
+    fi
+
+    # Truncate to 140 characters
+    if [ ${#new_name} -gt 140 ]; then
+        # If there's an extension, preserve it
+        if [[ "$new_name" == *.* ]]; then
+            extension="${new_name##*.}"
+            base="${new_name%.*}"
+            max_length=$((140 - ${#extension} - 1))
+            base="${base:0:$max_length}"
+            new_name="${base}.${extension}"
+        else
+            new_name="${new_name:0:140}"
+        fi
+    fi
+
+    # Full path for the new name
+    new_path="$item_path/$new_name"
+
+    # Rename if the new name is different
+    if [ "$new_name" != "$basename" ]; then
+        if [ "$dry_run" = true ]; then
+            echo "[Dry Run] Would rename '$item' to '$new_path'"
+        else
+            mv "$item" "$new_path"
+            echo "Renamed '$basename' to '$new_name'"
+        fi
+    fi
+done
