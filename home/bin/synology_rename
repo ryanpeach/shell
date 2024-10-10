@@ -93,17 +93,17 @@ for item in "$FOLDER_PATH"/*; do
         new_name="${new_name//./}"
     fi
 
-    # Truncate to 140 characters
-    if [ ${#new_name} -gt 140 ]; then
+    # Truncate to 135 characters
+    if [ ${#new_name} -gt 135 ]; then
         # If there's an extension, preserve it
         if [[ "$new_name" == *.* ]]; then
             extension="${new_name##*.}"
             base="${new_name%.*}"
-            max_length=$((140 - ${#extension} - 1))
+            max_length=$((135 - ${#extension} - 1))
             base="${base:0:$max_length}"
             new_name="${base}.${extension}"
         else
-            new_name="${new_name:0:140}"
+            new_name="${new_name:0:135}"
         fi
     fi
 
