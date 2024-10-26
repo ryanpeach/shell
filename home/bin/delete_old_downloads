@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+echo "Deleting old files:"
+find ~/Downloads -type f -mtime +30 -print -delete
+echo "Deleting empty folders:"
+find ~/Downloads -type d -empty -print -delete
+echo "Done!"

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Iterate through all subdirectories in this directory
+# If a subdirectory is a git repository, and the repository has changes, print its name
+root=$PWD
+for dir in $(find . -type d); do
+    if [ -d "$dir/.git" ]; then
+        cd $dir
+        # If there are changes, print the subdirectory name
+        if [ -n "$(git status --porcelain)" ]; then
+            echo "$dir: Needs to be committed."
+        fi
+        # Iterate over all local branches
+        for branch in $(git branch -a | sed -e 's/^..//' | grep -v '^remotes/'); do
+            # If the branch is not pushed to origin, print the branch name
+            if [ -z "$(git branch -r | grep "origin/$branch")" ]; then
+                echo "$dir: branch $branch needs to be pushed."
+            fi
+        done
+        cd $root
+    fi
+done

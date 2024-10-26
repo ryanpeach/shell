@@ -1,0 +1,220 @@
+#!/usr/bin/env python
+import boto3
+from tqdm import tqdm
+
+from pathlib import Path
+import zipfile
+import shutil
+import json
+import os
+from botocore.exceptions import ClientError
+from urllib3.exceptions import ProtocolError
+
+
+def to_gigs(size: float):
+    return size/1073741824 # 1024/1024/1024
+
+def big_list_all_objects(bucket):
+    client = boto3.client('s3')
+    cont_token = ""
+    first = True
+    gigs = dict()
+    pbar = tqdm(desc=f"Indexing {bucket}")
+    while cont_token or first:
+        first = False
+        if cont_token:
+            response = client.list_objects_v2(Bucket=bucket, ContinuationToken=cont_token)
+        else:
+            response = client.list_objects_v2(Bucket=bucket)
+        contents = response['Contents']
+        gigs.update({c['Key']: to_gigs(c['Size']) for c in contents if c['Key'][-1] != r'/'})
+        if response['IsTruncated']:
+            cont_token = response['NextContinuationToken']
+        else:
+            cont_token = None
+        pbar.update()
+    pbar.close()
+    return gigs
+
+
+class Cache:
+    def __init__(self, function):
+        self.function = function
+        if Path('.cache.json').exists():
+            with open('.cache.json', 'r') as f:
+                self.cache = json.load(f)
+        else:
+            self.cache = dict()
+
+    def __call__(self, arg):
+        if arg in self.cache:
+            return self.cache[arg]
+        returns = self.function(arg)
+        self.cache[arg] = returns
+        with open('.cache.json', 'w') as f:
+            json.dump(self.cache, f)
+        return returns
+
+
+@Cache
+def get_bucket_size(bucket_name):
+    '''Given a bucket name, retrieve the size of each key in the bucket
+    and sum them together. Returns the size in gigabytes and
+    the number of objects.'''
+
+    try:
+        bucket = boto3.resource('s3').Bucket(bucket_name)
+        total_gigs, n = 0, 0
+        for obj in bucket.objects.all():
+            total_gigs += to_gigs(obj.size)
+            n += 1
+            if total_gigs > 100:
+                break
+            if n > 1E5:
+                total_gigs = 101
+                break
+        return total_gigs, n
+    except boto3.client('s3').exceptions.NoSuchBucket:
+        print(f"No such bucket {bucket_name}")
+        return 0, 0
+
+
+def zip_path_and_remove(path: Path):
+    path = Path(path)
+    try:
+        zip_path = str(path)+'.zip'
+        if not Path(zip_path).is_file():
+            ziph = zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED)
+            n_obj = len([name for name in os.listdir(path) if os.path.isfile(os.path.join(path, name))])
+            pbar = tqdm(desc=f"Zipping {path.name}", total=n_obj)
+            for root, dirs, files in os.walk(path):
+                root = Path(root)
+                for f in files:
+                    ziph.write(root / f, root.relative_to(path) / f)
+                    pbar.update(1)
+            ziph.close()
+            pbar.close()
+            shutil.rmtree(path)
+    except:
+        Path(str(path)+'.zip').unlink()
+        raise
+
+
+def download_bucket(bucket_name: str, path: Path):
+    path = Path(path)
+    bucket = boto3.resource('s3').Bucket(bucket_name)
+    this_path = (path / bucket_name)
+    if not Path(str(this_path)+'.zip').is_file():
+        _, n_obj = get_bucket_size(bucket_name)
+        for obj in tqdm(bucket.objects.all(), desc=f"Downloading {bucket_name}", total=n_obj):
+            if obj.key[-1] == r"/":
+                continue
+            dir_path = (this_path / Path(obj.key).parents[0])
+            dir_path.mkdir(parents=True, exist_ok=True)
+            file_path = (path / bucket_name / obj.key)
+            if not file_path.is_file():
+                try_again = True
+                while try_again:
+                    try:
+                        with file_path.open('wb') as f:
+                            bucket.download_fileobj(obj.key, f)
+                        try_again = False
+                    except ProtocolError:
+                        try_again = True
+                    except:
+                        file_path.unlink()
+                        raise
+
+        zip_path_and_remove(this_path)
+
+
+def download_bucket_parts(bucket_name, path: Path):
+    path = Path(path)
+    bucket = boto3.resource('s3').Bucket(bucket_name)
+    gigs_file = big_list_all_objects(bucket_name)
+    gigs_file = list(reversed(sorted(gigs_file.items(), key=lambda x: x[1])))
+
+    # Get the part enumerations and what file goes in each part
+    # This is like filling in a cup with rocks and then sand
+    # you want to fill in order of the biggest file first
+    # then smaller files till you reach your limit
+    # then when it's almost full, get the next cup and do again with what
+    # you have left
+    total_gigs = [0]
+    parts = [[]]
+    while gigs_file:
+        delete_indexes = []
+        for i, (key, gigs) in enumerate(gigs_file):
+            if gigs > 100:
+                raise Exception(f"No one file can be greater than 100. Got {key} size {gigs}GB")
+            if gigs + total_gigs[-1] < 100:
+                parts[-1].append(key)
+                total_gigs[-1] += gigs
+                delete_indexes.append(i)
+
+        # Now delete indexes in delete_indexes from the gigs_file list
+        for i in sorted(delete_indexes, reverse=True):
+            del gigs_file[i]
+
+        # Add part if gigs_file not empty yet
+        if gigs_file:
+            parts.append([])
+            total_gigs.append(0)
+
+    # Now do the download in parts
+    for partn, partlist in tqdm(list(enumerate(parts)), leave=True, desc="Part"):
+        this_path = (path / bucket_name / ('Part-'+str(partn).zfill(4)))
+        for key in tqdm(partlist, leave=True, desc=f"Downloading {bucket_name}"):
+            if not Path(str(this_path)+'.zip').is_file():
+                dir_path = (this_path / Path(key).parents[0])
+                dir_path.mkdir(parents=True, exist_ok=True)
+                file_path = this_path / key
+                # IDK wky but sometimes the key is actually just a directory
+                if not file_path.is_file():
+                    try_again = True
+                    while try_again:
+                        try:
+                            with file_path.open('wb') as f:
+                                bucket.download_fileobj(key, f)
+                            try_again = False
+                        except ProtocolError:
+                            try_again = True
+                        except:
+                            file_path.unlink()
+                            raise
+                zip_path_and_remove(this_path)
+
+# Retrieve the list of existing buckets
+response = boto3.client('s3').list_buckets()
+
+# Output the bucket names
+print('Existing buckets:')
+for bucket in response["Buckets"]:
+    print(f'    {bucket["Name"]}')
+
+buckets_greater_than_100_gb = []
+other = []
+for bucket in tqdm(response['Buckets'], desc="Getting Bucket Sizes"):
+    gigs, n = get_bucket_size(bucket["Name"])
+    if n > 0:
+        if gigs > 100:
+            buckets_greater_than_100_gb.append(bucket["Name"])
+        else:
+            other.append(bucket["Name"])
+
+print('Small buckets:')
+for bucket in other:
+    print(f'    {bucket}')
+    try:
+        download_bucket(bucket, r'/Volumes/My Passport 1/Buckets/SmallBuckets')
+    except ClientError as e:
+        print(e)
+print('Big buckets:')
+for bucket in buckets_greater_than_100_gb:
+    print(f'    {bucket}')
+    if (Path(r'/Volumes/My Passport 1/Buckets/BigBuckets') / (bucket + '.zip')).is_file():
+        continue
+    try:
+        download_bucket_parts(bucket, r'/Volumes/My Passport 1/Buckets/BigBuckets')
+    except ClientError as e:
+        print(e)

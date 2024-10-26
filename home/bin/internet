@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+nmcli device wifi rescan
+nmcli device wifi list
+
+DONE=''
+
+while [ -z "$DONE" ]
+do
+  echo "Enter the SSID: "
+  read SSID
+  echo "Enter the password: "
+  read -s PSW
+
+  if ! [ -z "$PSW" ]; then
+    PSW="password $PSW"
+  fi
+
+  nmcli device wifi connect "$SSID" $PSW
+  if [ $? -eq 0 ]
+  then
+    DONE='true'
+  else
+    echo "Try again"
+  fi
+done
+
+openvpn_reboot
