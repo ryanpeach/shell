@@ -72,8 +72,36 @@ function _G.replace_with_random_motion(type)
     end
 end
 
--- Register functions globally for operator usage
-_G.replace_with_random_motion = replace_with_random_motion
+-- Function to generate a random string based on the input word, preserving the case
+function _G.get_random_string(word, ...)
+    local random_string = ""
+    for i = 1, #word do
+        local char = word:sub(i, i)
+        random_string = random_string .. get_random_character(char)
+    end
+    return random_string
+end
+
+-- Function to replace all occurrences of a word with random text
+function _G.replace_word_with_random_global()
+    -- Get the word under the cursor
+    local current_word = vim.fn.expand("<cword>")
+    if current_word == "" then
+        print("No word under cursor")
+        return
+    end
+
+    -- Escape special characters in the word
+    local escaped_word = vim.fn.escape(current_word, [[\]])
+
+    -- Build the substitution command
+    local cmd = string.format(
+                    "%%s/\\<%s\\>/\\=luaeval('get_random_string(_A)', submatch(0))/g",
+                    escaped_word)
+
+    -- Execute the substitution command
+    vim.cmd(cmd)
+end
 
 -- Set up which-key mappings
 local wk = require("which-key")
@@ -82,5 +110,9 @@ wk.add({
         "gRr",
         ":set opfunc=v:lua.replace_with_random_motion<CR>g@",
         desc = "Replace with Random Character"
+    }, {
+        "gRW",
+        ":<C-u>call v:lua.replace_word_with_random_global()<CR>",
+        desc = "Replace Word with Random Text Globally"
     }
 })
