@@ -62,8 +62,6 @@ RUN apk add --no-cache \
     luarocks \
     python3 \
     python3-dev \
-    nodejs \
-    npm \
     perl \
     texlive \
   # Miscellaneous tools \
@@ -139,8 +137,9 @@ RUN apk --no-cache --virtual .build-deps add \
     && luarocks-5.1 install --server=https://luarocks.org/dev luaformatter \
     && apk del .build-deps
 
-# npm installs
-RUN npm install -g \
+# deno installs
+RUN curl -fsSL https://deno.land/install.sh | sh
+RUN deno install --global \
     prettier \
     pyright \
     twilio-cli

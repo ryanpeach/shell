@@ -291,3 +291,6 @@ add-zsh-hook chpwd check_pre_commit
 
 # Neofetch
 neofetch
+
+# deno
+source "$HOME/.deno/env"
