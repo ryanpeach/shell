@@ -73,7 +73,7 @@ clone_or_update_repo() {
         cd - || exit
     else
         echo "Cloning $repo_name into $target_dir"
-        git clone git@github.com:$ORGANIZATION/$repo_name.git "$target_dir/$repo_name" --mirror
+        git clone git@github.com:$ORGANIZATION/$repo_name.git "$target_dir/$repo_name"
     fi
 }
 

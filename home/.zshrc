@@ -238,6 +238,24 @@ build-deps () {
 alias trueclear="clear"
 alias clear="trueclear && neofetch"
 
+# Load environment variables from a file
+function dotenv() {
+  if [[ -f "$1" ]]; then
+    export $(grep -v '^#' "$1" | xargs)
+  else
+    echo "dotenv: File '$1' not found."
+  fi
+}
+
+# Unset environment variables that were set from a file
+function undotenv() {
+  if [[ -f "$1" ]]; then
+    unset $(grep -v '^#' "$1" | sed -E 's/(.*)=.*/\1/' | xargs)
+  else
+    echo "undotenv: File '$1' not found."
+  fi
+}
+
 ## =============== Exit =========================
 ## Because the shell has ~/shell inside its own filesystem
 ## we want to protect any work we are doing in this filesystem
