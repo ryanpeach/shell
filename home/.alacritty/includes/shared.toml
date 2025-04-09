@@ -1,6 +1,6 @@
 [font]
 size = 12
-normal = { family = "JetBrainsMono Nerd Font", style = "Regular" }
+normal = { family = "JetBrainsMono NF", style = "Regular" }
 
 [scrolling]
 history = 100000
