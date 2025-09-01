@@ -140,6 +140,7 @@ alias gd='git diff'
 alias gds='git diff --staged'
 alias grc='git rebase --continue'
 alias pr='gh pr create'
+alias please='sudo'
 
 # uv aliases
 alias pip='uv pip'
