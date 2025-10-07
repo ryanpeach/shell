@@ -29,6 +29,8 @@ RUN apk add --no-cache \
     sshpass \
     openssh-client \
     openssh-server \
+    gnupg \
+    pass \
   # Archive tools \
     unzip \
     tar \

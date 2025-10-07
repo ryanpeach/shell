@@ -2,6 +2,7 @@
 .python-version
 lazy-lock.json
 lazyvim.json
+*ansys*
 
 #nvim
 ## Swap
