@@ -16,6 +16,9 @@ fi
 # If you come from bash you might have to change your $PATH.
 export PATH=$HOME/bin:/usr/local/bin:$HOME/.local/bin:$PATH:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin:$HOME/.cargo/bin
 
+# Add docker to path
+export PATH=$PATH:$HOME/.docker/bin
+
 # Load private info location
 if [ -z "$ZSHRC_PRIVATE_LOC" ]; then
     ZSHRC_PRIVATE_LOC=$MNT
