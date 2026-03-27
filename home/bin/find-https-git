@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Iterate though all the directories in the current directory
+# If the directory is a git repo, check if its origin remote url uses https
+# If it does, then convert the url to ssh
+root=$PWD
+for dir in $(find . -type d); do
+    if [ -d "$dir/.git" ]; then
+        cd $dir
+        if [ "$(git remote get-url origin | grep -c 'https')" -gt 0 ]; then
+            echo "Need to change the $dir origin url to ssh"
+        fi
+        cd $root
+    fi
+done
