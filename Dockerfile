@@ -168,6 +168,7 @@ RUN apk --no-cache --virtual .build-deps add \
   && set -x && autoreconf -iv \
   && ./configure \
   &&  make install \
+  && mkdir -p /usr/share/info \
   && apk del .build-deps
 
 # Copies
