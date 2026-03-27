@@ -22,7 +22,6 @@ RUN apk add --no-cache \
     git \
     lazygit \
     make \
-    shfmt \
   # Uncategorized dependencies \
     iputils \
     bind-tools \
@@ -57,17 +56,11 @@ RUN apk add --no-cache \
     rust \
     rust-analyzer \
     cargo \
-    lua \
-    lua-dev \
-    luarocks \
     python3 \
     python3-dev \
     nodejs \
     npm \
-    perl \
-    texlive \
   # Miscellaneous tools \
-    neovim \
     jq \
     neofetch \
     tmux \
@@ -119,7 +112,6 @@ RUN apk --no-cache --virtual .build-deps add \
       gcc-doc && \
       # uv tool install aider-chat && \ TODO: Fix this, something to do with scipy
       uv tool install --verbose pre-commit && \
-      uv tool install --verbose cookiecutter && \
       uv tool install --verbose ruff && \
       uv tool install --verbose ipython && \
       uv tool install --verbose ipdb && \
@@ -127,23 +119,12 @@ RUN apk --no-cache --virtual .build-deps add \
       uv tool install --verbose pyright && \
       uv tool install --verbose ruff-lsp && \
       uv tool install --verbose just && \
-      uv tool install --verbose aws-parallelcluster && \
       uv tool install --verbose ansible
-
-# luarocks installs
-ENV PATH="/usr/local/lib/luarocks/bin/:$HOME/.luarocks/bin/:$PATH"
-RUN luarocks-5.1 config local_by_default true
-RUN apk --no-cache --virtual .build-deps add \
-      g++ \
-      cmake \
-    && luarocks-5.1 install --server=https://luarocks.org/dev luaformatter \
-    && apk del .build-deps
 
 # npm installs
 RUN npm install -g \
     prettier \
-    pyright \
-    twilio-cli
+    pyright
 
 # Install tfenv
 RUN git clone --depth=1 https://github.com/tfutils/tfenv.git $HOME/.tfenv
@@ -173,24 +154,6 @@ RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM
 RUN git clone https://github.com/eth-p/bat-extras.git \
   && cd bat-extras \
   && ./build.sh --install --no-verify
-
-# Install ngrok cli
-RUN ARCH=$(echo "$TARGETPLATFORM" | sed 's/linux\///') \
-  && wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-${ARCH}.tgz \
-  && tar -xvf ngrok-v3-stable-linux-${ARCH}.tgz -C /usr/local/bin
-
-# Slurm
-# WORKDIR /tmp
-# RUN wget https://download.schedmd.com/slurm/slurm-<version>.tar.bz2 && \
-#    tar -xaf slurm-24.05.2.tar.bz2 && \
-#    cd slurm-24.05.2.tar.bz2 && \
-#    ./configure --prefix=/usr --sysconfdir=/etc/slurm --with-munge && \
-#    make && \
-#    make install && \
-#    ldconfig -n /usr/lib && \
-#    ldconfig -n /usr/lib64 && \
-#    rm -rf /var/cache/apk/* /tmp/slurm-*
-# WORKDIR /home/root
 
 # Stow
 RUN apk --no-cache --virtual .build-deps add \
@@ -222,9 +185,6 @@ RUN cd $SHELL_DIR \
 
 # Chmod so that these files are runnable
 RUN find $SHELL_DIR/home/bin -type f -exec chmod +x {} \;
-
-# Get neovim to download all its stuff
-RUN nvim --headless '+Lazy install' +qall
 
 # terminal colors with xterm
 ENV TERM=xterm-256color
