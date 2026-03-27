@@ -265,13 +265,22 @@ if [[ $IS_DOCKER ]]; then
     trap on_exit SIGHUP EXIT
 fi
 
+# Function to check if pre-commit hooks are installed
+check_pre_commit_hooks_installed() {
+    if [ -f .git/hooks/pre-commit ] && [ -f .git/hooks/pre-push ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 # I have a problem with not installing pre-commit on all my repos
 # So this will force me to
-check_pre_commit() {
+install_pre_commit_hooks() {
     # Check for the presence of .pre-commit-config.yaml or .pre-commit-config.yml
     if [[ -f ".pre-commit-config.yaml" || -f ".pre-commit-config.yml" ]]; then
         # Check if .pre-commit-installed exists
-        if [[ ! -f ".pre-commit-installed" ]]; then
+        if [[ ! check_pre_commit_hooks_installed ]]; then
             echo "Found pre-commit config file. Running pre-commit install..."
             pre-commit install  # Run the pre-commit install command
 
@@ -288,7 +297,7 @@ check_pre_commit() {
 }
 
 # Add the function to run every time you change directories using chpwd hook
-add-zsh-hook chpwd check_pre_commit
+add-zsh-hook chpwd install_pre_commit_hooks
 
 # Neofetch
 neofetch
