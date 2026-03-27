@@ -114,7 +114,7 @@ zstyle ':omz:update' mode disabled  # disable automatic updates
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git wd aws direnv branch github golang helm kubectl python virtualenv poetry-env vi-mode zsh-autosuggestions zsh-syntax-highlighting)
+plugins=(git wd aws direnv branch github golang helm kubectl python virtualenv vi-mode zsh-autosuggestions zsh-syntax-highlighting)
 
 # Gotta source the oh-my-zsh script
 export ZSH="$HOME/.oh-my-zsh"
@@ -143,6 +143,7 @@ alias gd='git diff'
 alias gds='git diff --staged'
 alias grc='git rebase --continue'
 alias pr='gh pr create'
+alias please='sudo'
 
 # uv aliases
 alias pip='uv pip'
@@ -165,13 +166,8 @@ alias v="nvim"
 alias vi="nvim"
 alias vim="nvim"
 
-# Poetry
-export POETRY_VIRTUALENVS_CREATE=true
-export POETRY_VIRTUALENVS_IN_PROJECT=true
-export POETRY_VIRTUALENVS_PREFER_ACTIVE_PYTHON=true
-
 # Venv
-alias venv="python3 -m venv .venv"
+alias venv="uv venv"
 alias activate="source .venv/bin/activate"
 
 # nvm
@@ -317,3 +313,6 @@ add-zsh-hook chpwd check_pre_commit
 
 # Neofetch
 neofetch
+
+# deno
+source "$HOME/.deno/env"

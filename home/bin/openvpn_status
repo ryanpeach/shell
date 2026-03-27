@@ -1,0 +1,2 @@
+#!/bin/sh
+echo "VPN: $(systemctl status openvpn-nordVPN | grep -oP '(?<=Active: ).*(?=(since))')"
