@@ -1,5 +1,5 @@
 # Stage 1: Build environment to install emerge and perform updates
-FROM alpine:edge AS builder
+FROM alpine:3.21 AS builder
 
 ARG TARGETPLATFORM
 
@@ -8,11 +8,13 @@ ARG TARGETPLATFORM
 WORKDIR /home/root
 ENV HOME=/home/root
 
-# Get the full version (e.g., 3.15.0) and major version (e.g., 3.15)
+# Stable repos first, edge as fallback for packages not yet in stable
 RUN ALPINE_VERSION=$(cut -d '.' -f1,2 /etc/alpine-release) && \
-    echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" > /etc/apk/repositories && \
-    echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
-    echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+    echo "http://dl-cdn.alpinelinux.org/alpine/v${ALPINE_VERSION}/main" > /etc/apk/repositories && \
+    echo "http://dl-cdn.alpinelinux.org/alpine/v${ALPINE_VERSION}/community" >> /etc/apk/repositories && \
+    echo "@edge http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
+    echo "@edge http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
+    echo "@edge http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
 
 # Update package list
 RUN apk update && apk upgrade
@@ -22,6 +24,7 @@ RUN apk add --no-cache \
     git \
     lazygit \
     make \
+    shfmt \
   # Uncategorized dependencies \
     iputils \
     bind-tools \
@@ -52,7 +55,7 @@ RUN apk add --no-cache \
     direnv \
     yq \
     fd \
-    thefuck \
+    thefuck@edge \
     delta \
   # Languages \
     go \
@@ -65,7 +68,7 @@ RUN apk add --no-cache \
     npm \
   # Miscellaneous tools \
     jq \
-    neofetch \
+    neofetch@edge \
     tmux \
     vim \
   # Shells and Zsh plugins \
@@ -75,9 +78,9 @@ RUN apk add --no-cache \
     zsh-completions \
   # K8s tools \
     kubectl \
-    helm \
-    helm-ls \
-    helmfile \
+    helm@edge \
+    helm-ls@edge \
+    helmfile@edge \
     k9s \
   && rm -rf /var/cache/apk/*
 
