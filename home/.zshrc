@@ -16,6 +16,9 @@ fi
 # If you come from bash you might have to change your $PATH.
 export PATH=$HOME/bin:/usr/local/bin:$HOME/.local/bin:$PATH:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin:$HOME/.cargo/bin
 
+# Add docker to path
+export PATH=$PATH:$HOME/.docker/bin
+
 # Load private info location
 if [ -z "$ZSHRC_PRIVATE_LOC" ]; then
     ZSHRC_PRIVATE_LOC=$MNT
@@ -233,6 +236,24 @@ build-deps () {
 # and I want to clearly see which is which
 alias trueclear="clear"
 alias clear="trueclear && neofetch"
+
+# Load environment variables from a file
+function dotenv() {
+  if [[ -f "$1" ]]; then
+    export $(grep -v '^#' "$1" | xargs)
+  else
+    echo "dotenv: File '$1' not found."
+  fi
+}
+
+# Unset environment variables that were set from a file
+function undotenv() {
+  if [[ -f "$1" ]]; then
+    unset $(grep -v '^#' "$1" | sed -E 's/(.*)=.*/\1/' | xargs)
+  else
+    echo "undotenv: File '$1' not found."
+  fi
+}
 
 ## =============== Exit =========================
 ## Because the shell has ~/shell inside its own filesystem
