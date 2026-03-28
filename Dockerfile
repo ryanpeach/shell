@@ -22,6 +22,7 @@ RUN apk add --no-cache \
     git \
     lazygit \
     make \
+    shfmt \
   # Uncategorized dependencies \
     iputils \
     bind-tools \
