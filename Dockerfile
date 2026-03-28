@@ -133,10 +133,6 @@ RUN .tfenv/bin/tfenv install latest
 
 # Go installs
 ENV PATH="$HOME/go/bin:$PATH"
-RUN go install github.com/terraform-docs/terraform-docs@v0.18.0 \
-  && terraform-docs --version \
-  && go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest \
-  && jira --help
 
 # Install gh
 ENV PATH=$HOME/.local/bin:$PATH
