@@ -25,6 +25,16 @@
 
 [push]
     autoSetupRemote=true
+
 [user]
-	email = rgpeach10@gmail.com
-	name = Ryan Peach
+    email = rgpeach10@gmail.com
+    name = Ryan Peach
+
+[url "https://github.com/snps-genai/"]
+    insteadOf = git@github.com:snps-genai/
+
+[filter "lfs"]
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true
+    clean = git-lfs clean -- %f
