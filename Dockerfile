@@ -159,6 +159,7 @@ RUN apk --no-cache --virtual .build-deps add \
     autoconf \
     texinfo \
     perl \
+    texlive \
   && git clone https://github.com/aspiers/stow.git \
   && cd stow \
   && sed '131,143d' -i Makefile.am \
