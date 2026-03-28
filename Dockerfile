@@ -157,7 +157,8 @@ RUN git clone https://github.com/eth-p/bat-extras.git \
   && ./build.sh --install --no-verify
 
 # Stow
-RUN apk --no-cache --virtual .build-deps add \
+RUN mkdir -p /usr/share/info \
+  && apk --no-cache --virtual .build-deps add \
     build-base \
     automake \
     autoconf \
@@ -168,8 +169,8 @@ RUN apk --no-cache --virtual .build-deps add \
   && sed -i '/check_pmdir/d' Makefile.am \
   && set -x && autoreconf -iv \
   && ./configure \
-  &&  make install
-  # && apk del .build-deps
+  &&  make install \
+  && apk del .build-deps
 
 # Copies
 ENV SHELL_DIR=$HOME/shell
