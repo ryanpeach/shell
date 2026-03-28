@@ -64,6 +64,7 @@ RUN apk add --no-cache \
     jq \
     neofetch \
     tmux \
+    vim \
   # Shells and Zsh plugins \
     zsh \
     zsh-autosuggestions \
