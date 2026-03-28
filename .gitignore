@@ -233,3 +233,4 @@ venv.bak/
 # mypy
 .mypy_cache/
 .aider*
+home/.password-store/@ansys-internal.gpg
