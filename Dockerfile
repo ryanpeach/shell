@@ -76,7 +76,7 @@ RUN apk add --no-cache \
     zsh-completions \
   # K8s tools \
     kubectl \
-    helm \
+    helm@edge \
     helm-ls@edge \
     helmfile@edge \
     k9s \
