@@ -9,12 +9,17 @@ WORKDIR /home/root
 ENV HOME=/home/root
 
 # Stable repos first, edge as fallback for packages not yet in stable
+# Stable repos first
 RUN ALPINE_VERSION=$(cut -d '.' -f1,2 /etc/alpine-release) && \
-    echo "http://dl-cdn.alpinelinux.org/alpine/v${ALPINE_VERSION}/main" > /etc/apk/repositories && \
-    echo "http://dl-cdn.alpinelinux.org/alpine/v${ALPINE_VERSION}/community" >> /etc/apk/repositories && \
-    echo "@edge http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
-    echo "@edge http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
-    echo "@edge http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+    printf '%s\n' \
+      "http://dl-cdn.alpinelinux.org/alpine/v${ALPINE_VERSION}/main" \
+      "http://dl-cdn.alpinelinux.org/alpine/v${ALPINE_VERSION}/community" \
+      > /etc/apk/repositories && \
+    printf '%s\n' \
+      "http://dl-cdn.alpinelinux.org/alpine/edge/main" \
+      "http://dl-cdn.alpinelinux.org/alpine/edge/community" \
+      "http://dl-cdn.alpinelinux.org/alpine/edge/testing" \
+      > /etc/apk/repositories.edge
 
 # Update package list
 RUN apk update && apk upgrade
@@ -55,7 +60,6 @@ RUN apk add --no-cache \
     direnv \
     yq \
     fd \
-    thefuck@edge \
     delta \
   # Languages \
     go \
@@ -68,7 +72,6 @@ RUN apk add --no-cache \
     npm \
   # Miscellaneous tools \
     jq \
-    neofetch@edge \
     tmux \
     vim \
   # Shells and Zsh plugins \
@@ -78,14 +81,19 @@ RUN apk add --no-cache \
     zsh-completions \
   # K8s tools \
     kubectl \
-    helm@edge \
-    helm-ls@edge \
-    helmfile@edge \
     k9s \
+    helm \
+  # Docker (for Docker-in-Docker via socket mount) \
+    docker-cli \
+    docker-cli-compose \
+    docker-cli-buildx \
   && rm -rf /var/cache/apk/*
 
-# K8s
-RUN helm plugin install https://github.com/databus23/helm-diff
+# Install only the edge-only packages with edge repo file explicitly
+RUN apk add --no-cache --repositories-file /etc/apk/repositories.edge \
+    neofetch \
+    helmfile \
+  && rm -rf /var/cache/apk/*
 
 # Cargo installs
 ENV PATH="/home/root/.cargo/bin:$PATH"
@@ -126,6 +134,7 @@ RUN apk --no-cache --virtual .build-deps add \
       uv tool install --verbose pyright && \
       uv tool install --verbose ruff-lsp && \
       uv tool install --verbose just && \
+      uv tool install --verbose thefuck && \
       uv tool install --verbose ansible
 
 # npm installs
