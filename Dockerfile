@@ -82,6 +82,7 @@ RUN apk add --no-cache \
   # K8s tools \
     kubectl \
     k9s \
+    helm \
   # Docker (for Docker-in-Docker via socket mount) \
     docker-cli \
     docker-cli-compose \
@@ -90,10 +91,7 @@ RUN apk add --no-cache \
 
 # Install only the edge-only packages with edge repo file explicitly
 RUN apk add --no-cache --repositories-file /etc/apk/repositories.edge \
-    thefuck \
     neofetch \
-    helm \
-    helm-ls \
     helmfile \
   && rm -rf /var/cache/apk/*
 
@@ -139,6 +137,7 @@ RUN apk --no-cache --virtual .build-deps add \
       uv tool install --verbose pyright && \
       uv tool install --verbose ruff-lsp && \
       uv tool install --verbose just && \
+      uv tool install --verbose thefuck && \
       uv tool install --verbose ansible
 
 # npm installs
