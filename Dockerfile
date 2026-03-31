@@ -53,7 +53,6 @@ RUN apk add --no-cache \
     direnv \
     yq \
     fd \
-    thefuck \
     delta \
   # Languages \
     go \
@@ -124,6 +123,7 @@ RUN apk --no-cache --virtual .build-deps add \
       uv tool install --verbose pyright && \
       uv tool install --verbose ruff-lsp && \
       uv tool install --verbose just && \
+      uv tool install --verbose thefuck && \
       uv tool install --verbose ansible
 
 # npm installs
