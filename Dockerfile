@@ -95,9 +95,6 @@ RUN apk add --no-cache --repositories-file /etc/apk/repositories.edge \
     helmfile \
   && rm -rf /var/cache/apk/*
 
-# K8s
-RUN helm plugin install https://github.com/databus23/helm-diff --version v3.9.12
-
 # Cargo installs
 ENV PATH="/home/root/.cargo/bin:$PATH"
 
