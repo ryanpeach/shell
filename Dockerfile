@@ -82,6 +82,10 @@ RUN apk add --no-cache \
     helm-ls@edge \
     helmfile@edge \
     k9s \
+  # Docker (for Docker-in-Docker via socket mount) \
+    docker-cli \
+    docker-cli-compose \
+    docker-cli-buildx \
   && rm -rf /var/cache/apk/*
 
 # K8s
