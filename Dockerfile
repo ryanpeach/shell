@@ -143,10 +143,13 @@ RUN uv tool install --verbose pre-commit && \
       uv tool install --verbose thefuck && \
       uv tool install --verbose ansible
 
-# npm installs
-RUN npm install -g \
+# npm installs (user-local prefix to avoid root)
+RUN mkdir -p "$HOME/.npm-global" && \
+    npm config set prefix "$HOME/.npm-global" && \
+    npm install -g \
     prettier \
     pyright
+ENV PATH="$HOME/.npm-global/bin:$PATH"
 
 # Install tfenv
 RUN git clone --depth=1 https://github.com/tfutils/tfenv.git $HOME/.tfenv
@@ -174,11 +177,11 @@ RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM
 # REF: https://github.com/eth-p/bat-extras/issues/126
 RUN git clone https://github.com/eth-p/bat-extras.git \
   && cd bat-extras \
-  && ./build.sh --install --no-verify
+  && ./build.sh --install --prefix="$HOME/.local" --no-verify
 
 # Copies
 ENV SHELL_DIR=$HOME/shell
-COPY . $SHELL_DIR
+COPY --chown=${USERNAME}:${USERNAME} . $SHELL_DIR
 RUN set -e \
   && cd $SHELL_DIR \
   && if [ -z "$(git status --porcelain)" ]; then echo "No changes"; else git status --porcelain; exit 1; fi
