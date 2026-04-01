@@ -9,9 +9,6 @@ ARG UID=1000
 ARG GID=1000
 ENV USERNAME=rgpeach10
 RUN adduser -D -u ${UID} -g ${GID} ${USERNAME}
-USER ${USERNAME}
-WORKDIR /home/${USERNAME}
-ENV HOME=/home/${USERNAME}
 
 # Stable repos first, edge as fallback for packages not yet in stable
 # Stable repos first
@@ -104,7 +101,7 @@ RUN apk add --no-cache --repositories-file /etc/apk/repositories.edge \
 ENV PATH="/home/${USERNAME}/.cargo/bin:$PATH"
 
 # uv installs
-ENV PATH="$HOME/.local/bin:$PATH"
+ENV PATH="/home/root/.local/bin:$PATH"
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 RUN apk --no-cache --virtual .build-deps add \
       gcc \
@@ -141,6 +138,12 @@ RUN apk --no-cache --virtual .build-deps add \
       uv tool install --verbose just && \
       uv tool install --verbose thefuck && \
       uv tool install --verbose ansible
+
+# Drop root permissions
+USER ${USERNAME}
+WORKDIR /home/${USERNAME}
+ENV HOME=/home/${USERNAME}
+ENV PATH="$HOME/.local/bin:$PATH"
 
 # npm installs
 RUN npm install -g \
