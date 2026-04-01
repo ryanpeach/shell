@@ -158,13 +158,10 @@ alias black='ruff format'
 # Linux replacements
 alias cat='bat'
 
-# NeoVim
-export PATH="$PATH:/opt/nvim-linux64/bin"
-export GIT_EDITOR=nvim
-alias oldvim="vim"
-alias v="nvim"
-alias vi="nvim"
-alias vim="nvim"
+# Vim
+export GIT_EDITOR=vim
+alias v="vim"
+alias vi="vim"
 
 # Venv
 alias venv="uv venv"
