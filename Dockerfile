@@ -5,8 +5,13 @@ ARG TARGETPLATFORM
 
 # We don't actually need to create a new user
 # Just set a reasonable home directory
-WORKDIR /home/root
-ENV HOME=/home/root
+ARG UID=1000
+ARG GID=1000
+ENV USERNAME=rgpeach10
+RUN adduser -D -u ${UID} -g ${GID} ${USERNAME}
+USER ${USERNAME}
+WORKDIR /home/${USERNAME}
+ENV HOME=/home/${USERNAME}
 
 # Stable repos first, edge as fallback for packages not yet in stable
 # Stable repos first
@@ -96,7 +101,7 @@ RUN apk add --no-cache --repositories-file /etc/apk/repositories.edge \
   && rm -rf /var/cache/apk/*
 
 # Cargo installs
-ENV PATH="/home/root/.cargo/bin:$PATH"
+ENV PATH="/home/${USERNAME}/.cargo/bin:$PATH"
 
 # uv installs
 ENV PATH="$HOME/.local/bin:$PATH"
@@ -155,7 +160,7 @@ RUN curl -sS https://webi.sh/gh | sh
 
 # Install Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-ENV ZSH_CUSTOM=/home/root/.oh-my-zsh/custom
+ENV ZSH_CUSTOM=/home/${USERNAME}/.oh-my-zsh/custom
 RUN git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
 RUN git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
 RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
