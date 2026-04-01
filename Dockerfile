@@ -97,12 +97,7 @@ RUN apk add --no-cache --repositories-file /etc/apk/repositories.edge \
     helmfile \
   && rm -rf /var/cache/apk/*
 
-# Cargo installs
-ENV PATH="/home/${USERNAME}/.cargo/bin:$PATH"
-
-# uv installs
-ENV PATH="/home/root/.local/bin:$PATH"
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+# Build dependencies needed for uv tool compilation (requires root)
 RUN apk --no-cache --virtual .build-deps add \
       gcc \
       g++ \
@@ -126,9 +121,18 @@ RUN apk --no-cache --virtual .build-deps add \
       sshpass \
       patch \
       build-base \
-      gcc-doc && \
+      gcc-doc
+
+# Drop root — all remaining commands run as the non-root user
+USER ${USERNAME}
+WORKDIR /home/${USERNAME}
+ENV HOME=/home/${USERNAME}
+
+# uv installs (as user)
+ENV PATH="$HOME/.local/bin:$PATH"
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+RUN uv tool install --verbose pre-commit && \
       # uv tool install aider-chat && \ TODO: Fix this, something to do with scipy
-      uv tool install --verbose pre-commit && \
       uv tool install --verbose ruff && \
       uv tool install --verbose ipython && \
       uv tool install --verbose ipdb && \
@@ -139,12 +143,6 @@ RUN apk --no-cache --virtual .build-deps add \
       uv tool install --verbose thefuck && \
       uv tool install --verbose ansible
 
-# Drop root permissions
-USER ${USERNAME}
-WORKDIR /home/${USERNAME}
-ENV HOME=/home/${USERNAME}
-ENV PATH="$HOME/.local/bin:$PATH"
-
 # npm installs
 RUN npm install -g \
     prettier \
@@ -153,6 +151,9 @@ RUN npm install -g \
 # Install tfenv
 RUN git clone --depth=1 https://github.com/tfutils/tfenv.git $HOME/.tfenv
 RUN .tfenv/bin/tfenv install latest
+
+# Rust installs
+ENV PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
 
 # Go installs
 ENV PATH="$HOME/go/bin:$PATH"
@@ -194,4 +195,8 @@ RUN find $SHELL_DIR/home/bin -type f -exec chmod +x {} \;
 # terminal colors with xterm
 ENV TERM=xterm-256color
 
+# Entrypoint must run as root to modify the user
+COPY entrypoint.sh /entrypoint.sh
+USER root
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/bin/zsh"]
