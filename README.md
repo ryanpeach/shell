@@ -37,6 +37,9 @@ Create a `~/.docker-shell.sh` file with the following contents:
 #!/usr/bin/env bash
 
 docker run -it --rm \
+    --user $(id -u) \
+    -e TARGET_USER=$(id -u) \
+    -e GLOBAL_USER=$(id -g) \
     -v $HOME:/home/rgpeach10/mnt \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -e GITHUB_TOKEN=$(gh auth token) \
