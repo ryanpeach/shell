@@ -1,5 +1,5 @@
 build:
-    docker buildx build --progress=plain -t rgpeach10/shell:local . --load
+    docker buildx build --progress=plain -t rgpeach10/shell:local --no-cache . --load
 
 run-local:
     docker run -it --rm \
