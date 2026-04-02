@@ -8,7 +8,10 @@ ARG TARGETPLATFORM
 ARG UID=1000
 ARG GID=1000
 ENV USERNAME=rgpeach10
-RUN adduser -D -u ${UID} -g ${GID} ${USERNAME}
+RUN addgroup -g ${GID} ${USERNAME} 2>/dev/null || addgroup ${USERNAME}; \
+    adduser -D -H -u ${UID} -G ${USERNAME} ${USERNAME} 2>/dev/null || \
+    (echo "${USERNAME}:x:${UID}:${GID}::/home/${USERNAME}:/bin/sh" >> /etc/passwd && \
+     mkdir -p /home/${USERNAME} && chown ${UID}:${GID} /home/${USERNAME})
 
 # Stable repos first, edge as fallback for packages not yet in stable
 # Stable repos first
