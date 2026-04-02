@@ -37,12 +37,9 @@ Create a `~/.docker-shell.sh` file with the following contents:
 #!/usr/bin/env bash
 
 docker run -it --rm \
-    -v $HOME/.ssh:/home/root/.ssh \
-    -v $HOME:/home/root/mnt \
+    -v $HOME:/home/rgpeach10/mnt \
     -v /var/run/docker.sock:/var/run/docker.sock \
-    -w /home/root/mnt \
     -e GITHUB_TOKEN=$(gh auth token) \
-    -e MNT=/home/rgpeach10/mnt \
     --pull=always \
     rgpeach10/shell:main
 ```
