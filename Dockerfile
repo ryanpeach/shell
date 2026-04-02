@@ -199,9 +199,7 @@ RUN find $SHELL_DIR/home/bin -type f -exec chmod +x {} \;
 ENV TERM=xterm-256color
 
 # Entrypoint must run as root to modify the user
-COPY entrypoint.sh /entrypoint.sh
 USER root
 WORKDIR /home/${USERNAME}/mnt
 ENV MNT=/home/${USERNAME}/mnt
-ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/bin/zsh"]
