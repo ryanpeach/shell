@@ -12,7 +12,9 @@ CURRENT_GID=$(id -g "$USERNAME")
 if [ "$CURRENT_UID" != "$TARGET_UID" ] || [ "$CURRENT_GID" != "$TARGET_GID" ]; then
     sed -i "s/^$USERNAME:x:$CURRENT_UID:$CURRENT_GID:/$USERNAME:x:$TARGET_UID:$TARGET_GID:/" /etc/passwd
     sed -i "s/^$USERNAME:x:$CURRENT_GID:/$USERNAME:x:$TARGET_GID:/" /etc/group
-    chown -R "$TARGET_UID:$TARGET_GID" "/home/$USERNAME"
+    chown "$TARGET_UID:$TARGET_GID" "/home/$USERNAME"
+    find "/home/$USERNAME" -mindepth 1 -maxdepth 1 ! -name mnt \
+        -exec chown -R "$TARGET_UID:$TARGET_GID" {} +
 fi
 
 exec su - "$USERNAME" -s /bin/zsh -c "$*"
