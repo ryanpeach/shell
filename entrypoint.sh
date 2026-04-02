@@ -13,8 +13,15 @@ if [ "$CURRENT_UID" != "$TARGET_UID" ] || [ "$CURRENT_GID" != "$TARGET_GID" ]; t
     sed -i "s/^$USERNAME:x:$CURRENT_UID:$CURRENT_GID:/$USERNAME:x:$TARGET_UID:$TARGET_GID:/" /etc/passwd
     sed -i "s/^$USERNAME:x:$CURRENT_GID:/$USERNAME:x:$TARGET_GID:/" /etc/group
     chown "$TARGET_UID:$TARGET_GID" "/home/$USERNAME"
-    find "/home/$USERNAME" -mindepth 1 -maxdepth 1 ! -name mnt \
-        -exec chown -R "$TARGET_UID:$TARGET_GID" {} +
+    ITEMS=$(find "/home/$USERNAME" -mindepth 1 -maxdepth 1 ! -name mnt)
+    TOTAL=$(printf '%s\n' "$ITEMS" | wc -l)
+    I=0
+    printf '%s\n' "$ITEMS" | while read -r item; do
+        I=$((I + 1))
+        printf '\r\033[Kchown [%d/%d] %s' "$I" "$TOTAL" "${item##*/}"
+        chown -R "$TARGET_UID:$TARGET_GID" "$item"
+    done
+    printf '\r\033[Kchown complete (%d items)\n' "$TOTAL"
 fi
 
 exec su - "$USERNAME" -s /bin/zsh -c "$*"
