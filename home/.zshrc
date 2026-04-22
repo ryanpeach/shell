@@ -229,11 +229,6 @@ build-deps () {
       gcc-doc
 }
 
-# I am going to set up neofetch to run on clear, because I often have a local terminal and this terminal open at the same time
-# and I want to clearly see which is which
-alias trueclear="clear"
-alias clear="trueclear && neofetch"
-
 # Load environment variables from a file
 function dotenv() {
   if [[ -f "$1" ]]; then
@@ -318,4 +313,7 @@ install_pre_commit_hooks() {
 add-zsh-hook chpwd install_pre_commit_hooks
 
 # Neofetch
-neofetch
+if [[ -n "${TMUX:-}" ]]; then
+  fastfetch
+fi
+source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

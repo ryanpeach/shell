@@ -1,8 +1,11 @@
+[general]
 import = [
     "~/.alacritty/includes/shared.toml"
 ]
 
-[shell]
+[terminal]
+
+[terminal.shell]
 program = "/bin/zsh"
 args = [
     "-l",

@@ -96,7 +96,7 @@ RUN apk add --no-cache \
 
 # Install only the edge-only packages with edge repo file explicitly
 RUN apk add --no-cache --repositories-file /etc/apk/repositories.edge \
-    neofetch \
+    fastfetch \
     helmfile \
   && rm -rf /var/cache/apk/*
 
