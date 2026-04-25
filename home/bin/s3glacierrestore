@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# This will give you a nice list of all objects in the bucket with the bucket name stripped out
+aws s3 ls --recursive s3://$1 | awk '{print substr($0, index($0, $4))}' | sed "s#s3://$1/##" > .glacier-restore.txt
+
+for x in `cat .glacier-restore.txt`
+do
+    echo "restoring $x"
+    if ! [ -f ./$x ]; then
+        aws s3api restore-object --restore-request Days=7 --bucket $1 --key "$x" > /dev/null
+    fi
+done

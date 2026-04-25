@@ -3,6 +3,8 @@
 lazy-lock.json
 lazyvim.json
 *ansys*
+*syn*
+*snps*
 
 #nvim
 ## Swap
@@ -233,3 +235,4 @@ venv.bak/
 # mypy
 .mypy_cache/
 .aider*
+home/.password-store/@ansys-internal.gpg

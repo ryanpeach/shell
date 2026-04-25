@@ -1,0 +1,4 @@
+	#!/usr/bin/env bash
+systemctl stop openvpn-nordVPN
+systemctl start openvpn-nordVPN
+ping google.com -c 1

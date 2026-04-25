@@ -37,14 +37,15 @@ Create a `~/.docker-shell.sh` file with the following contents:
 #!/usr/bin/env bash
 
 docker run -it --rm \
-    -v $HOME/.ssh:/home/root/.ssh \
-    -v $HOME:/home/root/mnt \
-    -w /home/root/mnt \
+    --user $(id -u) \
+    -v $HOME:/home/rgpeach10/mnt \
+    -v /var/run/docker.sock:/var/run/docker.sock \
     -e GITHUB_TOKEN=$(gh auth token) \
-    -e MNT=/home/rgpeach10/mnt \
     --pull=always \
     rgpeach10/shell:main
 ```
+
+NOTE: User must match the $UID and $(id -g) must match $GID build args. Othwerwise, please build this locally then run it.
 
 Then set your terminal to launch this script when you open it.
 

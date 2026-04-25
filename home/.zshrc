@@ -114,7 +114,7 @@ zstyle ':omz:update' mode disabled  # disable automatic updates
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git wd aws direnv branch github golang helm kubectl python virtualenv poetry-env vi-mode zsh-autosuggestions zsh-syntax-highlighting)
+plugins=(git wd aws direnv branch github golang helm kubectl python virtualenv vi-mode zsh-autosuggestions zsh-syntax-highlighting)
 
 # Gotta source the oh-my-zsh script
 export ZSH="$HOME/.oh-my-zsh"
@@ -143,6 +143,7 @@ alias gd='git diff'
 alias gds='git diff --staged'
 alias grc='git rebase --continue'
 alias pr='gh pr create'
+alias please='sudo'
 
 # uv aliases
 alias pip='uv pip'
@@ -157,21 +158,13 @@ alias black='ruff format'
 # Linux replacements
 alias cat='bat'
 
-# NeoVim
-export PATH="$PATH:/opt/nvim-linux64/bin"
-export GIT_EDITOR=nvim
-alias oldvim="vim"
-alias v="nvim"
-alias vi="nvim"
-alias vim="nvim"
-
-# Poetry
-export POETRY_VIRTUALENVS_CREATE=true
-export POETRY_VIRTUALENVS_IN_PROJECT=true
-export POETRY_VIRTUALENVS_PREFER_ACTIVE_PYTHON=true
+# Vim
+export GIT_EDITOR=vim
+alias v="vim"
+alias vi="vim"
 
 # Venv
-alias venv="python3 -m venv .venv"
+alias venv="uv venv"
 alias activate="source .venv/bin/activate"
 
 # nvm
@@ -290,13 +283,22 @@ if [[ $IS_DOCKER ]]; then
     trap on_exit SIGHUP EXIT
 fi
 
+# Function to check if pre-commit hooks are installed
+check_pre_commit_hooks_installed() {
+    if [ -f .git/hooks/pre-commit ] && [ -f .git/hooks/pre-push ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 # I have a problem with not installing pre-commit on all my repos
 # So this will force me to
-check_pre_commit() {
+install_pre_commit_hooks() {
     # Check for the presence of .pre-commit-config.yaml or .pre-commit-config.yml
     if [[ -f ".pre-commit-config.yaml" || -f ".pre-commit-config.yml" ]]; then
         # Check if .pre-commit-installed exists
-        if [[ ! -f ".pre-commit-installed" ]]; then
+        if [[ ! check_pre_commit_hooks_installed ]]; then
             echo "Found pre-commit config file. Running pre-commit install..."
             pre-commit install  # Run the pre-commit install command
 
@@ -313,7 +315,7 @@ check_pre_commit() {
 }
 
 # Add the function to run every time you change directories using chpwd hook
-add-zsh-hook chpwd check_pre_commit
+add-zsh-hook chpwd install_pre_commit_hooks
 
 # Neofetch
 neofetch
