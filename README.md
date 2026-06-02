@@ -120,6 +120,15 @@ just stow-hard
 
 Should do almost everything you need to do to run this container mounting the home directory and getting `git` and `gh` to work. The rest are just understanding the commands and what they do.
 
+## How the image is built
+
+The `Dockerfile` is intentionally minimal: it starts from `debian:bookworm-slim`,
+bootstraps just enough to run the installer (`sudo`, `curl`, `git`, `zsh`, a
+UTF-8 locale), creates the non-root user, then runs `./install.sh --headless`.
+That means the container and a local machine install the exact same toolset from
+the same script — `install.sh` is the single source of truth. `--headless`
+skips the GUI-only pieces (alacritty + Nerd Font) that belong on the host.
+
 # Design Information
 
 ## Getting GH and Git to work
