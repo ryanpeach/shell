@@ -171,6 +171,47 @@ else
 fi
 
 # ---------------------------------------------------------------------------
+# Rust (via rustup) - apt's rustc lags; rustup gives cargo + rust-analyzer
+# ---------------------------------------------------------------------------
+
+if have cargo || [ -x "$HOME/.cargo/bin/cargo" ]; then
+  log "Rust already installed"
+else
+  log "Installing Rust via rustup"
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+    | sh -s -- -y --no-modify-path
+fi
+
+# Make cargo available for the rest of this run (the dotfiles add it to PATH).
+if [ -x "$HOME/.cargo/bin/cargo" ]; then
+  export PATH="$HOME/.cargo/bin:$PATH"
+fi
+
+if have rustup && ! have rust-analyzer; then
+  log "Adding rust-analyzer component"
+  rustup component add rust-analyzer || warn "Could not add rust-analyzer component"
+fi
+
+# ---------------------------------------------------------------------------
+# Deno (JavaScript/TypeScript runtime) - not in apt, use official installer
+# ---------------------------------------------------------------------------
+
+if have deno || [ -x "$HOME/.deno/bin/deno" ]; then
+  log "Deno already installed"
+else
+  log "Installing Deno"
+  # DENO_INSTALL pins the location; -y skips the interactive PATH/shell prompts.
+  curl -fsSL https://deno.land/install.sh | DENO_INSTALL="$HOME/.deno" sh -s -- -y
+fi
+
+# The dotfiles put ~/.cargo/bin and ~/.local/bin on PATH but not ~/.deno/bin,
+# so expose deno via ~/.local/bin.
+if [ -x "$HOME/.deno/bin/deno" ] && ! have deno; then
+  ln -sf "$HOME/.deno/bin/deno" "$HOME/.local/bin/deno"
+  log "Linked deno -> ~/.local/bin/deno"
+fi
+
+# ---------------------------------------------------------------------------
 # Oh My Zsh + plugins + powerlevel10k theme
 # ---------------------------------------------------------------------------
 
