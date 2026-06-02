@@ -302,13 +302,32 @@ fi
 # Oh My Zsh + plugins + powerlevel10k theme
 # ---------------------------------------------------------------------------
 
-if [ -d "$HOME/.oh-my-zsh" ]; then
+# Check for the actual entrypoint file, not just the directory -- a failed
+# install can leave an empty/partial ~/.oh-my-zsh behind.
+if [ -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]; then
   log "Oh My Zsh already installed"
 else
   log "Installing Oh My Zsh (unattended)"
-  # RUNZSH/CHSH off so the installer doesn't launch a shell or prompt.
-  RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+  # Download to a file first so a failed curl can't silently no-op (the old
+  # `sh -c "$(curl ...)"` form runs an empty script and exits 0 on failure).
+  omz_installer="$(mktemp)"
+  if curl -fsSL -o "$omz_installer" \
+      https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh; then
+    # RUNZSH/CHSH off so the installer doesn't launch a shell or prompt.
+    RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh "$omz_installer" --unattended \
+      || warn "The Oh My Zsh installer exited with an error."
+  else
+    warn "Could not download the Oh My Zsh installer (network/proxy?)."
+  fi
+  rm -f "$omz_installer"
+
+  # The .zshrc sources oh-my-zsh.sh unconditionally, so make a missing install
+  # loud rather than letting every future zsh startup error out.
+  if [ ! -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]; then
+    err "Oh My Zsh did not install: $HOME/.oh-my-zsh/oh-my-zsh.sh is missing."
+    err "zsh will error on startup until this is fixed. Re-run install.sh once"
+    err "you have network access to raw.githubusercontent.com and github.com."
+  fi
 fi
 
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
