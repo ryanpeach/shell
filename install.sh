@@ -116,6 +116,21 @@ if ! have brew; then
   exit 1
 fi
 
+# Persist Homebrew on PATH for future shells. Everything below installs into
+# the Homebrew prefix, so a shell that can't find brew won't find zsh, stow,
+# just, etc. The stowed .zshrc already adds the Homebrew prefix, so zsh is
+# covered (and we must NOT append to it -- it's a symlink into this repo).
+# bash, however, needs help: add brew's shellenv to the user's bash startup.
+brew_shellenv_line="eval \"\$($(brew --prefix)/bin/brew shellenv)\""
+for rc in "$HOME/.bashrc" "$HOME/.profile"; do
+  # Always seed ~/.bashrc; only touch ~/.profile if it already exists.
+  [ -f "$rc" ] || [ "$rc" = "$HOME/.bashrc" ] || continue
+  if ! grep -qsF 'brew shellenv' "$rc"; then
+    printf '\n# Homebrew (added by shell/install.sh)\n%s\n' "$brew_shellenv_line" >> "$rc"
+    log "Added Homebrew to $rc"
+  fi
+done
+
 # ---------------------------------------------------------------------------
 # Homebrew formulae (cross-platform)
 # ---------------------------------------------------------------------------
@@ -335,11 +350,17 @@ fi
 # ---------------------------------------------------------------------------
 
 log "Done."
-cat <<'EOF'
+cat <<EOF
+
+The tools were installed via Homebrew (prefix: $(brew --prefix)). To use them
+they must be on your PATH:
+
+  - This shell, right now:   eval "\$($(brew --prefix)/bin/brew shellenv)"
+  - New bash shells:         already set up in ~/.bashrc
+  - zsh:                     handled by this repo's .zshrc (run: exec zsh)
 
 Next steps:
-  - Restart your terminal, or run:  exec zsh
-  - Make zsh your default shell:    chsh -s "$(command -v zsh)"
+  - Make zsh your default shell:  chsh -s "\$(command -v zsh)"
   - On Linux, set your terminal font to "JetBrainsMono Nerd Font".
     On macOS it's installed via Homebrew cask and available immediately.
 EOF
