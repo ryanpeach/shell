@@ -4,9 +4,36 @@ My personal customed shell as a docker container
 
 # Install in Terminal
 
+## Bootstrap a blank terminal (macOS or Ubuntu)
+
+If you want the tools this shell expects on a fresh machine, without the Docker
+container, run the installer:
+
+```bash
+./install.sh
+```
+
+It uses **Homebrew** as the primary package manager, so the same script works
+on both **macOS** and **Ubuntu/Linux**. It installs Homebrew (and, on Linux,
+the apt build prerequisites it needs), then `brew install`s the core tools
+(`just`, `stow`, zsh, `ripgrep`, `fzf`, `eza`, `bat`, `git-delta`, `yq`, `uv`,
+`gh`, `go`, k8s tooling, etc.). Rust (rustup), `nvm` (which installs the latest
+LTS Node), Oh My Zsh + powerlevel10k, and Claude Code are installed via their
+own cross-platform installers, and the JetBrainsMono Nerd Font + alacritty are
+installed per-OS
+(Homebrew cask on macOS, apt/release download on Linux). Finally it stows the
+dotfiles from `./home` into your `$HOME`.
+
+It is safe to re-run. Pass `--no-stow` to install the tools without touching
+your dotfiles.
+
+This is the cross-platform counterpart to the Alpine-based `Dockerfile`.
+
 ## Install Nerdfonts
 
-Do this in your terminal, not in the container
+`install.sh` already installs the JetBrainsMono Nerd Font (the one this config
+is tested with). If you want a different font, or the full collection, do this
+in your terminal, not in the container:
 
 ```bash
 git clone --depth=1 https://github.com/ryanoasis/nerd-fonts.git
