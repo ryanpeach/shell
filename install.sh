@@ -212,6 +212,21 @@ if [ -x "$HOME/.deno/bin/deno" ] && ! have deno; then
 fi
 
 # ---------------------------------------------------------------------------
+# nvm (Node Version Manager) - the .zshrc already sources it from ~/.nvm
+# ---------------------------------------------------------------------------
+
+NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+  log "nvm already installed"
+else
+  log "Installing nvm"
+  # PROFILE=/dev/null stops the installer from editing shell rc files; the
+  # stowed .zshrc already sources $NVM_DIR/nvm.sh itself.
+  PROFILE=/dev/null bash -c \
+    "curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash"
+fi
+
+# ---------------------------------------------------------------------------
 # Oh My Zsh + plugins + powerlevel10k theme
 # ---------------------------------------------------------------------------
 
