@@ -57,6 +57,10 @@ as_root() {
   fi
 }
 
+# Put user-local bin dirs on PATH for this run so re-runs detect tools that
+# install there (e.g. Claude Code, rustup) instead of reinstalling them.
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+
 OS="$(uname -s)" # Darwin (macOS) or Linux
 
 # ---------------------------------------------------------------------------
