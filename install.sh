@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 #
-# install.sh - Bootstrap this shell config on a blank apt-based terminal.
+# install.sh - Bootstrap this shell config on macOS or Ubuntu via Homebrew.
 #
-# This is the apt/Debian/Ubuntu counterpart to the Alpine-based Dockerfile.
-# It installs the tools this shell expects, then stows the dotfiles in ./home.
+# Homebrew is the primary package manager so the same script works on both
+# macOS and Linux. A thin per-OS layer handles the few things brew can't do
+# cross-platform (GUI app + fonts).
 #
 # Usage:
 #   ./install.sh            # install everything, then stow
@@ -20,11 +21,15 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DO_STOW=1
 
+usage() {
+  sed -n '3,13p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+}
+
 for arg in "$@"; do
   case "$arg" in
     --no-stow) DO_STOW=0 ;;
     -h | --help)
-      sed -n '2,18p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+      usage
       exit 0
       ;;
     *)
@@ -52,132 +57,175 @@ as_root() {
   fi
 }
 
+OS="$(uname -s)" # Darwin (macOS) or Linux
+
 # ---------------------------------------------------------------------------
-# Preconditions
+# Prerequisites
 # ---------------------------------------------------------------------------
 
-if ! have apt-get; then
-  err "apt-get not found. This installer only supports apt-based systems"
-  err "(Debian, Ubuntu, and derivatives). See the Dockerfile for Alpine."
+if [ "$OS" = "Darwin" ]; then
+  # Homebrew needs the Xcode Command Line Tools (git, compilers).
+  if ! xcode-select -p >/dev/null 2>&1; then
+    log "Installing Xcode Command Line Tools (a GUI prompt may appear)"
+    xcode-select --install || warn "Could not trigger Xcode CLT install; do it manually if brew fails."
+  fi
+elif [ "$OS" = "Linux" ]; then
+  # On Debian/Ubuntu, install the handful of packages Homebrew (and the Nerd
+  # Font + alacritty steps) need before brew can take over.
+  if have apt-get; then
+    export DEBIAN_FRONTEND=noninteractive
+    log "Installing Linux prerequisites via apt"
+    as_root apt-get update -y
+    as_root apt-get install -y --no-install-recommends \
+      build-essential procps curl file git unzip fontconfig \
+      || warn "Some apt prerequisites failed to install."
+  else
+    warn "apt-get not found; assuming build prerequisites for Homebrew are already present."
+  fi
+else
+  err "Unsupported OS '$OS'. This installer supports macOS and Linux."
   exit 1
 fi
 
-export DEBIAN_FRONTEND=noninteractive
-
 # ---------------------------------------------------------------------------
-# apt packages
+# Homebrew
 # ---------------------------------------------------------------------------
 
-# Packages available directly from the default apt repos. Names differ from
-# Alpine in a few cases (noted inline).
-APT_PACKAGES=(
+if ! have brew; then
+  if [ -x /opt/homebrew/bin/brew ] || [ -x /usr/local/bin/brew ] \
+    || [ -x /home/linuxbrew/.linuxbrew/bin/brew ] || [ -x "$HOME/.linuxbrew/bin/brew" ]; then
+    : # brew is installed but not yet on PATH; the shellenv step below fixes it.
+  else
+    log "Installing Homebrew"
+    NONINTERACTIVE=1 bash -c \
+      "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  fi
+fi
+
+# Put brew on PATH for the rest of this run (a fresh install isn't yet).
+for cand in /opt/homebrew/bin/brew /usr/local/bin/brew \
+  /home/linuxbrew/.linuxbrew/bin/brew "$HOME/.linuxbrew/bin/brew"; do
+  if [ -x "$cand" ]; then
+    eval "$("$cand" shellenv)"
+    break
+  fi
+done
+
+if ! have brew; then
+  err "Homebrew installation failed or brew is not on PATH. Cannot continue."
+  exit 1
+fi
+
+# ---------------------------------------------------------------------------
+# Homebrew formulae (cross-platform)
+# ---------------------------------------------------------------------------
+
+BREW_FORMULAE=(
   # Core / VCS
   git
   make
-  # Networking & remote
-  iputils-ping
-  dnsutils       # bind-tools on Alpine
-  sshpass
-  openssh-client
-  openssh-server
-  gnupg
-  pass
-  # Archive tools
-  unzip
-  tar
-  gzip
-  patch
-  # Download tools
-  curl
-  wget
-  rsync
-  # System utilities
-  sed
   stow
   gawk
   graphviz
+  # Search / navigation / files
   zoxide
   ripgrep
   fzf
   direnv
-  fd-find        # binary is fdfind; we symlink to fd below
-  bat            # binary is batcat; we symlink to bat below
-  # Languages / runtimes
-  golang-go
-  python3
-  python3-dev
-  python3-venv
-  python3-pip
-  nodejs
-  npm
-  # Misc
+  fd
+  bat
+  bat-extras
+  eza
+  yq
+  git-delta
   jq
+  # Editor / multiplexer
   tmux
   vim
-  fontconfig     # provides fc-cache for installing Nerd Fonts
-  build-essential # Homebrew + native build dependency
-  procps         # Homebrew dependency
-  file           # Homebrew dependency
-  # Terminal emulator (config lives in home/.alacritty*)
-  alacritty
+  # Security / remote
+  gnupg
+  pass
+  openssh
+  rsync
+  wget
+  curl
+  # Languages / runtimes (rust + nvm handled separately below)
+  go
+  node
+  python
+  deno
+  uv
+  just
   # Shell
   zsh
-  zsh-autosuggestions
-  zsh-syntax-highlighting
+  shfmt
+  # Dev tooling
+  gh
+  lazygit
+  # Kubernetes
+  kubectl
+  k9s
+  helm
+  helmfile
 )
 
-log "Updating apt package lists"
-as_root apt-get update -y
-
-log "Installing apt packages"
-# Install one at a time so a single unavailable package on an older release
-# doesn't abort the whole run.
-for pkg in "${APT_PACKAGES[@]}"; do
-  if dpkg -s "$pkg" >/dev/null 2>&1; then
+log "Installing Homebrew formulae"
+# Install one at a time so a single unavailable/relocated formula doesn't
+# abort the whole run.
+for formula in "${BREW_FORMULAE[@]}"; do
+  if brew list --formula "$formula" >/dev/null 2>&1; then
     continue
   fi
-  if ! as_root apt-get install -y --no-install-recommends "$pkg"; then
-    warn "Could not install '$pkg' from apt; skipping. Install it manually if you need it."
+  if ! brew install "$formula"; then
+    warn "Could not install '$formula' via brew; skipping."
   fi
 done
 
-# Debian/Ubuntu ship these under different binary names. Provide the
-# conventional names in ~/.local/bin so the dotfiles' aliases work.
-mkdir -p "$HOME/.local/bin"
-if have fdfind && ! have fd; then
-  ln -sf "$(command -v fdfind)" "$HOME/.local/bin/fd"
-  log "Linked fdfind -> ~/.local/bin/fd"
-fi
-if have batcat && ! have bat; then
-  ln -sf "$(command -v batcat)" "$HOME/.local/bin/bat"
-  log "Linked batcat -> ~/.local/bin/bat"
-fi
-
 # ---------------------------------------------------------------------------
-# just (command runner) - not reliably packaged in apt, use official installer
+# Terminal emulator + Nerd Font (per-OS: cask on macOS, native on Linux)
 # ---------------------------------------------------------------------------
 
-if have just; then
-  log "just already installed ($(just --version))"
+if [ "$OS" = "Darwin" ]; then
+  # Casks are macOS-only.
+  for cask in alacritty font-jetbrains-mono-nerd-font; do
+    if brew list --cask "$cask" >/dev/null 2>&1; then
+      log "$cask already installed"
+    else
+      log "Installing $cask"
+      brew install --cask "$cask" || warn "Could not install cask '$cask'."
+    fi
+  done
 else
-  log "Installing just to ~/.local/bin"
-  curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh \
-    | bash -s -- --to "$HOME/.local/bin"
+  # Linux: alacritty from apt, JetBrainsMono Nerd Font from the release.
+  if have apt-get && ! have alacritty; then
+    log "Installing alacritty via apt"
+    as_root apt-get install -y --no-install-recommends alacritty \
+      || warn "Could not install alacritty from apt (not packaged on this release?)."
+  fi
+
+  FONT_DIR="$HOME/.local/share/fonts"
+  if ls "$FONT_DIR"/JetBrainsMono*NerdFont*.ttf >/dev/null 2>&1; then
+    log "JetBrainsMono Nerd Font already installed"
+  else
+    log "Installing JetBrainsMono Nerd Font"
+    mkdir -p "$FONT_DIR"
+    font_tmp="$(mktemp -d)"
+    if curl -fsSL -o "$font_tmp/JetBrainsMono.zip" \
+        https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip; then
+      unzip -oq "$font_tmp/JetBrainsMono.zip" -d "$FONT_DIR" -x "*.md" "LICENSE*"
+      if have fc-cache; then
+        fc-cache -f "$FONT_DIR" >/dev/null 2>&1 || true
+      fi
+      log "JetBrainsMono Nerd Font installed to $FONT_DIR"
+    else
+      warn "Could not download JetBrainsMono Nerd Font; skipping."
+    fi
+    rm -rf "$font_tmp"
+  fi
 fi
 
 # ---------------------------------------------------------------------------
-# uv (Python tool/runtime manager)
-# ---------------------------------------------------------------------------
-
-if have uv; then
-  log "uv already installed ($(uv --version))"
-else
-  log "Installing uv"
-  curl -LsSf https://astral.sh/uv/install.sh | sh
-fi
-
-# ---------------------------------------------------------------------------
-# Rust (via rustup) - apt's rustc lags; rustup gives cargo + rust-analyzer
+# Rust (via rustup) - keeps cargo in ~/.cargo/bin as the .zshrc expects
 # ---------------------------------------------------------------------------
 
 if have cargo || [ -x "$HOME/.cargo/bin/cargo" ]; then
@@ -188,33 +236,12 @@ else
     | sh -s -- -y --no-modify-path
 fi
 
-# Make cargo available for the rest of this run (the dotfiles add it to PATH).
 if [ -x "$HOME/.cargo/bin/cargo" ]; then
   export PATH="$HOME/.cargo/bin:$PATH"
 fi
-
 if have rustup && ! have rust-analyzer; then
   log "Adding rust-analyzer component"
   rustup component add rust-analyzer || warn "Could not add rust-analyzer component"
-fi
-
-# ---------------------------------------------------------------------------
-# Deno (JavaScript/TypeScript runtime) - not in apt, use official installer
-# ---------------------------------------------------------------------------
-
-if have deno || [ -x "$HOME/.deno/bin/deno" ]; then
-  log "Deno already installed"
-else
-  log "Installing Deno"
-  # DENO_INSTALL pins the location; -y skips the interactive PATH/shell prompts.
-  curl -fsSL https://deno.land/install.sh | DENO_INSTALL="$HOME/.deno" sh -s -- -y
-fi
-
-# The dotfiles put ~/.cargo/bin and ~/.local/bin on PATH but not ~/.deno/bin,
-# so expose deno via ~/.local/bin.
-if [ -x "$HOME/.deno/bin/deno" ] && ! have deno; then
-  ln -sf "$HOME/.deno/bin/deno" "$HOME/.local/bin/deno"
-  log "Linked deno -> ~/.local/bin/deno"
 fi
 
 # ---------------------------------------------------------------------------
@@ -233,24 +260,6 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# gh (GitHub CLI) - via GitHub's official apt repository
-# ---------------------------------------------------------------------------
-
-if have gh; then
-  log "gh already installed ($(gh --version | head -1))"
-else
-  log "Installing GitHub CLI (gh)"
-  as_root mkdir -p -m 755 /etc/apt/keyrings
-  wget -nv -O- https://cli.github.com/packages/githubcli-archive-keyring.gpg \
-    | as_root tee /etc/apt/keyrings/githubcli-archive-keyring.gpg >/dev/null
-  as_root chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
-  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
-    | as_root tee /etc/apt/sources.list.d/github-cli.list >/dev/null
-  as_root apt-get update -y
-  as_root apt-get install -y gh || warn "Could not install gh from its apt repo."
-fi
-
-# ---------------------------------------------------------------------------
 # Claude Code (Anthropic CLI) - native installer to ~/.local/bin
 # ---------------------------------------------------------------------------
 
@@ -259,20 +268,6 @@ if have claude; then
 else
   log "Installing Claude Code"
   curl -fsSL https://claude.ai/install.sh | bash || warn "Could not install Claude Code."
-fi
-
-# ---------------------------------------------------------------------------
-# Homebrew (Linuxbrew) - the .zshrc already adds it to PATH
-# ---------------------------------------------------------------------------
-
-if have brew || [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
-  log "Homebrew already installed"
-else
-  log "Installing Homebrew"
-  # NONINTERACTIVE skips the prompt/confirmation; the installer handles sudo.
-  NONINTERACTIVE=1 bash -c \
-    "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" \
-    || warn "Could not install Homebrew."
 fi
 
 # ---------------------------------------------------------------------------
@@ -308,30 +303,6 @@ clone_if_missing https://github.com/romkatv/powerlevel10k.git \
   "$ZSH_CUSTOM/themes/powerlevel10k"
 
 # ---------------------------------------------------------------------------
-# Nerd Fonts (JetBrainsMono - the font this config is tested with)
-# ---------------------------------------------------------------------------
-
-FONT_DIR="$HOME/.local/share/fonts"
-if ls "$FONT_DIR"/JetBrainsMono*NerdFont*.ttf >/dev/null 2>&1; then
-  log "JetBrainsMono Nerd Font already installed"
-else
-  log "Installing JetBrainsMono Nerd Font"
-  mkdir -p "$FONT_DIR"
-  font_tmp="$(mktemp -d)"
-  if curl -fsSL -o "$font_tmp/JetBrainsMono.zip" \
-      https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip; then
-    unzip -oq "$font_tmp/JetBrainsMono.zip" -d "$FONT_DIR" -x "*.md" "LICENSE*"
-    if have fc-cache; then
-      fc-cache -f "$FONT_DIR" >/dev/null 2>&1 || true
-    fi
-    log "JetBrainsMono Nerd Font installed to $FONT_DIR"
-  else
-    warn "Could not download JetBrainsMono Nerd Font; skipping."
-  fi
-  rm -rf "$font_tmp"
-fi
-
-# ---------------------------------------------------------------------------
 # Stow the dotfiles from ./home into $HOME
 # ---------------------------------------------------------------------------
 
@@ -356,9 +327,6 @@ cat <<'EOF'
 Next steps:
   - Restart your terminal, or run:  exec zsh
   - Make zsh your default shell:    chsh -s "$(command -v zsh)"
-  - Ensure ~/.local/bin is on your PATH (the dotfiles handle this in zsh).
-
-Some tools from the Docker image are not in the default apt repos and were
-skipped (e.g. eza, git-delta, yq, k9s, helm, kubectl, shfmt). Install those
-from their upstream releases if you need them.
+  - On Linux, set your terminal font to "JetBrainsMono Nerd Font".
+    On macOS it's installed via Homebrew cask and available immediately.
 EOF

@@ -4,25 +4,29 @@ My personal customed shell as a docker container
 
 # Install in Terminal
 
-## Bootstrap a blank apt-based terminal
+## Bootstrap a blank terminal (macOS or Ubuntu)
 
-If you're on a fresh Debian/Ubuntu (or derivative) machine and want the tools
-this shell expects without the Docker container, run the installer:
+If you want the tools this shell expects on a fresh machine, without the Docker
+container, run the installer:
 
 ```bash
 ./install.sh
 ```
 
-It checks for `apt`, installs the core tools (`just`, `stow`, zsh + plugins,
-`ripgrep`, `fzf`, `uv`, `gh`, Rust, Deno, `nvm`, Homebrew, `alacritty`, Claude
-Code, etc.), installs Oh My Zsh and powerlevel10k, installs the JetBrainsMono
-Nerd Font, then stows the dotfiles from `./home` into your `$HOME`. It is safe
-to re-run. Pass `--no-stow` to install the tools without touching your
-dotfiles.
+It uses **Homebrew** as the primary package manager, so the same script works
+on both **macOS** and **Ubuntu/Linux**. It installs Homebrew (and, on Linux,
+the apt build prerequisites it needs), then `brew install`s the core tools
+(`just`, `stow`, zsh, `ripgrep`, `fzf`, `eza`, `bat`, `git-delta`, `yq`, `uv`,
+`gh`, `go`, `node`, k8s tooling, etc.). Rust (rustup), `nvm`, Oh My Zsh +
+powerlevel10k, and Claude Code are installed via their own cross-platform
+installers, and the JetBrainsMono Nerd Font + alacritty are installed per-OS
+(Homebrew cask on macOS, apt/release download on Linux). Finally it stows the
+dotfiles from `./home` into your `$HOME`.
 
-This is the apt counterpart to the Alpine-based `Dockerfile`; a few tools that
-aren't in the default apt repos (e.g. `eza`, `git-delta`, `k9s`, `helm`) are
-skipped and noted at the end of the run.
+It is safe to re-run. Pass `--no-stow` to install the tools without touching
+your dotfiles.
+
+This is the cross-platform counterpart to the Alpine-based `Dockerfile`.
 
 ## Install Nerdfonts
 
