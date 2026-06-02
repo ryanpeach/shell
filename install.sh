@@ -266,12 +266,19 @@ fi
 # nvm (Node Version Manager) - the .zshrc already sources it from ~/.nvm
 # ---------------------------------------------------------------------------
 
-NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+# Pin to $HOME/.nvm to match what the stowed .zshrc hardcodes (don't inherit a
+# stray NVM_DIR from the environment, or nvm would land somewhere .zshrc can't
+# source).
+NVM_DIR="$HOME/.nvm"
 export NVM_DIR
 if [ -s "$NVM_DIR/nvm.sh" ]; then
   log "nvm already installed"
 else
   log "Installing nvm"
+  # Create NVM_DIR first: with NVM_DIR exported, nvm's installer aborts with
+  # "you have NVM_DIR set to ... but that directory does not exist" unless the
+  # directory already exists (e.g. when XDG_CONFIG_HOME changes nvm's default).
+  mkdir -p "$NVM_DIR"
   # PROFILE=/dev/null stops the installer from editing shell rc files; the
   # stowed .zshrc already sources $NVM_DIR/nvm.sh itself.
   PROFILE=/dev/null bash -c \
