@@ -7,9 +7,8 @@
 # cross-platform (GUI app + fonts).
 #
 # Usage:
-#   ./install.sh             # install everything, then stow
-#   ./install.sh --no-stow   # install tools but skip stowing dotfiles
-#   ./install.sh --headless  # skip GUI-only bits (alacritty + Nerd Font)
+#   ./install.sh            # install everything, then stow
+#   ./install.sh --no-stow  # install tools but skip stowing dotfiles
 #
 # Safe to re-run: every step checks for what it needs before doing work.
 
@@ -21,16 +20,14 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DO_STOW=1
-DO_GUI=1
 
 usage() {
-  sed -n '3,14p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+  sed -n '3,13p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
 }
 
 for arg in "$@"; do
   case "$arg" in
     --no-stow) DO_STOW=0 ;;
-    --headless) DO_GUI=0 ;;
     -h | --help)
       usage
       exit 0
@@ -185,12 +182,9 @@ done
 
 # ---------------------------------------------------------------------------
 # Terminal emulator + Nerd Font (per-OS: cask on macOS, native on Linux)
-# Skipped with --headless (e.g. in a container or on a server).
 # ---------------------------------------------------------------------------
 
-if [ "$DO_GUI" -eq 0 ]; then
-  log "Skipping alacritty + Nerd Font (--headless)"
-elif [ "$OS" = "Darwin" ]; then
+if [ "$OS" = "Darwin" ]; then
   # Casks are macOS-only.
   for cask in alacritty font-jetbrains-mono-nerd-font; do
     if brew list --cask "$cask" >/dev/null 2>&1; then
