@@ -4,6 +4,24 @@ My personal customed shell as a docker container
 
 # Install in Terminal
 
+## Bootstrap a blank apt-based terminal
+
+If you're on a fresh Debian/Ubuntu (or derivative) machine and want the tools
+this shell expects without the Docker container, run the installer:
+
+```bash
+./install.sh
+```
+
+It checks for `apt`, installs the core tools (`just`, `stow`, zsh + plugins,
+`ripgrep`, `fzf`, `uv`, etc.), installs Oh My Zsh and powerlevel10k, then stows
+the dotfiles from `./home` into your `$HOME`. It is safe to re-run. Pass
+`--no-stow` to install the tools without touching your dotfiles.
+
+This is the apt counterpart to the Alpine-based `Dockerfile`; a few tools that
+aren't in the default apt repos (e.g. `eza`, `git-delta`, `k9s`, `helm`) are
+skipped and noted at the end of the run.
+
 ## Install Nerdfonts
 
 Do this in your terminal, not in the container
