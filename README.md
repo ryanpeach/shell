@@ -14,9 +14,11 @@ this shell expects without the Docker container, run the installer:
 ```
 
 It checks for `apt`, installs the core tools (`just`, `stow`, zsh + plugins,
-`ripgrep`, `fzf`, `uv`, etc.), installs Oh My Zsh and powerlevel10k, then stows
-the dotfiles from `./home` into your `$HOME`. It is safe to re-run. Pass
-`--no-stow` to install the tools without touching your dotfiles.
+`ripgrep`, `fzf`, `uv`, `gh`, Rust, Deno, `nvm`, Homebrew, `alacritty`, Claude
+Code, etc.), installs Oh My Zsh and powerlevel10k, installs the JetBrainsMono
+Nerd Font, then stows the dotfiles from `./home` into your `$HOME`. It is safe
+to re-run. Pass `--no-stow` to install the tools without touching your
+dotfiles.
 
 This is the apt counterpart to the Alpine-based `Dockerfile`; a few tools that
 aren't in the default apt repos (e.g. `eza`, `git-delta`, `k9s`, `helm`) are
@@ -24,7 +26,9 @@ skipped and noted at the end of the run.
 
 ## Install Nerdfonts
 
-Do this in your terminal, not in the container
+`install.sh` already installs the JetBrainsMono Nerd Font (the one this config
+is tested with). If you want a different font, or the full collection, do this
+in your terminal, not in the container:
 
 ```bash
 git clone --depth=1 https://github.com/ryanoasis/nerd-fonts.git

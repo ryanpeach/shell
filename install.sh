@@ -114,6 +114,12 @@ APT_PACKAGES=(
   jq
   tmux
   vim
+  fontconfig     # provides fc-cache for installing Nerd Fonts
+  build-essential # Homebrew + native build dependency
+  procps         # Homebrew dependency
+  file           # Homebrew dependency
+  # Terminal emulator (config lives in home/.alacritty*)
+  alacritty
   # Shell
   zsh
   zsh-autosuggestions
@@ -227,6 +233,49 @@ else
 fi
 
 # ---------------------------------------------------------------------------
+# gh (GitHub CLI) - via GitHub's official apt repository
+# ---------------------------------------------------------------------------
+
+if have gh; then
+  log "gh already installed ($(gh --version | head -1))"
+else
+  log "Installing GitHub CLI (gh)"
+  as_root mkdir -p -m 755 /etc/apt/keyrings
+  wget -nv -O- https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+    | as_root tee /etc/apt/keyrings/githubcli-archive-keyring.gpg >/dev/null
+  as_root chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+    | as_root tee /etc/apt/sources.list.d/github-cli.list >/dev/null
+  as_root apt-get update -y
+  as_root apt-get install -y gh || warn "Could not install gh from its apt repo."
+fi
+
+# ---------------------------------------------------------------------------
+# Claude Code (Anthropic CLI) - native installer to ~/.local/bin
+# ---------------------------------------------------------------------------
+
+if have claude; then
+  log "Claude Code already installed"
+else
+  log "Installing Claude Code"
+  curl -fsSL https://claude.ai/install.sh | bash || warn "Could not install Claude Code."
+fi
+
+# ---------------------------------------------------------------------------
+# Homebrew (Linuxbrew) - the .zshrc already adds it to PATH
+# ---------------------------------------------------------------------------
+
+if have brew || [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+  log "Homebrew already installed"
+else
+  log "Installing Homebrew"
+  # NONINTERACTIVE skips the prompt/confirmation; the installer handles sudo.
+  NONINTERACTIVE=1 bash -c \
+    "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" \
+    || warn "Could not install Homebrew."
+fi
+
+# ---------------------------------------------------------------------------
 # Oh My Zsh + plugins + powerlevel10k theme
 # ---------------------------------------------------------------------------
 
@@ -257,6 +306,30 @@ clone_if_missing https://github.com/zsh-users/zsh-syntax-highlighting.git \
   "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
 clone_if_missing https://github.com/romkatv/powerlevel10k.git \
   "$ZSH_CUSTOM/themes/powerlevel10k"
+
+# ---------------------------------------------------------------------------
+# Nerd Fonts (JetBrainsMono - the font this config is tested with)
+# ---------------------------------------------------------------------------
+
+FONT_DIR="$HOME/.local/share/fonts"
+if ls "$FONT_DIR"/JetBrainsMono*NerdFont*.ttf >/dev/null 2>&1; then
+  log "JetBrainsMono Nerd Font already installed"
+else
+  log "Installing JetBrainsMono Nerd Font"
+  mkdir -p "$FONT_DIR"
+  font_tmp="$(mktemp -d)"
+  if curl -fsSL -o "$font_tmp/JetBrainsMono.zip" \
+      https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip; then
+    unzip -oq "$font_tmp/JetBrainsMono.zip" -d "$FONT_DIR" -x "*.md" "LICENSE*"
+    if have fc-cache; then
+      fc-cache -f "$FONT_DIR" >/dev/null 2>&1 || true
+    fi
+    log "JetBrainsMono Nerd Font installed to $FONT_DIR"
+  else
+    warn "Could not download JetBrainsMono Nerd Font; skipping."
+  fi
+  rm -rf "$font_tmp"
+fi
 
 # ---------------------------------------------------------------------------
 # Stow the dotfiles from ./home into $HOME
