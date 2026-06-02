@@ -17,9 +17,10 @@ It uses **Homebrew** as the primary package manager, so the same script works
 on both **macOS** and **Ubuntu/Linux**. It installs Homebrew (and, on Linux,
 the apt build prerequisites it needs), then `brew install`s the core tools
 (`just`, `stow`, zsh, `ripgrep`, `fzf`, `eza`, `bat`, `git-delta`, `yq`, `uv`,
-`gh`, `go`, `node`, k8s tooling, etc.). Rust (rustup), `nvm`, Oh My Zsh +
-powerlevel10k, and Claude Code are installed via their own cross-platform
-installers, and the JetBrainsMono Nerd Font + alacritty are installed per-OS
+`gh`, `go`, k8s tooling, etc.). Rust (rustup), `nvm` (which installs the latest
+LTS Node), Oh My Zsh + powerlevel10k, and Claude Code are installed via their
+own cross-platform installers, and the JetBrainsMono Nerd Font + alacritty are
+installed per-OS
 (Homebrew cask on macOS, apt/release download on Linux). Finally it stows the
 dotfiles from `./home` into your `$HOME`.
 

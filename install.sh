@@ -149,9 +149,8 @@ BREW_FORMULAE=(
   rsync
   wget
   curl
-  # Languages / runtimes (rust + nvm handled separately below)
+  # Languages / runtimes (rust + node-via-nvm handled separately below)
   go
-  node
   python
   deno
   uv
@@ -249,6 +248,7 @@ fi
 # ---------------------------------------------------------------------------
 
 NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+export NVM_DIR
 if [ -s "$NVM_DIR/nvm.sh" ]; then
   log "nvm already installed"
 else
@@ -257,6 +257,19 @@ else
   # stowed .zshrc already sources $NVM_DIR/nvm.sh itself.
   PROFILE=/dev/null bash -c \
     "curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash"
+fi
+
+# Install a Node runtime through nvm (node is no longer installed via brew).
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+  # shellcheck disable=SC1090,SC1091
+  . "$NVM_DIR/nvm.sh"
+  if ! nvm which default >/dev/null 2>&1; then
+    log "Installing latest LTS Node via nvm"
+    nvm install --lts && nvm alias default 'lts/*' \
+      || warn "Could not install Node via nvm; run 'nvm install --lts' later."
+  else
+    log "Node already installed via nvm ($(nvm version default))"
+  fi
 fi
 
 # ---------------------------------------------------------------------------
