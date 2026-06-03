@@ -232,7 +232,7 @@ build-deps () {
 # I am going to set up neofetch to run on clear, because I often have a local terminal and this terminal open at the same time
 # and I want to clearly see which is which
 alias trueclear="clear"
-alias clear="trueclear && neofetch"
+alias clear="trueclear && fastfetch"
 
 # Load environment variables from a file
 function dotenv() {
@@ -318,4 +318,4 @@ install_pre_commit_hooks() {
 add-zsh-hook chpwd install_pre_commit_hooks
 
 # Neofetch
-neofetch
+fastfetch
