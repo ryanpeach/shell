@@ -14,7 +14,7 @@ if [[ "$MNT" != "$HOME" ]]; then
 fi
 
 # If you come from bash you might have to change your $PATH.
-export PATH=$HOME/bin:/usr/local/bin:$HOME/.local/bin:$PATH:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin:$HOME/.cargo/bin
+export PATH=$HOME/bin:/usr/local/bin:$HOME/.local/bin:$PATH:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin:$HOME/.cargo/bin:$HOME/go/bin
 
 # Add docker to path
 export PATH=$PATH:$HOME/.docker/bin
@@ -319,3 +319,13 @@ add-zsh-hook chpwd install_pre_commit_hooks
 
 # Neofetch
 fastfetch
+
+# bun completions
+[ -s "/Users/ryanpeach/.bun/_bun" ] && source "/Users/ryanpeach/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+. "/Users/ryanpeach/.deno/env"
+
+alias mount_nas='mount_smbfs //ryanpeach@100.95.80.108/Default ~/Desktop/NAS'
